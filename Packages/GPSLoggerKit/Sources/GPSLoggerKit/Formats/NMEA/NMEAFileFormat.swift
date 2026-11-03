@@ -14,7 +14,7 @@ public struct NMEAFileFormat: FileFormat {
     /// At least three syntactically valid sentences among the lines of the prefix.
     public func matches(prefix: Data) -> Bool {
         var valid = 0
-        for line in Self.lines(of: prefix) {
+        for line in TextLines.lines(of: prefix, where: Self.isSentenceStart) {
             if case .valid = NMEASentence.validate(line.text) {
                 valid += 1
                 if valid >= 3 { return true }
@@ -38,42 +38,8 @@ public struct NMEAFileFormat: FileFormat {
         return ImportResult(recording: Recording(tracks: tracks, waypoints: waypoints), warnings: warnings)
     }
 
-    /// Splits data into lines (LF, CR or CRLF). Bytes are decoded as UTF-8 with replacement.
-    static func lines(of data: Data) -> [(number: Int, text: Substring)] {
-        var result: [(Int, Substring)] = []
-        forEachLine(in: data) { number, text in
-            result.append((number, text))
-            return true
-        }
-        return result
-    }
-
-    /// Calls `body` for every line that starts with `$` (other lines are skipped without decoding).
-    /// `body` returns `false` to stop.
-    static func forEachLine(in data: Data, _ body: (Int, Substring) throws -> Bool) rethrows {
-        try data.withUnsafeBytes { (buffer: UnsafeRawBufferPointer) in
-            let bytes = buffer.bindMemory(to: UInt8.self)
-            var lineNumber = 0
-            var start = 0
-            var i = 0
-            let count = bytes.count
-            while start < count {
-                i = start
-                while i < count, bytes[i] != 0x0A, bytes[i] != 0x0D { i += 1 }
-                lineNumber += 1
-                if i > start, bytes[start] == 0x24 {  // "$"
-                    let text = String(decoding: UnsafeBufferPointer(rebasing: bytes[start..<i]), as: UTF8.self)
-                    if try !body(lineNumber, Substring(text)) { return }
-                }
-                // Skip the terminator; CRLF counts as one line break.
-                if i < count, bytes[i] == 0x0D, i + 1 < count, bytes[i + 1] == 0x0A {
-                    start = i + 2
-                } else {
-                    start = i + 1
-                }
-            }
-        }
-    }
+    /// Only lines starting with `$` are NMEA sentences.
+    static func isSentenceStart(_ byte: UInt8) -> Bool { byte == 0x24 }
 }
 
 /// Reads one NMEA file: collects sentences per epoch (same UTC time) and resolves dates.
@@ -122,7 +88,7 @@ struct NMEAFileReader {
 
     mutating func read(_ data: Data) throws {
         var cancellation = CancellationCheck()
-        try NMEAFileFormat.forEachLine(in: data) { number, line in
+        try TextLines.forEachLine(in: data, where: NMEAFileFormat.isSentenceStart) { number, line in
             try cancellation.tick()
             switch NMEASentence.validate(line) {
             case .valid(let sentence): handle(sentence, line: number)
@@ -145,7 +111,7 @@ struct NMEAFileReader {
             startEpoch(NMEASentence.timeOfDay(s[0]), line: line)
             let valid = s[1] == "A" && s[11] != "N"
             guard valid else { return }
-            if let date = NMEASentence.date(ddmmyy: s[8]) { epoch?.date = date }
+            if let date = UTCTime.days(ddmmyy: s[8]) { epoch?.date = date }
             guard let position = position(s[2], s[3], s[4], s[5], line: line) else { return }
             epoch?.rmcPosition = position
             if let knots = NMEASentence.double(s[6]) { epoch?.speed = knots * 1852 / 3600 }
@@ -271,7 +237,7 @@ struct NMEAFileReader {
         quality.fix = e.dgps ? .dgps : e.gsaFix
         var point = TrackPoint(latitude: position.0, longitude: position.1, elevation: e.elevation, quality: quality)
         if let time = e.timeOfDay, let date = currentDate {
-            point.time = Self.date(days: date, timeOfDay: time)
+            point.time = UTCTime.date(days: date, timeOfDay: time)
         } else if e.timeOfDay != nil, firstUndated == nil {
             firstUndated = points.count
         }
@@ -286,7 +252,7 @@ struct NMEAFileReader {
                 guard let pointTime = timesOfDay[index] else { continue }
                 // Points later in the day than the first dated one must be from the previous day.
                 let day = pointTime > time ? date - 1 : date
-                points[index].time = Self.date(days: day, timeOfDay: pointTime)
+                points[index].time = UTCTime.date(days: day, timeOfDay: pointTime)
             }
             firstUndated = nil
         }
@@ -318,9 +284,5 @@ struct NMEAFileReader {
         points = []
         timesOfDay = []
         if undated > 0 { warnings.add(.missingDate, line: nil, count: undated) }
-    }
-
-    static func date(days: Int, timeOfDay: Int) -> Date {
-        Date(timeIntervalSince1970: Double(days) * 86_400 + Double(timeOfDay) / 1000)
     }
 }

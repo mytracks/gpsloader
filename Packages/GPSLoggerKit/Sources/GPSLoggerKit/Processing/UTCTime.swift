@@ -38,6 +38,24 @@ enum UTCTime {
 }
 
 /// Parser for ISO 8601 / XML Schema `dateTime` values as used in GPX.
+extension UTCTime {
+    /// `ddmmyy` as days since 1970; two-digit years are read as 1980...2079.
+    static func days(ddmmyy field: some StringProtocol) -> Int? {
+        guard field.count == 6, field.allSatisfy({ $0.isASCII && $0.isNumber }), let value = Int(field) else { return nil }
+        let day = value / 10_000
+        let month = value / 100 % 100
+        let yy = value % 100
+        let year = yy < 80 ? 2000 + yy : 1900 + yy
+        guard isValid(year: year, month: month, day: day) else { return nil }
+        return days(year: year, month: month, day: day)
+    }
+
+    /// Days since 1970 plus milliseconds since midnight as a date.
+    static func date(days: Int, timeOfDay: Int) -> Date {
+        Date(timeIntervalSince1970: Double(days) * 86_400 + Double(timeOfDay) / 1000)
+    }
+}
+
 enum ISO8601 {
     /// Parses `YYYY-MM-DDThh:mm:ss[.fff][Z|±hh:mm]`. Values without zone are UTC.
     /// Also accepts a date without time (`YYYY-MM-DD`) as midnight UTC.

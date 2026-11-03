@@ -90,8 +90,12 @@ context: |
       (GT-100/120/200/200e/600 über USB-HID, GT-800/Pro seriell).
     - Weiterhin über gpsbabel (nur in der Mac-App): Locosys SBP/SBN, Magellan Meridian/SporTrak,
       XAiOX iTrackU (gpsbabel), Alan Map500 und die übrigen Formate der myTracks-Formatliste.
-  - Reihenfolge: zuerst ein Change für Paketgerüst, NMEA und GPX-Eingang; danach je ein Change pro
-    Familie (Wintec, MTK, SkyTraq, Navilink, i-GotU, FIT/TCX/Suunto, IGC, CSV-Logger).
+  - Reihenfolge: zuerst ein Change für Paketgerüst, NMEA und GPX-Eingang (erledigt); danach je ein
+    Change pro Familie. Umgestellt am 2026-11-03: Familien mit öffentlicher Spezifikation zuerst
+    (IGC, FIT/TCX/Suunto, SkyTraq, Navilink, MTK, CSV-Logger). Wintec und i-GotU kommen zuletzt,
+    weil es dafür keine öffentliche Spezifikation gibt; sie brauchen Beispieldateien und gpsbabel-
+    Ausgaben des Entwicklers (Black-Box). Die NAL-Beschreibung in legacy-analysis.md stammt aus
+    wsg2000.c und ist deshalb keine zulässige Quelle.
 
   ## Umfang (entschieden)
   - Unterstützt wird der Gerätekatalog der Alt-App (docs/legacy-device-catalog.md) mit diesen Abweichungen:

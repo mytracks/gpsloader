@@ -14,6 +14,7 @@ data model and GPX 1.1 output.
 |---|---|---|---|
 | `nmea` | NMEA 0183 | yes | RMC, GGA, GLL, GSA, VTG, ZDA, WPL; any talker |
 | `gpx` | GPX 1.0 / 1.1 | yes | tracks and waypoints; routes are ignored |
+| `igc` | IGC (FAI flight recorder) | yes | B fixes with date from `HFDTE`, satellites from `SIU`; one track per file; task (C records) ignored |
 
 Output is always GPX 1.1 (`GPXWriter`).
 

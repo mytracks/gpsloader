@@ -120,6 +120,23 @@
         }
       }
     },
+    "format.igc": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IGC (Flugaufzeichnung)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IGC (flight recorder)"
+          }
+        }
+      }
+    },
     "format.nmea": {
       "extractionState": "manual",
       "localizations": {

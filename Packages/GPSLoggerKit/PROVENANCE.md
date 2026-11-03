@@ -38,3 +38,12 @@ read, translated, or copied. Each section heading is the format ID used in the c
 - Date/time values: XML Schema `dateTime` (W3C XML Schema Part 2) / ISO 8601.
 - The GPX writer is the author's own code from gpsloader (`setup-foundation`).
 - Test fixtures are synthetic.
+
+## `igc`
+
+- FAI/IGC: "Technical Specification for IGC-approved GNSS Flight Recorders", Appendix A (data file
+  format: A, H, I and B records, `HFDTE` in both the old `ddmmyy` and the newer `DATE:ddmmyy,nn`
+  form, extension code `SIU`). Published by the FAI International Gliding Commission on fai.org.
+- No third-party IGC reader (e.g. gpsbabel `igc.cc`) was consulted. myTracks had no IGC code of its
+  own; it called gpsbabel.
+- Test fixtures are synthetic, written by hand following the specification.

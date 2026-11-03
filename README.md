@@ -75,7 +75,7 @@ xcrun notarytool store-credentials gpsloader-notary --apple-id <Apple-ID> --team
 |---|---|
 | `App/` | AppKit-App (UI, Lokalisierung `Localizable.xcstrings`) |
 | `RosettaInstaller/` | Hilfs-App nur für x86_64; ihr Start löst den Rosetta-Installationsdialog von macOS aus |
-| `Packages/GPSLoggerKit/` | Eigenständiges Paket (MIT, macOS 12+ und iOS 27+): Datenmodell, Dateiformate (NMEA, GPX), GPX-Ausgabe. Wird später in ein eigenes Repository ausgelagert; siehe dessen `README.md` und `PROVENANCE.md` |
+| `Packages/GPSLoggerKit/` | Eigenständiges Paket (MIT, macOS 12+ und iOS 27+): Datenmodell, Dateiformate (NMEA, GPX, IGC), GPX-Ausgabe. Wird später in ein eigenes Repository ausgelagert; siehe dessen `README.md` und `PROVENANCE.md` |
 | `Packages/GPSLoaderKit/` | `LoggerCore` (Treibervertrag, Session), `SerialTransport`, `GPSBabelRuntime`, `GPXExport` (Dateiname, Schreiben), `DiagnosticCapture`, `TestSupport` |
 | `Vendor/gpsbabel-1.7.0/` | gpsbabel 1.7.0 (x86_64) und Qt Core 5.12.9 aus myTracks, Lizenztexte, Herkunftsnachweis |
 | `Scripts/` | Signieren der Helfer (Build-Phase), Release, Bundle-Prüfung, Lokalisierungsprüfung |

@@ -69,17 +69,6 @@ struct NMEASentence {
         return ((hour * 60 + minute) * 60 + second) * 1000 + milliseconds
     }
 
-    /// `ddmmyy` as days since 1970; two-digit years are read as 1980...2079.
-    static func date(ddmmyy field: Substring) -> Int? {
-        guard field.count == 6, let value = Int(field) else { return nil }
-        let day = value / 10_000
-        let month = value / 100 % 100
-        let yy = value % 100
-        let year = yy < 80 ? 2000 + yy : 1900 + yy
-        guard UTCTime.isValid(year: year, month: month, day: day) else { return nil }
-        return UTCTime.days(year: year, month: month, day: day)
-    }
-
     enum CoordinateResult {
         case missing
         case invalid

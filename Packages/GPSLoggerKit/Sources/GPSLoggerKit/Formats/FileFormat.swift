@@ -16,6 +16,7 @@ public struct FileFormatID: RawRepresentable, Hashable, Sendable, ExpressibleByS
 
     public static let nmea: FileFormatID = "nmea"
     public static let gpx: FileFormatID = "gpx"
+    public static let igc: FileFormatID = "igc"
 }
 
 /// The content of one input file.
@@ -91,7 +92,7 @@ public enum FileFormats {
     public static let sniffLength = 4096
 
     /// All supported formats.
-    public static let all: [any FileFormat] = [NMEAFileFormat(), GPXFileFormat()]
+    public static let all: [any FileFormat] = [NMEAFileFormat(), GPXFileFormat(), IGCFileFormat()]
 
     /// The format with the given identifier.
     public static func format(withID id: FileFormatID) -> (any FileFormat)? {
