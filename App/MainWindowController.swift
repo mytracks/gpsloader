@@ -3,8 +3,9 @@ import GPSBabelRuntime
 import LoggerCore
 
 @MainActor
-final class MainWindowController: NSWindowController {
+final class MainWindowController: NSWindowController, NSMenuItemValidation {
     private(set) var sessionPresenter: SessionPresenter!
+    private(set) var conversionPresenter: ConversionPresenter!
     private let environmentView = EnvironmentStatusView()
 
     convenience init() {
@@ -18,6 +19,7 @@ final class MainWindowController: NSWindowController {
         window.minSize = NSSize(width: 520, height: 360)
         self.init(window: window)
         sessionPresenter = SessionPresenter(window: window)
+        conversionPresenter = ConversionPresenter(window: window, sessionPresenter: sessionPresenter)
         buildContent()
         window.center()
         window.setFrameAutosaveName("MainWindow")
@@ -27,13 +29,25 @@ final class MainWindowController: NSWindowController {
     }
 
     private func buildContent() {
+        let filesBox = NSBox()
+        filesBox.title = String(localized: "Files")
+        let filesText = NSTextField(wrappingLabelWithString: String(localized: "Convert files from memory cards or USB storage to GPX. Supported formats: \(ConversionPresenter.supportedFormatNames). You can also drag files onto this window."))
+        filesText.textColor = .secondaryLabelColor
+        let convertButton = NSButton(title: String(localized: "Convert Files…"), target: self, action: #selector(convertFiles(_:)))
+        let filesStack = NSStackView(views: [filesText, convertButton])
+        filesStack.orientation = .vertical
+        filesStack.alignment = .leading
+        filesStack.spacing = 8
+        filesText.widthAnchor.constraint(equalTo: filesStack.widthAnchor).isActive = true
+        filesBox.contentView = padded(filesStack, fillWidth: true)
+
         let deviceBox = NSBox()
         deviceBox.title = String(localized: "Device")
         let placeholder = NSTextField(wrappingLabelWithString: String(localized: "Device drivers will be added in upcoming versions."))
         placeholder.textColor = .secondaryLabelColor
         deviceBox.contentView = padded(placeholder)
 
-        var sections: [NSView] = [environmentView, deviceBox]
+        var sections: [NSView] = [environmentView, filesBox, deviceBox]
         #if DEBUG
         sections.append(makeDebugBox())
         #endif
@@ -46,7 +60,29 @@ final class MainWindowController: NSWindowController {
         for section in sections {
             section.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -40).isActive = true
         }
-        window?.contentView = stack
+        let dropView = FileDropView()
+        dropView.acceptsDrops = { [weak self] in self?.conversionPresenter.isConverting == false }
+        dropView.onDrop = { [weak self] urls in self?.conversionPresenter.convert(urls) }
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        dropView.addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.leadingAnchor.constraint(equalTo: dropView.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: dropView.trailingAnchor),
+            stack.topAnchor.constraint(equalTo: dropView.topAnchor),
+            stack.bottomAnchor.constraint(lessThanOrEqualTo: dropView.bottomAnchor),
+        ])
+        window?.contentView = dropView
+    }
+
+    // MARK: - File conversion (spec `file-conversion`)
+
+    @objc func convertFiles(_ sender: Any?) {
+        conversionPresenter.chooseFiles()
+    }
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        if menuItem.action == #selector(convertFiles(_:)) { return !conversionPresenter.isConverting }
+        return true
     }
 
     #if DEBUG
@@ -100,13 +136,16 @@ final class MainWindowController: NSWindowController {
     }
     #endif
 
-    private func padded(_ view: NSView) -> NSView {
+    private func padded(_ view: NSView, fillWidth: Bool = false) -> NSView {
         let container = NSView()
         view.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(view)
+        let trailing = fillWidth
+            ? view.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8)
+            : view.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor, constant: -8)
         NSLayoutConstraint.activate([
             view.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
-            view.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor, constant: -8),
+            trailing,
             view.topAnchor.constraint(equalTo: container.topAnchor, constant: 8),
             view.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -8),
         ])

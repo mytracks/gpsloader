@@ -91,6 +91,16 @@
         }
       }
     },
+    "Choose one or more files to convert to GPX.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wählen Sie eine oder mehrere Dateien, die nach GPX konvertiert werden sollen."
+          }
+        }
+      }
+    },
     "Close": {
       "localizations": {
         "de": {
@@ -107,6 +117,66 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fortfahren"
+          }
+        }
+      }
+    },
+    "Continue Without These Files": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ohne diese Dateien fortfahren"
+          }
+        }
+      }
+    },
+    "Continue Without This File": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ohne diese Datei fortfahren"
+          }
+        }
+      }
+    },
+    "Convert": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konvertieren"
+          }
+        }
+      }
+    },
+    "Convert Files…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien konvertieren …"
+          }
+        }
+      }
+    },
+    "Convert files from memory cards or USB storage to GPX. Supported formats: %@. You can also drag files onto this window.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien von Speicherkarte oder USB-Speicher nach GPX konvertieren. Unterstützte Formate: %@. Sie können Dateien auch auf dieses Fenster ziehen."
+          }
+        }
+      }
+    },
+    "Converting files…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien werden konvertiert …"
           }
         }
       }
@@ -257,6 +327,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Das Löschen wurde nicht bestätigt."
+          }
+        }
+      }
+    },
+    "File": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ablage"
+          }
+        }
+      }
+    },
+    "Files": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien"
           }
         }
       }
@@ -471,6 +561,16 @@
         }
       }
     },
+    "The GPX file has been saved. Some data was skipped:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die GPX-Datei wurde gespeichert. Einige Daten wurden übersprungen:"
+          }
+        }
+      }
+    },
     "The capture contains all data exchanged with the device, including recorded positions. Only send it to people you trust, for example the developer of gpsloader.": {
       "localizations": {
         "de": {
@@ -497,6 +597,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Der erste Start unter Rosetta kann einige Sekunden dauern."
+          }
+        }
+      }
+    },
+    "The format of %lld files is not supported.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Format von %lld Dateien wird nicht unterstützt."
+          }
+        }
+      }
+    },
+    "The format of the chosen files is not supported.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Format der gewählten Dateien wird nicht unterstützt."
+          }
+        }
+      }
+    },
+    "The format of “%@” is not supported.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Format von „%@“ wird nicht unterstützt."
           }
         }
       }

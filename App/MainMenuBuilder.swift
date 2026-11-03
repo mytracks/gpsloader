@@ -6,6 +6,7 @@ enum MainMenuBuilder {
     static func makeMainMenu() -> NSMenu {
         let mainMenu = NSMenu()
         mainMenu.addItem(makeAppMenuItem())
+        mainMenu.addItem(makeFileMenuItem())
         mainMenu.addItem(makeEditMenuItem())
         mainMenu.addItem(makeWindowMenuItem())
         mainMenu.addItem(makeDiagnosticsMenuItem())
@@ -44,6 +45,17 @@ enum MainMenuBuilder {
         menu.addItem(withTitle: String(localized: "Quit \(appName)"),
                      action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
 
+        item.submenu = menu
+        return item
+    }
+
+    /// "Ablage" menu (spec `file-conversion`, "Dateien auswählen"). The action goes through the responder chain
+    /// to the main window controller.
+    private static func makeFileMenuItem() -> NSMenuItem {
+        let item = NSMenuItem()
+        let menu = NSMenu(title: String(localized: "File"))
+        menu.addItem(withTitle: String(localized: "Convert Files…"),
+                     action: #selector(MainWindowController.convertFiles(_:)), keyEquivalent: "o")
         item.submenu = menu
         return item
     }

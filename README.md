@@ -24,6 +24,12 @@ open build/DerivedData/Build/Products/Debug/gpsloader.app
 
 Alternativ nach `xcodegen generate` das Projekt `gpsloader.xcodeproj` in Xcode öffnen.
 
+## Bedienung
+
+- **Dateimodus:** „Ablage > Dateien konvertieren …“ (⌘O), die Schaltfläche im Bereich „Dateien“ oder Dateien
+  per Drag & Drop auf das Hauptfenster. Das Format wird am Inhalt erkannt (alle Formate von `GPSLoggerKit`,
+  derzeit NMEA 0183, GPX und IGC). Mehrere Dateien ergeben eine GPX-Datei.
+
 ## Tests
 
 Die Geräte- und Protokolllogik liegt im lokalen Swift-Package `Packages/GPSLoaderKit` und ist ohne Hardware testbar:
@@ -55,6 +61,13 @@ build/DerivedData/Build/Products/Debug/gpsloader.app/Contents/MacOS/gpsloader \
     -DebugDemo success -DebugSimulatedStatus ready -AppleLanguages '(de)'
 ```
 
+Dateikonvertierung ohne Dialoge (schreibt nach `-DebugSaveDirectory`, Bildschirmfotos nach `-DebugSnapshotDirectory`):
+
+```sh
+build/DerivedData/Build/Products/Debug/gpsloader.app/Contents/MacOS/gpsloader \
+    -DebugConvert /pfad/a.nmea,/pfad/b.igc -DebugSaveDirectory /tmp/out -DebugQuitAfter 5
+```
+
 ## Release
 
 ```sh
@@ -76,7 +89,7 @@ xcrun notarytool store-credentials gpsloader-notary --apple-id <Apple-ID> --team
 | `App/` | AppKit-App (UI, Lokalisierung `Localizable.xcstrings`) |
 | `RosettaInstaller/` | Hilfs-App nur für x86_64; ihr Start löst den Rosetta-Installationsdialog von macOS aus |
 | `Packages/GPSLoggerKit/` | Eigenständiges Paket (MIT, macOS 12+ und iOS 27+): Datenmodell, Dateiformate (NMEA, GPX, IGC), GPX-Ausgabe. Wird später in ein eigenes Repository ausgelagert; siehe dessen `README.md` und `PROVENANCE.md` |
-| `Packages/GPSLoaderKit/` | `LoggerCore` (Treibervertrag, Session), `SerialTransport`, `GPSBabelRuntime`, `GPXExport` (Dateiname, Schreiben), `DiagnosticCapture`, `TestSupport` |
+| `Packages/GPSLoaderKit/` | `LoggerCore` (Treibervertrag, Session), `SerialTransport`, `GPSBabelRuntime`, `GPXExport` (Dateiname, Schreiben), `DiagnosticCapture`, `FileConversion` (Dateimodus: Erkennen, Zusammenführen), `TestSupport` |
 | `Vendor/gpsbabel-1.7.0/` | gpsbabel 1.7.0 (x86_64) und Qt Core 5.12.9 aus myTracks, Lizenztexte, Herkunftsnachweis |
 | `Scripts/` | Signieren der Helfer (Build-Phase), Release, Bundle-Prüfung, Lokalisierungsprüfung |
 

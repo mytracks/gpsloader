@@ -29,6 +29,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Cancels running operations and terminates child processes (gpsbabel) before quitting
     /// (spec `gpsbabel-runtime`, "App wird während eines Aufrufs beendet").
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        // File conversions run in-process only; cancelling them is enough (spec `file-conversion`).
+        mainWindowController?.conversionPresenter.cancel()
         let sessions = mainWindowController?.sessionPresenter.runningSessions ?? []
         let registry = ProcessRegistry.shared
         guard !isTerminating, !sessions.isEmpty || !registry.runningProcesses.isEmpty else {

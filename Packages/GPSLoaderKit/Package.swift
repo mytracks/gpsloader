@@ -12,6 +12,7 @@ let package = Package(
         .library(name: "GPSBabelRuntime", targets: ["GPSBabelRuntime"]),
         .library(name: "GPXExport", targets: ["GPXExport"]),
         .library(name: "DiagnosticCapture", targets: ["DiagnosticCapture"]),
+        .library(name: "FileConversion", targets: ["FileConversion"]),
         .library(name: "TestSupport", targets: ["TestSupport"]),
     ],
     dependencies: [
@@ -27,6 +28,7 @@ let package = Package(
         .target(name: "GPSBabelRuntime", dependencies: ["LoggerCore"]),
         .target(name: "GPXExport", dependencies: ["LoggerCore", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]),
         .target(name: "DiagnosticCapture", dependencies: ["LoggerCore"]),
+        .target(name: "FileConversion", dependencies: [.product(name: "GPSLoggerKit", package: "GPSLoggerKit")]),
         .target(
             name: "TestSupport",
             dependencies: ["LoggerCore", "DiagnosticCapture", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]
@@ -48,6 +50,10 @@ let package = Package(
             resources: [.copy("Fixtures")]
         ),
         .testTarget(name: "TestSupportTests", dependencies: ["TestSupport", "LoggerCore"]),
+        .testTarget(
+            name: "FileConversionTests",
+            dependencies: ["FileConversion", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]
+        ),
     ],
     swiftLanguageModes: [.v6]
 )

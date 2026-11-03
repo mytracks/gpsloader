@@ -13,6 +13,7 @@ import LoggerCore
 ///     -DebugShowCaptureExport <seconds>  open "Save Latest Diagnostic Capture…" after the given delay
 ///     -DebugCancelAfter <seconds>       press "Cancel" on running operations
 ///     -DebugSaveDirectory <dir>         save results there without the save panel (see SessionPresenter)
+///     -DebugConvert <path>[,<path>…]    convert these files as if chosen in "Convert Files…" (ConversionPresenter)
 ///     -DebugQuitAfter <seconds>
 @MainActor
 enum DebugAutomation {
@@ -39,6 +40,11 @@ enum DebugAutomation {
             mainWindow.sessionPresenter.erase(with: DemoDriver(scenario: .success, erase: erase))
         }
 
+        if let paths = defaults.string(forKey: "DebugConvert") {
+            let urls = paths.split(separator: ",").map { URL(fileURLWithPath: String($0)) }
+            mainWindow.conversionPresenter.convert(urls)
+        }
+
         if let directory = defaults.string(forKey: "DebugSnapshotDirectory") {
             for delay in [1.0, 2.5, 5.0] {
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
@@ -59,6 +65,7 @@ enum DebugAutomation {
             DispatchQueue.main.asyncAfter(deadline: .now() + cancelAfter) {
                 MainActor.assumeIsolated {
                     mainWindow.sessionPresenter.runningSessions.forEach { $0.cancel() }
+                    mainWindow.conversionPresenter.cancel()
                 }
             }
         }
@@ -66,7 +73,11 @@ enum DebugAutomation {
         let quitAfter = defaults.double(forKey: "DebugQuitAfter")
         if quitAfter > 0 {
             DispatchQueue.main.asyncAfter(deadline: .now() + quitAfter) {
-                MainActor.assumeIsolated { NSApp.terminate(nil) }
+                MainActor.assumeIsolated {
+                    // AppKit refuses to quit while the two-button question sheet is open; close it first.
+                    mainWindow.conversionPresenter.cancel()
+                    NSApp.terminate(nil)
+                }
             }
         }
     }

@@ -70,6 +70,8 @@ targets:
         product: GPXExport
       - package: GPSLoaderKit
         product: DiagnosticCapture
+      - package: GPSLoaderKit
+        product: FileConversion
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: info.stichling.gpsloader
@@ -118,5 +120,6 @@ schemes:
         - package: GPSLoaderKit/GPXExportTests
         - package: GPSLoaderKit/DiagnosticCaptureTests
         - package: GPSLoaderKit/TestSupportTests
+        - package: GPSLoaderKit/FileConversionTests
     archive:
       config: Release
