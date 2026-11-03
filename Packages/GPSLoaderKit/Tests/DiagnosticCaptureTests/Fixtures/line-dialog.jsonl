@@ -1,0 +1,9 @@
+{"app": "0.1.0", "arch": "arm64", "created": "2026-11-02T14:30:05Z", "driver": "line-test", "format": "gpsloader-capture", "kind": "header", "os": "Version 27.0", "params": {"baud": "9600"}, "port": "/dev/cu.fixture", "translated": false, "version": 1}
+{"kind": "event", "name": "open", "source": "/dev/cu.fixture", "t": 5}
+{"ascii": "$CNT\\r\\n", "hex": "24 43 4E 54 0D 0A", "kind": "tx", "source": "/dev/cu.fixture", "t": 10}
+{"ascii": "$CNT,2\\r\\n", "hex": "24 43 4E 54 2C 32 0D 0A", "kind": "rx", "source": "/dev/cu.fixture", "t": 15}
+{"ascii": "$PT,0\\r\\n", "hex": "24 50 54 2C 30 0D 0A", "kind": "tx", "source": "/dev/cu.fixture", "t": 20}
+{"ascii": "$PT,0,51.5,8.5\\r\\n", "hex": "24 50 54 2C 30 2C 35 31 2E 35 2C 38 2E 35 0D 0A", "kind": "rx", "source": "/dev/cu.fixture", "t": 25}
+{"ascii": "$PT,1\\r\\n", "hex": "24 50 54 2C 31 0D 0A", "kind": "tx", "source": "/dev/cu.fixture", "t": 30}
+{"ascii": "$PT,1,51.6,8.6\\r\\n", "hex": "24 50 54 2C 31 2C 35 31 2E 36 2C 38 2E 36 0D 0A", "kind": "rx", "source": "/dev/cu.fixture", "t": 35}
+{"kind": "event", "name": "close", "source": "/dev/cu.fixture", "t": 40}

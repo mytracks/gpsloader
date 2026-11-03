@@ -1,0 +1,16 @@
+/* LoggerCore error messages (spec logger-session) */
+"error.deviceNotFound.message" = "The device was not found.";
+"error.deviceNotFound.recovery" = "Check that the logger is connected and switched on, and that the right device is selected.";
+"error.portBusy.message" = "The port is in use.";
+"error.portBusy.recovery" = "Close other programs that use the logger, or wait until the running operation has finished.";
+"error.timeout.message" = "The device did not respond in time.";
+"error.timeout.recovery" = "Check the connection and the selected device.";
+"error.protocolError.message" = "The device sent unexpected data.";
+"error.protocolError.recovery" = "Try again. If the problem persists, record a diagnostic capture and send it to the developer.";
+"error.rosettaMissing.message" = "Rosetta is not installed.";
+"error.rosettaMissing.recovery" = "Devices that use gpsbabel need Rosetta on Macs with Apple silicon. Install Rosetta and try again.";
+"error.gpsbabelFailed.message" = "gpsbabel reported an error.";
+"error.gpsbabelFailed.recovery" = "Check the connection and the selected device. The details contain the output of gpsbabel.";
+"error.writeFailed.message" = "The file could not be written.";
+"error.writeFailed.recovery" = "Choose a different location and check that you have write access.";
+"error.cancelled.message" = "The operation was cancelled.";

@@ -1,0 +1,586 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%lld of %lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld von %2$lld"
+          }
+        }
+      }
+    },
+    "About %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Über %@"
+          }
+        }
+      }
+    },
+    "About gpsloader": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Über gpsloader"
+          }
+        }
+      }
+    },
+    "All supported devices can be used.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle unterstützten Geräte können verwendet werden."
+          }
+        }
+      }
+    },
+    "Another operation is already using %@. Wait until it has finished.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein anderer Vorgang verwendet bereits %@. Bitte warten Sie, bis er beendet ist."
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbrechen"
+          }
+        }
+      }
+    },
+    "Cancelling…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird abgebrochen …"
+          }
+        }
+      }
+    },
+    "Check Again": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erneut prüfen"
+          }
+        }
+      }
+    },
+    "Checking gpsbabel…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "gpsbabel wird geprüft …"
+          }
+        }
+      }
+    },
+    "Close": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließen"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortfahren"
+          }
+        }
+      }
+    },
+    "Copy": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopieren"
+          }
+        }
+      }
+    },
+    "Copy Command": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehl kopieren"
+          }
+        }
+      }
+    },
+    "Details: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details: %@"
+          }
+        }
+      }
+    },
+    "Device": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gerät"
+          }
+        }
+      }
+    },
+    "Device drivers will be added in upcoming versions.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gerätetreiber folgen in kommenden Versionen."
+          }
+        }
+      }
+    },
+    "Devices that use gpsbabel only work after Rosetta has been installed. Devices with built-in drivers work without Rosetta.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geräte, die gpsbabel nutzen, funktionieren erst nach der Installation von Rosetta. Geräte mit eingebauten Treibern funktionieren auch ohne Rosetta."
+          }
+        }
+      }
+    },
+    "Diagnostics": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagnose"
+          }
+        }
+      }
+    },
+    "Edit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bearbeiten"
+          }
+        }
+      }
+    },
+    "Environment": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umgebung"
+          }
+        }
+      }
+    },
+    "Erase": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen"
+          }
+        }
+      }
+    },
+    "Erase all data on %@?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Daten auf %@ löschen?"
+          }
+        }
+      }
+    },
+    "Erased data cannot be recovered. Save the data first if you still need it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gelöschte Daten können nicht wiederhergestellt werden. Sichern Sie die Daten vorher, wenn Sie sie noch benötigen."
+          }
+        }
+      }
+    },
+    "Erasing %@…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wird gelöscht …"
+          }
+        }
+      }
+    },
+    "Erasing is not supported for this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen wird für dieses Gerät nicht unterstützt."
+          }
+        }
+      }
+    },
+    "Erasing was not confirmed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Löschen wurde nicht bestätigt."
+          }
+        }
+      }
+    },
+    "GPL 2.0": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GPL 2.0"
+          }
+        }
+      }
+    },
+    "GPL 3.0": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GPL 3.0"
+          }
+        }
+      }
+    },
+    "GPSBabel 1.7.0 source code": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quellcode von GPSBabel 1.7.0"
+          }
+        }
+      }
+    },
+    "Hide %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ausblenden"
+          }
+        }
+      }
+    },
+    "Hide Others": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andere ausblenden"
+          }
+        }
+      }
+    },
+    "Install Rosetta manually": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rosetta manuell installieren"
+          }
+        }
+      }
+    },
+    "Install Rosetta…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rosetta installieren …"
+          }
+        }
+      }
+    },
+    "LGPL 3.0": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LGPL 3.0"
+          }
+        }
+      }
+    },
+    "Minimize": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Dock ablegen"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "Qt 5.12.9 source code": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quellcode von Qt 5.12.9"
+          }
+        }
+      }
+    },
+    "Quit %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ beenden"
+          }
+        }
+      }
+    },
+    "Reading %@…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wird ausgelesen …"
+          }
+        }
+      }
+    },
+    "Ready – gpsbabel %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereit – gpsbabel %@"
+          }
+        }
+      }
+    },
+    "Record Diagnostic Capture": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagnose-Mitschnitt aufzeichnen"
+          }
+        }
+      }
+    },
+    "Rosetta is not installed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rosetta ist nicht installiert"
+          }
+        }
+      }
+    },
+    "Save Latest Diagnostic Capture…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzten Diagnose-Mitschnitt sichern …"
+          }
+        }
+      }
+    },
+    "Save diagnostic capture?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagnose-Mitschnitt sichern?"
+          }
+        }
+      }
+    },
+    "Select All": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles auswählen"
+          }
+        }
+      }
+    },
+    "Services": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dienste"
+          }
+        }
+      }
+    },
+    "Show All": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle einblenden"
+          }
+        }
+      }
+    },
+    "The capture contains all data exchanged with the device, including recorded positions. Only send it to people you trust, for example the developer of gpsloader.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Mitschnitt enthält alle mit dem Gerät ausgetauschten Daten, einschließlich der aufgezeichneten Positionen. Senden Sie ihn nur an Personen, denen Sie vertrauen, zum Beispiel an den Entwickler von gpsloader."
+          }
+        }
+      }
+    },
+    "The data has been erased.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Daten wurden gelöscht."
+          }
+        }
+      }
+    },
+    "The first start under Rosetta can take a few seconds.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der erste Start unter Rosetta kann einige Sekunden dauern."
+          }
+        }
+      }
+    },
+    "The logger does not contain any data.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Logger enthält keine Daten."
+          }
+        }
+      }
+    },
+    "The system dialog for installing Rosetta could not be opened. Open Terminal, enter the following command and confirm with your administrator password:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Systemdialog zur Installation von Rosetta konnte nicht geöffnet werden. Öffnen Sie das Terminal, geben Sie den folgenden Befehl ein und bestätigen Sie mit Ihrem Administratorpasswort:"
+          }
+        }
+      }
+    },
+    "Third-party software": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Software von Drittanbietern"
+          }
+        }
+      }
+    },
+    "Version %@ (%@)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "Warning: Erasing is experimental for this device. It has not been tested with a real device and might fail or leave the logger in an unusable state.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Achtung: Das Löschen ist für dieses Gerät experimentell. Es wurde nicht mit einem echten Gerät getestet und könnte fehlschlagen oder den Logger in einem unbrauchbaren Zustand hinterlassen."
+          }
+        }
+      }
+    },
+    "Window": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenster"
+          }
+        }
+      }
+    },
+    "gpsbabel cannot be started": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "gpsbabel kann nicht gestartet werden"
+          }
+        }
+      }
+    },
+    "gpsloader includes GPSBabel 1.7.0 (copyright the GPSBabel authors), distributed under the GNU General Public License version 2 or later. GPSBabel runs as a separate program and uses Qt Core 5.12.9 (copyright The Qt Company Ltd. and other contributors), distributed under the GNU Lesser General Public License version 3. The complete source code of both is available at the links below.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "gpsloader enthält GPSBabel 1.7.0 (Copyright der GPSBabel-Autoren), verbreitet unter der GNU General Public License Version 2 oder neuer. GPSBabel läuft als eigenständiges Programm und verwendet Qt Core 5.12.9 (Copyright The Qt Company Ltd. und weitere Mitwirkende), verbreitet unter der GNU Lesser General Public License Version 3. Der vollständige Quellcode beider Projekte ist über die folgenden Links erhältlich."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

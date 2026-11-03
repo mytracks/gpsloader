@@ -1,0 +1,17 @@
+input
+
+# Xcode / XcodeGen
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+DerivedData/
+build/
+*.xcarchive
+
+# SwiftPM
+.build/
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store

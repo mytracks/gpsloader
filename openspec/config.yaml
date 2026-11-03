@@ -1,0 +1,121 @@
+schema: spec-driven
+
+# Projektkontext: Leitplanken für alle OpenSpec-Artefakte.
+# Fachliche Hintergründe zur Alt-App stehen in docs/legacy-analysis.md und
+# docs/legacy-device-catalog.md und werden hier nur referenziert.
+context: |
+  ## Produkt
+  gpsloader (Arbeitstitel) ist eine kleine, eigenständige macOS-App. Sie liest GPS-Logger
+  aus und speichert die Aufzeichnungen als GPX-Dateien. Sie löst die Logger-Funktionen der
+  seit fast 20 Jahren entwickelten App myTracks ab; dort werden diese Funktionen entfernt.
+  Zielgruppe sind myTracks-Bestandskunden und andere Besitzer solcher Logger.
+  Zum Funktionsumfang gehören:
+  - Direktmodus: Gerät wählen (serieller Port /dev/cu.* bzw. gekoppeltes Bluetooth-Gerät),
+    Daten auslesen, GPX schreiben, optional den Logger-Speicher löschen.
+  - Dateimodus: Dateien von Speicherkarte bzw. USB-Speicher (NMEA, FIT, TCX, IGC, NAL,
+    wintec_tes, sbp/sbn usw.) nach GPX konvertieren.
+  Nicht dazu gehören Track-Verwaltung, Karten, Geotagging und Bearbeitung.
+
+  ## Vertrieb
+  - Download von der Website des Entwicklers, NICHT über den Mac App Store.
+  - Developer-ID-signiert, notarisiert, Hardened Runtime. Die App-Sandbox ist nicht erforderlich
+    (direkter Zugriff auf /dev/cu.*, IOKit/HID, IOBluetooth und das Starten von gpsbabel).
+  - Die App selbst ist ein Universal Binary (arm64 + x86_64).
+
+  ## Technische Leitplanken (entschieden)
+  - Minimales Deployment Target: macOS 12 (entschieden am 2026-11-02; das SDK von Xcode 27
+    unterstützt nichts Älteres).
+  - Eigener Code ausschließlich in Swift. Kein Objective-C-, C- oder C++-Quellcode im Projekt.
+    System-APIs wie IOKit, IOHID, termios/POSIX und IOBluetooth werden direkt aus Swift genutzt.
+  - Möglichst modernes Swift: Swift 6 Language Mode, Strict Concurrency, async/await, Actors,
+    Sendable, value types, Swift Package Manager für die Modularisierung.
+    APIs, die neuer als macOS 12 sind, nur mit `#available`-Fallback.
+  - UI auf AppKit-Basis. SwiftUI nur, wo es unter macOS 12 zuverlässig funktioniert.
+  - Treiber-Architektur: ein gemeinsames Treiber-Protokoll (async, abbrechbar, mit Fortschritt)
+    mit zwei Arten von Implementierungen:
+    1. Native Swift-Treiber: BG728 (Maptaq Trip IQ), GNS2000 (IOBluetooth/RFCOMM),
+       i-GotU GT-800 (seriell), i-GotU GT-100/120/200e/600 (USB, vermutlich HID),
+       WSG-2000-NAL-Dateien sowie die NMEA-Vorverarbeitung (Dateien zusammenfügen, '@'-Zeilen entfernen).
+    2. gpsbabel-Treiber: alle übrigen Geräte und Dateiformate des Katalogs.
+  - gpsbabel: Es wird AUSSCHLIESSLICH gpsbabel 1.7.0 verwendet, und zwar das fertige
+    x86_64-Binary mit QtCoreGpsBabel.framework (Qt 5.12.9) aus myTracks
+    (Herkunft: siehe docs/legacy-analysis.md, Abschnitt 3.1). gpsbabel wird NICHT selbst gebaut.
+    Grund: Neuere Versionen kennen wbt, navilink, magellan, itracku, wintec_tes, sbp, sbn
+    usw. nicht mehr.
+    gpsbabel läuft als eigenständiges Programm (Process mit Argument-Array, niemals über eine
+    Shell) und wird nur mitgeliefert, nicht eingebunden (Lizenz: GPL- bzw. LGPL-Text und
+    Quellcode-Angebot für gpsbabel und Qt beilegen).
+  - Rosetta 2: Auf Apple Silicon ist Rosetta Voraussetzung für alle gpsbabel-Geräte.
+    gpsloader muss fehlendes Rosetta vor dem Start von gpsbabel erkennen, das dem Anwender
+    verständlich erklären und die Installation anbieten. Native Treiber dürfen nicht von
+    Rosetta abhängen. Apple hat angekündigt, Rosetta nach macOS 27 nur noch eingeschränkt
+    anzubieten; das ist ein bekanntes, bewusst akzeptiertes Risiko.
+  - Bluetooth-Logger (außer GNS2000) werden nur über den seriellen Port /dev/cu.* angesprochen,
+    den macOS nach dem Koppeln anlegt. Es gibt keine eigene RFCOMM-Brücke.
+  - Keine Laufzeitabhängigkeit von Python, Perl oder anderen Interpretern.
+    Kein system()/popen(), keine Shell-Kommandozeilen mit Platzhaltern wie in der Alt-App.
+  - Gerätelogik (Protokolle, Parser, GPX-Erzeugung) liegt in UI-unabhängigen Swift-Packages.
+    Diese müssen ohne Hardware testbar sein: Transport als Protokoll, Mock-Transport,
+    aufgezeichnete Gerätedialoge als Test-Fixtures.
+  - Ausgabe: GPX 1.1, Zeiten in UTC (ISO 8601 mit Z), ohne myTracks-Extensions.
+    Tracks werden so aufgeteilt, wie es das Gerät bzw. der Treiber vorgibt.
+  - Lokalisierung: Deutsch und Englisch. Code, Bezeichner und Code-Kommentare auf Englisch.
+
+  ## Umfang (entschieden)
+  - Unterstützt wird der Gerätekatalog der Alt-App (docs/legacy-device-catalog.md) mit diesen Abweichungen:
+    - Entfallen: alle LoadMyTracks-Geräte; alle Treiber auf Basis von Skriptsprachen
+      (Royaltek RGM-3800/RBT-2300/GOSGET S1, Gisteq DPL700/CD111, XAiOX iTrackU Nemerix/SiRF,
+      MainNav, Suunto Ambit via ambit2gpx, fit2tcx); die Palm-OS-Formate cetus und coto
+      (fehlen in gpsbabel 1.7.0).
+    - Wieder aufgenommen: i-GotU GT-100, GT-120, GT-200e, GT-600 und GT-800/Pro (nativ).
+  - Keine Übernahme von Logger-Konfigurationen aus myTracks.
+  - Kein Echtzeit-Tracking.
+  - Diagnose-Mitschnitt (bestätigt am 2026-11-02, umgesetzt in setup-foundation): alle gesendeten
+    und empfangenen Bytes bzw. gpsbabel-Ausgaben mit Zeitstempel in eine Datei, die Anwender dem
+    Entwickler schicken können. Mitschnitte dienen zugleich als Test-Fixtures.
+
+  ## Vorschläge aus der Exploration (noch nicht bestätigt)
+  - i-GotU-Löschen als "experimentell" kennzeichnen, mit Warnung (Befehle nicht dokumentiert, keine Testgeräte).
+  - Wintec WPL 1000 / Navilock NL-456DL zurückstellen (nur ein x86-Binary ohne Quellcode vorhanden).
+  - "Holux GPSport 245 – alternative" als festen Ablauf mit zwei gpsbabel-Aufrufen übernehmen.
+  - Rückweg zu myTracks: erzeugte GPX-Datei per "In myTracks öffnen" übergeben.
+  - Updates über Sparkle, als eigener Change.
+
+  ## Rahmenbedingungen der Entwicklung
+  - Der Entwickler ist sehr erfahren mit macOS und myTracks. Fachliche Rückfragen zu Geräten
+    sind sinnvoll, Grundlagenerklärungen nicht.
+  - Der Entwickler hat KEINE Testgeräte für i-GotU und Bluetooth-Logger. Tests mit echter
+    Hardware übernehmen hier die Anwender. Für die übrigen Geräte ist Hardware-Verifikation
+    immer ein manueller Schritt des Entwicklers; der Agent hat keine Hardware.
+  - Der Originalcode von myTracks liegt in input/mytracks4mac/. Er ist ein Git-Repository,
+    nur lesbar, per .gitignore nicht versioniert und darf weder verändert noch in den Build
+    übernommen werden. Gelöschter Code (i-GotU, gpsbabel 1.7.0) ist über die Git-Historie
+    abrufbar. Proposals und Designs verweisen auf docs/legacy-analysis.md bzw. die Quelldateien,
+    statt Wissen neu herzuleiten.
+  - Ziel ist eine moderne Neuimplementierung des Verhaltens, keine 1:1-Portierung.
+    Schwächen der Alt-App (siehe legacy-analysis.md, Abschnitt 8) werden nicht übernommen.
+
+rules:
+  proposal:
+    - Auf Deutsch schreiben.
+    - Betroffene Geräte und Treiberfamilien (gemäß docs/legacy-device-catalog.md) explizit nennen.
+    - Immer einen Abschnitt "Nicht im Umfang" aufnehmen.
+    - Berührt der Change einen der noch nicht bestätigten Vorschläge, die Entscheidung
+      ausdrücklich beim Entwickler einholen und festhalten.
+  specs:
+    - Fließtext auf Deutsch. Jede Requirement-Aussage enthält das Schlüsselwort SHALL oder MUST,
+      weil der OpenSpec-Validator das verlangt (z. B. "Die App SHALL …").
+    - Szenarien im Format WHEN/THEN, möglichst ohne echte Hardware prüfbar
+      (Mock-Transport, aufgezeichnete Antworten).
+    - Protokolldetails (Befehle, Antwortformate, Byte-Layouts) gehören in die Specs der
+      jeweiligen Treiber-Capability, nicht in die UI-Specs.
+  design:
+    - Auf Deutsch schreiben.
+    - Relevante Alt-Quelldateien unter input/mytracks4mac/ mit Pfad (bei gelöschtem Code mit Commit) referenzieren.
+    - "Swift-6-Concurrency explizit behandeln: Isolation, Sendable, Timeouts, Abbruch."
+    - Bei gpsbabel-Treibern das Verhalten ohne Rosetta behandeln.
+  tasks:
+    - Auf Deutsch schreiben.
+    - Zu jedem Protokoll-/Parser-Task gehört ein Test-Task mit Fixtures.
+    - Manuelle Hardware-Tests als eigene, klar markierte Tasks ("[manuell, Hardware]") aufführen;
+      Tests, die Anwender übernehmen müssen, als "[manuell, Anwender]".
