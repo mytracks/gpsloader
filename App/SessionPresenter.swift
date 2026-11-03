@@ -1,5 +1,6 @@
 import AppKit
 import DiagnosticCapture
+import GPSLoggerKit
 import GPXExport
 import LoggerCore
 import UniformTypeIdentifiers
@@ -162,7 +163,7 @@ final class SessionPresenter {
             let url = URL(fileURLWithPath: directory).appendingPathComponent(suggestedName)
             do {
                 try FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true)
-                try GPXWriter(creator: AppEnvironment.shared.gpxCreator).write(recording, to: url)
+                try GPXExport.write(recording, to: url, creator: AppEnvironment.shared.gpxCreator)
             } catch {
                 showError(error as? LoggerError ?? LoggerError(.writeFailed, detail: error.localizedDescription))
             }
@@ -176,7 +177,7 @@ final class SessionPresenter {
         let write: (NSApplication.ModalResponse) -> Void = { response in
             guard response == .OK, let url = panel.url else { return }
             do {
-                try GPXWriter(creator: AppEnvironment.shared.gpxCreator).write(recording, to: url)
+                try GPXExport.write(recording, to: url, creator: AppEnvironment.shared.gpxCreator)
             } catch let error as LoggerError {
                 self.showError(error)
             } catch {

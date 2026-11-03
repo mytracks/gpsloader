@@ -1,4 +1,5 @@
 import Foundation
+import GPSLoggerKit
 import Testing
 import TestSupport
 @testable import LoggerCore

@@ -1,4 +1,5 @@
 import Foundation
+import GPSLoggerKit
 import LoggerCore
 
 /// A driver whose behavior is defined by closures. For session and UI tests.

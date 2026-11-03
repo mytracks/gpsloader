@@ -1,4 +1,5 @@
 import Foundation
+import GPSLoggerKit
 
 /// Progress of a running operation (spec `logger-session`, "Fortschritt").
 public enum ProgressUpdate: Sendable, Equatable {

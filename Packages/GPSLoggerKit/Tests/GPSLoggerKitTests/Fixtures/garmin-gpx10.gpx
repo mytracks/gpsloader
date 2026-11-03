@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!-- Synthetic test fixture in the style of an older Garmin device (invented coordinates). -->
+<gpx xmlns="http://www.topografix.com/GPX/1/0" version="1.0" creator="Synthetic Test"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+  <time>2008-06-14T10:00:00Z</time>
+  <trk>
+    <name>ACTIVE LOG</name>
+    <trkseg>
+      <trkpt lat="51.741158" lon="8.680967"><ele>94.3</ele><time>2008-06-14T09:15:00Z</time><course>45.0</course><speed>1.5</speed></trkpt>
+      <trkpt lat="51.741258" lon="8.681067"><ele>94.8</ele><time>2008-06-14T09:15:10Z</time></trkpt>
+      <trkpt lat="51.741358" lon="8.681167"><ele>95.1</ele><time>2008-06-14T09:15:20Z</time></trkpt>
+      <trkpt lat="51.741458" lon="8.681267"><ele>95.6</ele><time>2008-06-14T09:15:30Z</time></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

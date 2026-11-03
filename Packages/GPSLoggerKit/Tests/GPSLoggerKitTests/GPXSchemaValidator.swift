@@ -1,5 +1,6 @@
+#if os(macOS)
 import Foundation
-@testable import GPXExport
+@testable import GPSLoggerKit
 
 /// Validates GPX data against the bundled GPX 1.1 XSD (no network access).
 enum GPXSchemaValidator {
@@ -8,7 +9,7 @@ enum GPXSchemaValidator {
     }
 
     static var schemaURL: URL {
-        Bundle.module.url(forResource: "gpx", withExtension: "xsd", subdirectory: "Resources")!
+        Bundle.module.url(forResource: "gpx", withExtension: "xsd", subdirectory: "Schemas")!
     }
 
     static func validate(_ data: Data) throws {
@@ -25,3 +26,4 @@ enum GPXSchemaValidator {
         }
     }
 }
+#endif

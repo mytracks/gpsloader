@@ -41,5 +41,9 @@ Sie ersetzt die Logger-Funktionen der App myTracks. Vertrieb per Download, nicht
 - Bluetooth-Logger nur über `/dev/cu.*`.
 - Keine Python- oder Perl-Abhängigkeit, kein `system()`/`popen()`.
 - Protokoll- und Parser-Logik in UI-unabhängigen Swift-Packages, ohne Hardware testbar.
+- `Packages/GPSLoggerKit`: eigenständiges Paket (macOS 12+, iOS/iPadOS 27+, **MIT-Lizenz**), wird später
+  in ein eigenes Repository ausgelagert. Keine Abhängigkeit auf andere Teile dieses Repositorys.
+  **Clean-Room:** GPL-Quelltext (gpsbabel, igotu2gpx, wsg2000.c u. a.) weder lesen noch übersetzen;
+  nur öffentliche Spezifikationen, eigener myTracks-Code und Black-Box-Beobachtung. Details in `openspec/config.yaml`.
 - Der Entwickler hat keine i-GotU- und Bluetooth-Logger; diese testen die Anwender.
   Der Agent hat keine Hardware.

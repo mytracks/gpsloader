@@ -1,5 +1,4 @@
 import Foundation
-import LoggerCore
 
 /// Writes recordings as GPX 1.1 (spec `gpx-export`).
 ///
@@ -7,12 +6,14 @@ import LoggerCore
 /// - Times are UTC (`Z`), milliseconds only when not zero.
 /// - Numbers never depend on the locale.
 /// - The same input and creation time always produce byte-identical output.
+/// - Quality values (`fix`, `sat`, `hdop`, `vdop`, `pdop`) in schema order; speed and course are not
+///   part of GPX 1.1 without extensions and are therefore not written.
 /// - No extensions.
 public struct GPXWriter: Sendable {
     public static let namespace = "http://www.topografix.com/GPX/1/1"
     public static let schemaLocation = "http://www.topografix.com/GPX/1/1/gpx.xsd"
 
-    /// Value of the `creator` attribute, e.g. "gpsloader 0.1.0".
+    /// Value of the `creator` attribute, e.g. "MyApp 1.0".
     public var creator: String
 
     public init(creator: String) {
@@ -25,11 +26,13 @@ public struct GPXWriter: Sendable {
     }
 
     /// Writes the document atomically. On failure nothing is left at `url` and an existing file stays unchanged.
+    /// - Throws: `GPSLoggerError` of kind `.writeFailed`.
     public func write(_ recording: Recording, to url: URL, createdAt: Date = Date()) throws {
         do {
             try data(for: recording, createdAt: createdAt).write(to: url, options: .atomic)
         } catch {
-            throw LoggerError(.writeFailed, detail: "\(url.path): \(error.localizedDescription)")
+            throw GPSLoggerError(.writeFailed, fileName: url.lastPathComponent,
+                                 detail: "\(url.path): \(error.localizedDescription)")
         }
     }
 
@@ -42,7 +45,7 @@ public struct GPXWriter: Sendable {
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \
         xsi:schemaLocation="\(Self.namespace) \(Self.schemaLocation)">
           <metadata>
-            <time>\(GPXFormat.time(createdAt))</time>
+            <time>\(GPXText.time(createdAt))</time>
           </metadata>
 
         """
@@ -50,10 +53,10 @@ public struct GPXWriter: Sendable {
         for waypoint in recording.waypoints {
             xml += "  <wpt \(Self.coordinates(waypoint.latitude, waypoint.longitude))>\n"
             if let elevation = waypoint.elevation {
-                xml += "    <ele>\(GPXFormat.elevation(elevation))</ele>\n"
+                xml += "    <ele>\(GPXText.elevation(elevation))</ele>\n"
             }
             if let time = waypoint.time {
-                xml += "    <time>\(GPXFormat.time(time))</time>\n"
+                xml += "    <time>\(GPXText.time(time))</time>\n"
             }
             if let name = waypoint.name {
                 xml += "    <name>\(Self.escape(name))</name>\n"
@@ -61,6 +64,7 @@ public struct GPXWriter: Sendable {
             if let comment = waypoint.comment {
                 xml += "    <cmt>\(Self.escape(comment))</cmt>\n"
             }
+            xml += Self.quality(waypoint.quality, indent: "    ")
             xml += "  </wpt>\n"
         }
 
@@ -71,17 +75,18 @@ public struct GPXWriter: Sendable {
                 xml += "    <trkseg>\n"
                 for point in segment.points {
                     let attributes = Self.coordinates(point.latitude, point.longitude)
-                    if point.elevation == nil && point.time == nil {
+                    if point.elevation == nil && point.time == nil && point.quality.isEmpty {
                         xml += "      <trkpt \(attributes)/>\n"
                         continue
                     }
                     xml += "      <trkpt \(attributes)>\n"
                     if let elevation = point.elevation {
-                        xml += "        <ele>\(GPXFormat.elevation(elevation))</ele>\n"
+                        xml += "        <ele>\(GPXText.elevation(elevation))</ele>\n"
                     }
                     if let time = point.time {
-                        xml += "        <time>\(GPXFormat.time(time))</time>\n"
+                        xml += "        <time>\(GPXText.time(time))</time>\n"
                     }
+                    xml += Self.quality(point.quality, indent: "        ")
                     xml += "      </trkpt>\n"
                 }
                 xml += "    </trkseg>\n"
@@ -99,13 +104,31 @@ public struct GPXWriter: Sendable {
             return name
         }
         if let start = track.segments.lazy.flatMap(\.points).compactMap(\.time).first {
-            return GPXFormat.displayTime(start)
+            return GPXText.displayTime(start)
         }
         return "Track \(index + 1)"
     }
 
+    /// `fix`, `sat`, `hdop`, `vdop`, `pdop` in the order of the GPX 1.1 schema.
+    private static func quality(_ quality: PositionQuality, indent: String) -> String {
+        guard !quality.isEmpty else { return "" }
+        var xml = ""
+        if let fix = quality.fix {
+            xml += "\(indent)<fix>\(fix.rawValue)</fix>\n"
+        }
+        if let satellites = quality.satellites, satellites >= 0 {
+            xml += "\(indent)<sat>\(satellites)</sat>\n"
+        }
+        for (name, value) in [("hdop", quality.hdop), ("vdop", quality.vdop), ("pdop", quality.pdop)] {
+            if let value {
+                xml += "\(indent)<\(name)>\(GPXText.fixed(value, decimals: 2))</\(name)>\n"
+            }
+        }
+        return xml
+    }
+
     private static func coordinates(_ latitude: Double, _ longitude: Double) -> String {
-        "lat=\"\(GPXFormat.coordinate(latitude))\" lon=\"\(GPXFormat.coordinate(longitude))\""
+        "lat=\"\(GPXText.coordinate(latitude))\" lon=\"\(GPXText.coordinate(longitude))\""
     }
 
     /// Escapes text for XML content and attributes and drops characters XML 1.0 does not allow.
@@ -131,7 +154,7 @@ public struct GPXWriter: Sendable {
 }
 
 /// Locale independent formatting for GPX values.
-enum GPXFormat {
+enum GPXText {
     /// Up to 7 decimals, no trailing zeros, "." as decimal separator.
     static func coordinate(_ value: Double) -> String {
         fixed(value, decimals: 7)

@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import LoggerCore
+@testable import GPSLoggerKit
 
 @Suite("Data model")
 struct ModelTests {
@@ -30,5 +30,24 @@ struct ModelTests {
         #expect(track.pointCount == 6)
         #expect(recording.trackPointCount == 12)
         #expect(!recording.isEmpty)
+    }
+}
+
+@Suite("Data model – quality")
+struct ModelQualityTests {
+    /// Scenario "Punkt nur mit Koordinaten".
+    @Test func pointWithOnlyCoordinatesHasNoOtherValues() {
+        let point = TrackPoint(latitude: 51.7, longitude: 8.6)
+        #expect(point.elevation == nil)
+        #expect(point.time == nil)
+        #expect(point.quality.isEmpty)
+        #expect(point.quality.speed == nil && point.quality.course == nil)
+        #expect(point.quality.satellites == nil && point.quality.fix == nil)
+        #expect(point.quality.hdop == nil && point.quality.vdop == nil && point.quality.pdop == nil)
+    }
+
+    @Test func qualityWithAnyValueIsNotEmpty() {
+        #expect(!PositionQuality(satellites: 0).isEmpty)
+        #expect(!PositionQuality(fix: FixType.none).isEmpty)
     }
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!-- Synthetic test fixture in the style of a Garmin Oregon (invented coordinates). -->
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
+     xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" creator="Synthetic Oregon" version="1.1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Testdatei</name>
+    <link href="http://www.garmin.com"><text>Garmin International</text></link>
+    <time>2026-10-18T12:00:00Z</time>
+  </metadata>
+  <wpt lat="51.741158" lon="8.680967"><ele>94.0</ele><time>2026-10-18T07:00:00Z</time><name>Start</name><cmt>Parkplatz</cmt><sym>Flag, Blue</sym></wpt>
+  <wpt lat="51.742000" lon="8.681500"><name>Brücke</name></wpt>
+  <wpt lat="51.743000" lon="8.682000"><name>Café &amp; Bäckerei</name><extensions><gpxx:WaypointExtension><gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode></gpxx:WaypointExtension></extensions></wpt>
+  <wpt lat="51.744000" lon="8.683000"><ele>310.5</ele><name>Gipfel</name></wpt>
+  <wpt lat="51.745000" lon="8.684000"><name>Ziel</name></wpt>
+  <rte>
+    <name>Geplante Route</name>
+    <rtept lat="51.741158" lon="8.680967"><name>Routenpunkt</name></rtept>
+    <rtept lat="51.745000" lon="8.684000"><name>Routenpunkt</name></rtept>
+  </rte>
+  <trk>
+    <name>Morgenrunde</name>
+    <extensions><gpxx:TrackExtension><gpxx:DisplayColor>Red</gpxx:DisplayColor></gpxx:TrackExtension></extensions>
+    <trkseg>
+      <trkpt lat="51.741158" lon="8.680967"><ele>94.0</ele><time>2026-10-18T07:02:11Z</time><fix>3d</fix><sat>9</sat><hdop>0.8</hdop>
+        <extensions><gpxtpx:TrackPointExtension><gpxtpx:hr>112</gpxtpx:hr><gpxtpx:cad>80</gpxtpx:cad></gpxtpx:TrackPointExtension></extensions>
+      </trkpt>
+      <trkpt lat="51.741258" lon="8.681067"><ele>94.5</ele><time>2026-10-18T07:02:21Z</time>
+        <extensions><gpxtpx:TrackPointExtension><gpxtpx:hr>118</gpxtpx:hr></gpxtpx:TrackPointExtension></extensions>
+      </trkpt>
+      <trkpt lat="51.741358" lon="8.681167"><ele>95.0</ele><time>2026-10-18T07:02:31Z</time></trkpt>
+    </trkseg>
+  </trk>
+  <trk>
+    <name>Nachmittag</name>
+    <trkseg><trkpt lat="51.75" lon="8.69"><time>2026-10-18T14:00:00+02:00</time></trkpt></trkseg>
+    <trkseg><trkpt lat="51.76" lon="8.70"><time>2026-10-18T14:10:00+02:00</time></trkpt></trkseg>
+  </trk>
+</gpx>

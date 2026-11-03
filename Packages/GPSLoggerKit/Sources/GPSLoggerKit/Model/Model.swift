@@ -1,21 +1,63 @@
 import Foundation
 
+/// Kind of position fix reported by a receiver.
+public enum FixType: String, Sendable, Hashable, CaseIterable {
+    case none
+    case twoD = "2d"
+    case threeD = "3d"
+    case dgps
+}
+
+/// Optional quality and motion values of a position. All values use SI units.
+public struct PositionQuality: Sendable, Hashable {
+    /// Speed over ground in meters per second.
+    public var speed: Double?
+    /// Course over ground in degrees (0...360, true north).
+    public var course: Double?
+    /// Number of satellites used for the fix.
+    public var satellites: Int?
+    public var hdop: Double?
+    public var vdop: Double?
+    public var pdop: Double?
+    public var fix: FixType?
+
+    public init(speed: Double? = nil, course: Double? = nil, satellites: Int? = nil,
+                hdop: Double? = nil, vdop: Double? = nil, pdop: Double? = nil, fix: FixType? = nil) {
+        self.speed = speed
+        self.course = course
+        self.satellites = satellites
+        self.hdop = hdop
+        self.vdop = vdop
+        self.pdop = pdop
+        self.fix = fix
+    }
+
+    /// True when no value is set.
+    public var isEmpty: Bool {
+        self == PositionQuality()
+    }
+}
+
 /// A single recorded position.
 public struct TrackPoint: Sendable, Hashable {
     /// Latitude in degrees (WGS 84).
     public var latitude: Double
     /// Longitude in degrees (WGS 84).
     public var longitude: Double
-    /// Elevation in meters, if the device recorded one.
+    /// Elevation in meters, if recorded.
     public var elevation: Double?
     /// Time of the fix (absolute point in time; exported as UTC).
     public var time: Date?
+    /// Quality and motion values, if recorded.
+    public var quality: PositionQuality
 
-    public init(latitude: Double, longitude: Double, elevation: Double? = nil, time: Date? = nil) {
+    public init(latitude: Double, longitude: Double, elevation: Double? = nil, time: Date? = nil,
+                quality: PositionQuality = PositionQuality()) {
         self.latitude = latitude
         self.longitude = longitude
         self.elevation = elevation
         self.time = time
+        self.quality = quality
     }
 }
 
@@ -28,7 +70,7 @@ public struct TrackSegment: Sendable, Hashable {
     }
 }
 
-/// A track as delivered by a logger, made of one or more segments.
+/// A track made of one or more segments.
 public struct Track: Sendable, Hashable {
     public var name: String?
     public var segments: [TrackSegment]
@@ -44,7 +86,7 @@ public struct Track: Sendable, Hashable {
     }
 }
 
-/// A single marked position (e.g. a waypoint button press on the logger).
+/// A single marked position.
 public struct Waypoint: Sendable, Hashable {
     public var latitude: Double
     public var longitude: Double
@@ -52,19 +94,21 @@ public struct Waypoint: Sendable, Hashable {
     public var time: Date?
     public var name: String?
     public var comment: String?
+    public var quality: PositionQuality
 
     public init(latitude: Double, longitude: Double, elevation: Double? = nil, time: Date? = nil,
-                name: String? = nil, comment: String? = nil) {
+                name: String? = nil, comment: String? = nil, quality: PositionQuality = PositionQuality()) {
         self.latitude = latitude
         self.longitude = longitude
         self.elevation = elevation
         self.time = time
         self.name = name
         self.comment = comment
+        self.quality = quality
     }
 }
 
-/// Everything read from a logger in one operation.
+/// Everything read in one operation.
 public struct Recording: Sendable, Hashable {
     public var tracks: [Track]
     public var waypoints: [Waypoint]

@@ -1,6 +1,7 @@
 #if DEBUG
 import Foundation
 import GPSBabelRuntime
+import GPSLoggerKit
 import LoggerCore
 
 /// Simulated driver for exercising the session UI without hardware (task 7.3). Debug builds only.

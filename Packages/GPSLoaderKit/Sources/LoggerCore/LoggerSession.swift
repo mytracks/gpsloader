@@ -1,4 +1,5 @@
 import Foundation
+import GPSLoggerKit
 
 public enum SessionOperation: Sendable, Equatable {
     case read

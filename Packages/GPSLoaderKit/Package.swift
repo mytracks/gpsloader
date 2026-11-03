@@ -14,28 +14,37 @@ let package = Package(
         .library(name: "DiagnosticCapture", targets: ["DiagnosticCapture"]),
         .library(name: "TestSupport", targets: ["TestSupport"]),
     ],
+    dependencies: [
+        .package(path: "../GPSLoggerKit"),
+    ],
     targets: [
         .target(
             name: "LoggerCore",
+            dependencies: [.product(name: "GPSLoggerKit", package: "GPSLoggerKit")],
             resources: [.process("Resources")]
         ),
         .target(name: "SerialTransport", dependencies: ["LoggerCore"]),
         .target(name: "GPSBabelRuntime", dependencies: ["LoggerCore"]),
-        .target(name: "GPXExport", dependencies: ["LoggerCore"]),
+        .target(name: "GPXExport", dependencies: ["LoggerCore", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]),
         .target(name: "DiagnosticCapture", dependencies: ["LoggerCore"]),
-        .target(name: "TestSupport", dependencies: ["LoggerCore", "DiagnosticCapture"]),
+        .target(
+            name: "TestSupport",
+            dependencies: ["LoggerCore", "DiagnosticCapture", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]
+        ),
 
-        .testTarget(name: "LoggerCoreTests", dependencies: ["LoggerCore", "TestSupport"]),
+        .testTarget(
+            name: "LoggerCoreTests",
+            dependencies: ["LoggerCore", "TestSupport", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]
+        ),
         .testTarget(name: "SerialTransportTests", dependencies: ["SerialTransport", "LoggerCore"]),
         .testTarget(name: "GPSBabelRuntimeTests", dependencies: ["GPSBabelRuntime", "LoggerCore", "TestSupport"]),
         .testTarget(
             name: "GPXExportTests",
-            dependencies: ["GPXExport", "LoggerCore"],
-            resources: [.copy("Resources")]
+            dependencies: ["GPXExport", "LoggerCore", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]
         ),
         .testTarget(
             name: "DiagnosticCaptureTests",
-            dependencies: ["DiagnosticCapture", "LoggerCore", "TestSupport"],
+            dependencies: ["DiagnosticCapture", "LoggerCore", "TestSupport", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")],
             resources: [.copy("Fixtures")]
         ),
         .testTarget(name: "TestSupportTests", dependencies: ["TestSupport", "LoggerCore"]),

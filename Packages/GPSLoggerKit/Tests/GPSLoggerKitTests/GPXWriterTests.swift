@@ -1,7 +1,6 @@
 import Foundation
 import Testing
-import LoggerCore
-@testable import GPXExport
+@testable import GPSLoggerKit
 
 private let writer = GPXWriter(creator: "gpsloader 0.1.0")
 /// 2026-11-02 14:30:05 UTC
@@ -24,6 +23,7 @@ private let sample = Recording(
 /// Serialized: XMLDocument (libxml2), used for validation in these tests, is not safe to use concurrently.
 @Suite("GPXWriter", .serialized)
 struct GPXWriterTests {
+#if os(macOS) // XMLDocument is not available on iOS
     // MARK: Conformance (task 4.1 / 4.2)
 
     /// Scenario "Validierung gegen das Schema".
@@ -60,6 +60,8 @@ struct GPXWriterTests {
         #expect(root.uri == "http://www.topografix.com/GPX/1/1")
     }
 
+#endif
+
     /// Scenario "Keine Erweiterungen".
     @Test func containsNoExtensions() {
         #expect(!writer.document(for: sample, createdAt: t0).contains("extensions"))
@@ -67,6 +69,7 @@ struct GPXWriterTests {
 
     // MARK: Content
 
+#if os(macOS) // XMLDocument is not available on iOS
     /// Scenario "Track mit Segmenten".
     @Test func trackWithTwoSegments() throws {
         let document = try XMLDocument(data: writer.data(for: sample, createdAt: t0))
@@ -76,6 +79,8 @@ struct GPXWriterTests {
             #expect(segment.children?.count == 3)
         }
     }
+
+#endif
 
     /// Scenario "Punkt ohne Höhe".
     @Test func pointWithoutElevationHasNoEle() {
@@ -100,16 +105,16 @@ struct GPXWriterTests {
 
     /// Scenario "Ganze Sekunden".
     @Test func wholeSecondsHaveNoFraction() {
-        #expect(GPXFormat.time(t0) == "2026-11-02T14:30:05Z")
+        #expect(GPXText.time(t0) == "2026-11-02T14:30:05Z")
     }
 
     /// Scenario "Millisekunden".
     @Test func millisecondsAreWritten() {
-        #expect(GPXFormat.time(t0.addingTimeInterval(0.25)) == "2026-11-02T14:30:05.250Z")
+        #expect(GPXText.time(t0.addingTimeInterval(0.25)) == "2026-11-02T14:30:05.250Z")
     }
 
     @Test func timesBefore1970() {
-        #expect(GPXFormat.time(Date(timeIntervalSince1970: -0.5)) == "1969-12-31T23:59:59.500Z")
+        #expect(GPXText.time(Date(timeIntervalSince1970: -0.5)) == "1969-12-31T23:59:59.500Z")
     }
 
     // MARK: Numbers
@@ -119,22 +124,25 @@ struct GPXWriterTests {
         // Proof that a German locale would produce a comma ...
         #expect(String(format: "%.1f", locale: Locale(identifier: "de_DE"), 1.5) == "1,5")
         // ... while the writer does not.
-        #expect(GPXFormat.coordinate(51.7411580) == "51.741158")
-        #expect(GPXFormat.coordinate(-8.0) == "-8")
-        #expect(GPXFormat.coordinate(-0.00000001) == "0")
-        #expect(GPXFormat.coordinate(12345.123456789) == "12345.1234568")
-        #expect(GPXFormat.elevation(94) == "94")
-        #expect(GPXFormat.elevation(1234.567) == "1234.57")
+        #expect(GPXText.coordinate(51.7411580) == "51.741158")
+        #expect(GPXText.coordinate(-8.0) == "-8")
+        #expect(GPXText.coordinate(-0.00000001) == "0")
+        #expect(GPXText.coordinate(12345.123456789) == "12345.1234568")
+        #expect(GPXText.elevation(94) == "94")
+        #expect(GPXText.elevation(1234.567) == "1234.57")
     }
 
     // MARK: Escaping
 
+#if os(macOS) // XMLDocument is not available on iOS
     /// Scenario "Name mit Sonderzeichen".
     @Test func specialCharactersRoundTrip() throws {
         let document = try XMLDocument(data: writer.data(for: sample, createdAt: t0))
         let names = try document.nodes(forXPath: "//*[local-name()='trk']/*[local-name()='name']")
         #expect(names.first?.stringValue == "Berg & Tal <1>")
     }
+
+#endif
 
     @Test func invalidControlCharactersAreDropped() {
         #expect(GPXWriter.escape("a\u{01}b\tc") == "ab\tc")
@@ -173,11 +181,11 @@ struct GPXWriterTests {
         #expect {
             try writer.write(sample, to: target, createdAt: t0)
         } throws: { error in
-            (error as? LoggerError)?.kind == .writeFailed
+            (error as? GPSLoggerError)?.kind == .writeFailed
         }
         #expect(!FileManager.default.fileExists(atPath: target.path))
 
-        #expect(throws: LoggerError.self) {
+        #expect(throws: GPSLoggerError.self) {
             try writer.write(sample, to: existing, createdAt: t0)
         }
         #expect(try Data(contentsOf: existing) == Data("old".utf8))
