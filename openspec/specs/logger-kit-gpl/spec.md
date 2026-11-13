@@ -99,11 +99,15 @@ Der Katalog des Pakets SHALL das Format `gopal` (Endung `trk`) enthalten. Der Ei
 - **THEN** enthält er `gopal`, und der gpsbabel-Eintrag nennt Jürgen Neumann
 
 ### Requirement: Geräteprotokolle
-Das Paket SHALL für Geräteprotokolle eine eigene Verbindungs-Schnittstelle (schreiben, lesen mit Zeitlimit, bis zu einem Endezeichen lesen, Eingang verwerfen, Baudrate wechseln) und einen Treibervertrag (auslesen, löschen, Fortschritt) bereitstellen. Es SHALL dafür von nichts außer GPSLoggerKit abhängen. Jeder Treiber SHALL ohne Hardware gegen ein simuliertes Gerät testbar sein.
+Die Geräteprotokolle des Pakets SHALL die Geräteschnittstelle aus GPSLoggerKit nutzen (Verbindung: schreiben, lesen mit Zeitlimit, bis zu einem Endezeichen lesen, Eingang verwerfen, Baudrate wechseln; Treibervertrag: auslesen, löschen, Fortschritt). Eine eigene Schnittstelle SHALL das Paket nicht mehr bereitstellen. Es SHALL dafür von nichts außer GPSLoggerKit abhängen. Jeder Treiber SHALL ohne Hardware gegen ein simuliertes Gerät testbar sein.
 
 #### Scenario: Simuliertes Gerät
 - **WHEN** ein Test einen Treiber mit einer simulierten Verbindung ausführt
 - **THEN** läuft er ohne seriellen Anschluss und liefert die Aufzeichnung des simulierten Geräts
+
+#### Scenario: Gemeinsame Schnittstelle
+- **WHEN** eine App Treiber aus GPSLoggerKit und aus GPSLoggerKitGPL verwendet
+- **THEN** erfüllen beide denselben Treibervertrag aus GPSLoggerKit
 
 ### Requirement: igotu2gpx in den Credits
 `credits` SHALL igotu2gpx mit Michael Hofmann, der Lizenz GPL-3.0-or-later und der Adresse der Version 0.3.0 nennen.

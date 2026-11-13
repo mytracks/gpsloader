@@ -159,3 +159,26 @@ read, translated, or copied. Each section heading is the format ID used in the c
 - Cross-check against gpsbabel 1.7.0 reading the fixtures (2026-11-13): point counts, positions,
   times, altitudes, speeds, fix types, satellites and DOP values agree. Difference: gpsbabel reads
   the columns at fixed positions; GPSLoggerKit finds them by name, so other column orders work too.
+
+## Device interface and protocols
+
+Not file formats; listed here because they are part of the package.
+
+### Device interface (`DeviceConnection`, `DeviceProtocol`)
+
+- The author's own code, written for gpsloader (change `device-mode`) and moved here from GPSLoggerKitGPL
+  (change `gns2000-driver`). It contains no ported code.
+
+### `GNS2000Device`
+
+- Basis: the author's own myTracks driver (`DsTrackFramework/Source/Classes/GpsDriver/GNS2000.m` and
+  `GNS2000.h`, © 2013 Dirk Stichling), written anew in Swift; no third-party source (e.g. gpsbabel's LOCUS
+  code) was read.
+- Taken over: sentences with XOR checksum (sent in lower case), waiting for the first NMEA sentence,
+  `$PGNS,R` with `$PMTKLOX,0/1/2`, the 16-byte record (time, fix type 1–4, float latitude and longitude,
+  height), skipping all-`FF` records, a new track when the time goes backwards, `$PGNS,C` confirmed by
+  `$PMTK001` with a repeated request after more than 10 lines without `$P`.
+- Changed (design D3 of change `gns2000-driver`): timeouts of 10 s (the old driver could wait forever);
+  progress by packets; at most five erase requests; tracks named after the first point in UTC (the old app
+  used the local time zone of its preferences); byte 15 of a record is still not evaluated.
+- Tests use a simulated device; there was no hardware.

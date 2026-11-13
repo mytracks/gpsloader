@@ -36,14 +36,16 @@ context: |
     APIs, die neuer als macOS 12 sind, nur mit `#available`-Fallback.
   - UI auf AppKit-Basis. SwiftUI nur, wo es unter macOS 12 zuverlässig funktioniert.
   - Treiber-Architektur: ein gemeinsames Treiber-Protokoll (async, abbrechbar, mit Fortschritt);
-    alle Treiber sind native Swift-Treiber in GPSLoggerKit bzw. GPSLoggerKitGPL (siehe unten).
-    Noch offen: BG728 (Maptaq Trip IQ), GNS2000 (IOBluetooth/RFCOMM) und WSG-2000-NAL-Dateien.
+    alle Treiber sind native Swift-Treiber in GPSLoggerKit bzw. GPSLoggerKitGPL (siehe unten). Die
+    Geräteschnittstelle (DeviceConnection/DeviceProtocol, eigener Code) liegt seit Change gns2000-driver
+    in GPSLoggerKit; die Transporte (seriell, USB-HID, Bluetooth-RFCOMM) liegen in GPSLoaderKit.
+    Noch offen: BG728 (Maptaq Trip IQ) und WSG-2000-NAL-Dateien.
   - Kein gpsbabel (entschieden am 2026-11-13, Change remove-gpsbabel): Die App liefert weder gpsbabel
     noch Qt noch einen Rosetta-Installer aus und braucht kein Rosetta. Das gpsbabel-1.7.0-Binary der
     Alt-App (x86_64, docs/legacy-analysis.md, Abschnitt 3.1; myTracks-Historie, Commit e0d1f18) dient
     nur noch der Black-Box-Gegenprüfung von Portierungen; es wird in den Scratchpad kopiert, nie ins
     Repository und nie in die App. Aufruf auch dort nur als Prozess mit Argument-Array, nie über eine Shell.
-  - Bluetooth-Logger (außer GNS2000) werden nur über den seriellen Port /dev/cu.* angesprochen,
+  - Bluetooth-Logger (außer GNS2000, der über IOBluetooth/RFCOMM läuft) werden nur über den seriellen Port /dev/cu.* angesprochen,
     den macOS nach dem Koppeln anlegt. Es gibt keine eigene RFCOMM-Brücke.
   - Keine Laufzeitabhängigkeit von Python, Perl oder anderen Interpretern.
     Kein system()/popen(), keine Shell-Kommandozeilen mit Platzhaltern wie in der Alt-App.
@@ -118,6 +120,8 @@ context: |
     - WSG-2000 NAL: Black-Box in GPSLoggerKit. `wsg2000.c` steht unter einer eigenen
       CC-BY-SA-ähnlichen Lizenz mit Zusatzbedingungen (GPLv2 nur als Absicht, Zeilen 5–13) und ist
       damit keine zulässige Vorlage, solange der Autor keine vereinbare Lizenz erteilt.
+    - GNS 2000 / GNS 2000 plus: Clean-Room in GPSLoggerKit aus dem eigenen myTracks-Treiber
+      (GpsDriver/GNS2000.m), Change gns2000-driver, Entscheidung des Entwicklers vom 2026-11-13.
     - CSV-Logger Columbus V-900/Visiontac und iBlue-CSV: Clean-Room in GPSLoggerKit (Change
       csv-logger-import, vom Entwickler bestätigt am 2026-11-13).
     - GPSLoggerKitGPL (Portierung; Entscheidung des Entwicklers am 2026-11-13: „Portieren alles, was

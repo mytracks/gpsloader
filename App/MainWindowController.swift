@@ -1,4 +1,5 @@
 import AppKit
+import BluetoothTransport
 import HIDTransport
 import LoggerCore
 
@@ -22,6 +23,7 @@ final class MainWindowController: NSWindowController, NSMenuItemValidation {
         conversionPresenter = ConversionPresenter(window: window, sessionPresenter: sessionPresenter)
         devicePanel = DevicePanel(sessionPresenter: sessionPresenter)
         devicePanel.hidFactory = IOKitHIDConnectionFactory()
+        devicePanel.bluetoothFactory = IOBluetoothTransportFactory()
         sessionPresenter.onRunningChange = { [weak self] in self?.devicePanel.update() }
         buildContent()
         window.center()

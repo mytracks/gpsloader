@@ -36,6 +36,14 @@ private struct HelloProtocol: DeviceProtocol {
     }
 }
 
+/// Returns a fixed recording without talking to the device.
+private struct FixedProtocol: DeviceProtocol {
+    let recording: Recording
+    var eraseSupport: DeviceErase { .unsupported }
+    func read(_ connection: any DeviceConnection, _ reporter: DeviceReporter) async throws -> Recording { recording }
+    func erase(_ connection: any DeviceConnection, _ reporter: DeviceReporter) async throws {}
+}
+
 private func entry() -> DeviceEntry {
     DeviceEntry(id: "test.hello", name: "Hello Logger", driverID: "hello", connection: .serial(baudRate: 9600)) {
         HelloProtocol()
@@ -87,6 +95,29 @@ struct ProtocolDriverTests {
         #expect(d.resourceKey == "/dev/cu.mock")
         try await d.erase(DriverContext())
         #expect(await mock.isScriptFinished)
+    }
+
+    /// Scenarios "Logger mit Wochenüberlauf" and "Aktuelle Zeiten bleiben" (spec `device-mode`).
+    @Test func weekRolloverIsCorrected() async throws {
+        let utc = ISO8601DateFormatter()
+        let reading = try #require(utc.date(from: "2026-11-13T10:00:00Z"))
+        let real = try #require(utc.date(from: "2026-11-02T12:00:00Z"))
+        let rolledOver = real.addingTimeInterval(-1024 * 7 * 86_400)  // 2007-03-19T12:00:00Z
+        let recent = try #require(utc.date(from: "2020-05-01T08:00:00Z"))
+        let recording = Recording(
+            tracks: [Track(segments: [TrackSegment(points: [TrackPoint(latitude: 50, longitude: 8, time: rolledOver),
+                                                            TrackPoint(latitude: 50, longitude: 8, time: recent),
+                                                            TrackPoint(latitude: 50, longitude: 8)])])],
+            waypoints: [Waypoint(latitude: 50, longitude: 8, time: rolledOver)])
+        let entry = DeviceEntry(id: "test.fixed", name: "Fixed Logger", driverID: "fixed", connection: .serial(baudRate: 9600)) {
+            FixedProtocol(recording: recording)
+        }
+        let d = ProtocolDriver(entry: entry, portPath: "/dev/cu.mock", hidFactory: nil, now: { reading }) { _, _ in
+            MockTransport(script: [])
+        }
+        let result = try await d.read(DriverContext())
+        #expect(result.tracks.first?.segments.first?.points.map(\.time) == [real, recent, nil])
+        #expect(result.waypoints.map(\.time) == [real])
     }
 
     @Test func serialEntryWithoutPort() async {
@@ -237,6 +268,59 @@ struct ITrackUCatalogTests {
         let selection = DeviceSelection(entryID: entry.id, portPath: "/dev/cu.iTrackU")
         #expect(selection.canRead(entries: DeviceCatalog.entries, isRunning: false))
         #expect(!selection.canErase(entries: DeviceCatalog.entries, isRunning: false))
+    }
+}
+
+/// A Bluetooth factory for tests: hands out a scripted transport.
+private struct TestBluetoothFactory: BluetoothTransportFactory {
+    let transport: MockTransport
+    func resourceKey(for entry: DeviceEntry) -> String { "bluetooth:test" }
+    func makeTransport(for entry: DeviceEntry) -> any ByteTransport { transport }
+}
+
+@Suite("Device catalog – GNS 2000")
+struct GNS2000CatalogTests {
+    private static func sentence(_ body: String) -> String {
+        "$\(body)*\(String(format: "%02X", body.utf8.reduce(0, ^)))\r\n"
+    }
+
+    /// Spec `gns2000-device`, "GNS 2000 wählen", and spec `device-mode`, "Bluetooth-Gerät".
+    @Test func gns2000Entry() throws {
+        let entry = try #require(DeviceCatalog.entry(withID: "gns2000.gns-2000"))
+        #expect(entry.name == "GNS 2000" && entry.driverID == "gns2000")
+        #expect(entry.connection == .bluetooth(deviceNames: ["GNS 2000", "GNS 2000 plus"], serviceName: "GNS GPS"))
+        #expect(!entry.needsPort && entry.eraseSupport == .supported)
+        let selection = DeviceSelection(entryID: entry.id, portPath: nil)
+        #expect(selection.hint(entries: DeviceCatalog.entries) == nil)
+        #expect(selection.canRead(entries: DeviceCatalog.entries, isRunning: false))
+        #expect(selection.canErase(entries: DeviceCatalog.entries, isRunning: false))
+    }
+
+    /// Spec `device-mode`, "Mitschnitt über Bluetooth": the bytes of the RFCOMM channel are captured.
+    @Test func capturesBluetoothBytes() async throws {
+        let entry = try #require(DeviceCatalog.entry(withID: "gns2000.gns-2000"))
+        let record = "407BE86A" + ",0300004A" + ",42000004" + ",417B0000"  // 2026-11-02T12:00Z, 50.5/8.25, 123 m
+        let mock = MockTransport(identifier: "bluetooth:GNS 2000", script: [
+            .reply(Self.sentence("GPGGA,120000,5030.000,N,00815.000,E,1,05,1.0,100.0,M,,,,")),
+            .expect("$PGNS,R*74\r\n"),
+            .reply(Self.sentence("PMTKLOX,0,1") + Self.sentence("PMTKLOX,1,0," + record) + Self.sentence("PMTKLOX,2")),
+        ])
+        let log = EventLog()
+        let driver = ProtocolDriver(entry: entry, portPath: nil, bluetoothFactory: TestBluetoothFactory(transport: mock))
+        #expect(driver.resourceKey == "bluetooth:test")
+        let recording = try await driver.read(DriverContext(diagnostics: log))
+        #expect(recording.trackPointCount == 1)
+        #expect(recording.tracks.first?.segments.first?.points.first?.elevation == 123)
+        #expect(log.events.contains(.transmitted(source: "bluetooth:GNS 2000", bytes: Array("$PGNS,R*74\r\n".utf8))))
+        #expect(log.events.contains { if case .received(source: "bluetooth:GNS 2000", _) = $0 { true } else { false } })
+        #expect(await mock.closeCount == 1)
+    }
+
+    @Test func bluetoothWithoutFactory() async throws {
+        let entry = try #require(DeviceCatalog.entry(withID: "gns2000.gns-2000"))
+        await #expect(throws: LoggerError(.deviceNotFound, detail: "Bluetooth is not available")) {
+            try await ProtocolDriver(entry: entry, portPath: nil).read(DriverContext())
+        }
     }
 }
 

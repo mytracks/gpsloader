@@ -9,6 +9,9 @@ public enum DeviceConnectionKind: Sendable, Equatable {
     case serial(baudRate: Int)
     /// A USB HID device found by vendor and product ID; no port selection.
     case hid(vendorID: Int, productIDs: [Int])
+    /// A paired Bluetooth device found by name, connected over the RFCOMM channel of an SDP service;
+    /// no port selection (change gns2000-driver).
+    case bluetooth(deviceNames: [String], serviceName: String)
 }
 
 /// One selectable device (spec `device-mode`, "Gerätekatalog").
@@ -53,6 +56,14 @@ public protocol HIDConnectionFactory: Sendable {
     func open(_ entry: DeviceEntry, diagnostics: any DiagnosticSink) async throws -> (any DeviceConnection, @Sendable () async -> Void)
 }
 
+/// Creates the transport for Bluetooth RFCOMM devices; provided by the Bluetooth transport (GNS 2000).
+public protocol BluetoothTransportFactory: Sendable {
+    /// The resource key used to reserve the device, e.g. "bluetooth:GNS 2000".
+    func resourceKey(for entry: DeviceEntry) -> String
+    /// A transport for the device; it connects in `open()`.
+    func makeTransport(for entry: DeviceEntry) -> any ByteTransport
+}
+
 /// The devices of all available drivers, sorted by name.
 public enum DeviceCatalog {
     public static var entries: [DeviceEntry] {
@@ -68,6 +79,6 @@ public enum DeviceCatalog {
 enum DeviceCatalogContent {
     static var all: [DeviceEntry] {
         SkyTraqDevices.entries + MTKDevices.entries + WintecDevices.entries + NavilinkDevices.entries
-            + MagellanDevices.entries + ITrackUDevices.entries + IGotUDevices.entries
+            + MagellanDevices.entries + ITrackUDevices.entries + IGotUDevices.entries + GNS2000Devices.entries
     }
 }

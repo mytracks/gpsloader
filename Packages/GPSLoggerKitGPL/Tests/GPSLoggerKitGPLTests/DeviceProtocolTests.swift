@@ -11,7 +11,7 @@ private struct LineProtocol: DeviceProtocol {
         try await connection.write(Array("GET\r\n".utf8))
         var points: [TrackPoint] = []
         while true {
-            let line = try await connection.readLine(timeout: 1)
+            let line = String(decoding: try await connection.readUntil([0x0D, 0x0A], maxLength: 64, timeout: 1), as: UTF8.self)
             if line == "END" { break }
             let parts = line.split(separator: ",").compactMap { Double($0) }
             guard parts.count == 2 else { throw DeviceProtocolError("Unexpected answer: \(line)") }
@@ -34,6 +34,12 @@ struct DeviceProtocolTests {
         #expect(recording.trackPointCount == 2)
         #expect(reports.values == [1, 2])
         #expect(LineProtocol().eraseSupport == .unsupported)
+    }
+
+    /// Spec `logger-kit-gpl`, "Gemeinsame Schnittstelle": the drivers of this package fulfil the contract of GPSLoggerKit.
+    @Test func driversUseTheContractOfGPSLoggerKit() {
+        let drivers: [any GPSLoggerKit.DeviceProtocol] = [NavilinkDevice(), MagellanDevice(), ITrackUDevice(), IGotUDevice(variant: .serial)]
+        #expect(drivers.map(\.eraseSupport) == [.unsupported, .unsupported, .unsupported, .experimental])
     }
 
     @Test func timeoutReachesTheCaller() async {

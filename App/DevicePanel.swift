@@ -23,6 +23,7 @@ final class DevicePanel: NSObject {
 
     /// The HID transport used for USB HID devices (i-GotU); set by the app if available.
     var hidFactory: (any HIDConnectionFactory)?
+    var bluetoothFactory: (any BluetoothTransportFactory)?
 
     init(sessionPresenter: SessionPresenter) {
         self.sessionPresenter = sessionPresenter
@@ -114,7 +115,8 @@ final class DevicePanel: NSObject {
 
     private var driver: ProtocolDriver? {
         guard let entry = selection.entry(in: entries) else { return nil }
-        return ProtocolDriver(entry: entry, portPath: entry.needsPort ? selection.portPath : nil, hidFactory: hidFactory)
+        return ProtocolDriver(entry: entry, portPath: entry.needsPort ? selection.portPath : nil, hidFactory: hidFactory,
+                              bluetoothFactory: bluetoothFactory)
     }
 
     #if DEBUG

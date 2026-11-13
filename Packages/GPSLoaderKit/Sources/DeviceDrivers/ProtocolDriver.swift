@@ -5,26 +5,33 @@ import GPSLoggerKitGPL
 import LoggerCore
 import SerialTransport
 
-/// Runs a protocol of GPSLoggerKitGPL as a session driver (spec `device-mode`, "Anbindung der Treiber").
+/// Runs a protocol of GPSLoggerKit or GPSLoggerKitGPL as a session driver (spec `device-mode`, "Anbindung der Treiber").
 public struct ProtocolDriver: LoggerDriver {
     public let entry: DeviceEntry
-    /// Serial port path; `nil` for HID devices.
+    /// Serial port path; `nil` for HID and Bluetooth devices.
     public let portPath: String?
     let hidFactory: (any HIDConnectionFactory)?
+    let bluetoothFactory: (any BluetoothTransportFactory)?
     /// Creates the transport for a serial port; replaceable in tests.
     let makeTransport: @Sendable (_ path: String, _ baudRate: Int) -> any ByteTransport
+    /// Reference time of the week rollover correction; replaceable in tests.
+    let now: @Sendable () -> Date
 
-    public init(entry: DeviceEntry, portPath: String?, hidFactory: (any HIDConnectionFactory)? = nil) {
-        self.init(entry: entry, portPath: portPath, hidFactory: hidFactory) { path, baudRate in
+    public init(entry: DeviceEntry, portPath: String?, hidFactory: (any HIDConnectionFactory)? = nil,
+                bluetoothFactory: (any BluetoothTransportFactory)? = nil) {
+        self.init(entry: entry, portPath: portPath, hidFactory: hidFactory, bluetoothFactory: bluetoothFactory) { path, baudRate in
             SerialPort(path: path, baudRate: baudRate)
         }
     }
 
     init(entry: DeviceEntry, portPath: String?, hidFactory: (any HIDConnectionFactory)?,
+         bluetoothFactory: (any BluetoothTransportFactory)? = nil, now: @escaping @Sendable () -> Date = { Date() },
          makeTransport: @escaping @Sendable (_ path: String, _ baudRate: Int) -> any ByteTransport) {
         self.entry = entry
         self.portPath = portPath
         self.hidFactory = hidFactory
+        self.bluetoothFactory = bluetoothFactory
+        self.now = now
         self.makeTransport = makeTransport
     }
 
@@ -34,13 +41,19 @@ public struct ProtocolDriver: LoggerDriver {
 
     public var resourceKey: String {
         if let portPath { return portPath }
+        if case .bluetooth = entry.connection {
+            return bluetoothFactory?.resourceKey(for: entry) ?? "bluetooth:\(entry.id)"
+        }
         return hidFactory?.resourceKey(for: entry) ?? "hid:\(entry.id)"
     }
 
+    /// Reads the device and corrects GPS week rollovers (spec `device-mode`,
+    /// "Korrektur des GPS-Wochenüberlaufs beim Auslesen").
     public func read(_ context: DriverContext) async throws -> Recording {
-        try await run(context) { proto, connection, reporter in
+        let recording = try await run(context) { proto, connection, reporter in
             try await proto.read(connection, reporter)
         }
+        return RecordingProcessing.correctingWeekRollover(recording, reference: now())
     }
 
     public func erase(_ context: DriverContext) async throws {
@@ -74,6 +87,13 @@ public struct ProtocolDriver: LoggerDriver {
         case .hid:
             guard let hidFactory else { throw LoggerError(.deviceNotFound, detail: "USB HID is not available") }
             (connection, close) = try await hidFactory.open(entry, diagnostics: context.diagnostics)
+        case .bluetooth:
+            guard let bluetoothFactory else { throw LoggerError(.deviceNotFound, detail: "Bluetooth is not available") }
+            let device = bluetoothFactory.makeTransport(for: entry)
+            let transport = CapturingTransport(device, sink: context.diagnostics)
+            try await transport.open()
+            connection = ConnectionBridge(transport: transport, port: device, activity: context.activity)
+            close = { await transport.close() }
         }
 
         do {

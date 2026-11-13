@@ -59,6 +59,8 @@ targets:
         product: DeviceDrivers
       - package: GPSLoaderKit
         product: HIDTransport
+      - package: GPSLoaderKit
+        product: BluetoothTransport
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: info.stichling.gpsloader
@@ -73,6 +75,8 @@ targets:
         INFOPLIST_KEY_NSPrincipalClass: NSApplication
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
         INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 Dirk Stichling"
+        # Shown by macOS before the first Bluetooth access (GNS 2000, change gns2000-driver); German in App/InfoPlist.xcstrings.
+        INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: "gpsloader connects to GPS loggers such as the GNS 2000 over Bluetooth to read their recordings."
         CODE_SIGN_ENTITLEMENTS: App/gpsloader.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: ""
 
@@ -94,5 +98,6 @@ schemes:
         - package: GPSLoaderKit/FileConversionTests
         - package: GPSLoaderKit/DeviceDriversTests
         - package: GPSLoaderKit/HIDTransportTests
+        - package: GPSLoaderKit/BluetoothTransportTests
     archive:
       config: Release

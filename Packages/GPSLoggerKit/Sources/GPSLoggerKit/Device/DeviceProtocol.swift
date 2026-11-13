@@ -1,8 +1,7 @@
-// Connection and driver contract for logger protocols (change device-mode). Own code.
-// SPDX-License-Identifier: GPL-3.0-or-later
+// Connection and driver contract for logger protocols (changes device-mode and gns2000-driver).
+// Own code, platform neutral; the transports live in the apps.
 
 import Foundation
-import GPSLoggerKit
 
 /// Byte oriented connection to a logger, provided by the app (serial port, USB HID, simulation).
 ///
@@ -70,14 +69,5 @@ extension DeviceProtocol {
 
     public func erase(_ connection: any DeviceConnection, _ reporter: DeviceReporter) async throws {
         throw DeviceProtocolError("Erasing is not supported.")
-    }
-}
-
-/// Helpers shared by the protocols.
-extension DeviceConnection {
-    /// Reads until `terminator`, as text (Latin-1 safe), without the terminator.
-    func readLine(terminator: [UInt8] = [0x0D, 0x0A], maxLength: Int = 4096, timeout: TimeInterval) async throws -> String {
-        let bytes = try await readUntil(terminator, maxLength: maxLength, timeout: timeout)
-        return String(decoding: bytes, as: UTF8.self)
     }
 }

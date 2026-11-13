@@ -15,6 +15,7 @@ let package = Package(
         .library(name: "TestSupport", targets: ["TestSupport"]),
         .library(name: "DeviceDrivers", targets: ["DeviceDrivers"]),
         .library(name: "HIDTransport", targets: ["HIDTransport"]),
+        .library(name: "BluetoothTransport", targets: ["BluetoothTransport"]),
     ],
     dependencies: [
         .package(path: "../GPSLoggerKit"),
@@ -46,8 +47,13 @@ let package = Package(
         ),
         .target(
             name: "HIDTransport",
-            dependencies: ["DeviceDrivers", "LoggerCore", .product(name: "GPSLoggerKitGPL", package: "GPSLoggerKitGPL")]
+            dependencies: [
+                "DeviceDrivers", "LoggerCore",
+                .product(name: "GPSLoggerKit", package: "GPSLoggerKit"),
+                .product(name: "GPSLoggerKitGPL", package: "GPSLoggerKitGPL"),
+            ]
         ),
+        .target(name: "BluetoothTransport", dependencies: ["DeviceDrivers", "LoggerCore"]),
         .target(
             name: "TestSupport",
             dependencies: ["LoggerCore", "DiagnosticCapture", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]
@@ -77,6 +83,7 @@ let package = Package(
             ]
         ),
         .testTarget(name: "HIDTransportTests", dependencies: ["HIDTransport", "DeviceDrivers", "LoggerCore"]),
+        .testTarget(name: "BluetoothTransportTests", dependencies: ["BluetoothTransport", "DeviceDrivers", "LoggerCore"]),
         .testTarget(
             name: "FileConversionTests",
             dependencies: ["FileConversion", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]

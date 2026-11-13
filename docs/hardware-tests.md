@@ -26,6 +26,7 @@ Stand: 2026-11-13. Die Changes sind archiviert, diese Tests stehen aber noch aus
 
 - [ ] **SkyTraq** (`skytraq-device-port` 3.2): einen SkyTraq-Logger auslesen und löschen. Prüfen: Punktanzahl und Zeiten wie gpsbabel (`-i skytraq`), danach ist der Logger leer.
 - [ ] **MTK und Holux** (`mtk-device-port` 3.2): einen MTK-Logger (z. B. Qstarz) und einen Holux M-241 auslesen und löschen. Prüfen: Ergebnisse wie gpsbabel, und das Logging läuft danach weiter.
+- [ ] **Wochenüberlauf** (`device-week-rollover` 3.2): den Holux M-241, dessen Zeiten um 1024 Wochen zu früh lagen, erneut auslesen. Prüfen: Die Zeiten im GPX liegen im richtigen Jahr.
 - [ ] **Wintec** (`wintec-device-port` 3.2): einen WBT-201 bzw. G-Rays 2 auslesen. Prüfen: Ergebnis wie gpsbabel (`-i wbt`).
 - [ ] **Magellan** (`magellan-port` 3.2): einen Meridian oder SporTrak seriell auslesen. Prüfen: Track und Wegpunkte wie gpsbabel (`-t -w -i magellan`).
 
@@ -38,6 +39,10 @@ Der Entwickler hat keine i-GotU- und keine Bluetooth-Logger.
   - Prüfen: Die Punkte stimmen mit @trip PC bzw. igotu2gpx überein.
 - [ ] **i-GotU löschen** (`igotu-driver` 3.3), experimentell. Prüfen: Danach meldet das Gerät 0 Datensätze.
 - [ ] **Locosys** (`navilink-device-port` 2.2): einen GT-31 im NAVILINK-Modus auslesen. Prüfen: Wegpunkte und Track wie gpsbabel (`-i navilink`).
+- [ ] **GNS 2000 / GNS 2000 plus** (`gns2000-driver` 5.2): in den Systemeinstellungen koppeln, in der App auslesen und löschen.
+  - Prüfen: Der Bluetooth-Berechtigungsdialog erscheint einmal mit dem Begründungstext.
+  - Prüfen: Die Punkte stimmen mit myTracks bzw. der Hersteller-Software überein; nach dem Löschen ist der Speicher leer.
+  - Byte 15 der Datensätze notieren (vermutlich eine Prüfsumme), am besten per Diagnose-Mitschnitt.
 - [ ] **XAiOX iTrackU** (`itracku-port` 2.2): über Bluetooth oder USB auslesen.
   - Prüfen: Punkte wie gpsbabel (`-t -i itracku`).
   - gpsbabel verwirft die letzten Datensätze, die zusammen mit der Endemarke ankommen. Die App hat dann einige Punkte mehr.

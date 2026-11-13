@@ -96,9 +96,9 @@ xcrun notarytool store-credentials gpsloader-notary --apple-id <Apple-ID> --team
 | Ort | Inhalt |
 |---|---|
 | `App/` | AppKit-App (UI, Lokalisierung `Localizable.xcstrings`) |
-| `Packages/GPSLoggerKit/` | Eigenständiges Paket (MIT, macOS 12+ und iOS 27+): Datenmodell, Dateiformate (NMEA, GPX, IGC, FIT, TCX, Suunto SML, KML/KMZ, V-900, iBlue-CSV), GPX-Ausgabe. Wird später in ein eigenes Repository ausgelagert; siehe dessen `README.md` und `PROVENANCE.md` |
+| `Packages/GPSLoggerKit/` | Eigenständiges Paket (MIT, macOS 12+ und iOS 27+): Datenmodell, Dateiformate (NMEA, GPX, IGC, FIT, TCX, Suunto SML, KML/KMZ, V-900, iBlue-CSV), Geräteschnittstelle und GNS-2000-Treiber, GPX-Ausgabe. Wird später in ein eigenes Repository ausgelagert; siehe dessen `README.md` und `PROVENANCE.md` |
 | `Packages/GPSLoggerKitGPL/` | Paket für Formate und Treiber, die aus GPL-Quellen portiert sind (GPL-3.0-or-later, nur macOS). Ergänzt den Katalog von GPSLoggerKit; Regeln für Portierungen in `Packages/GPSLoggerKitGPL/README.md` |
-| `Packages/GPSLoaderKit/` | `LoggerCore` (Treibervertrag, Session), `SerialTransport`, `GPXExport` (Dateiname, Schreiben), `DiagnosticCapture`, `FileConversion` (Dateimodus: Erkennen, Zusammenführen), `DeviceDrivers` (Gerätekatalog, Anbindung der Treiber), `HIDTransport` (USB-HID), `TestSupport` |
+| `Packages/GPSLoaderKit/` | `LoggerCore` (Treibervertrag, Session), `SerialTransport`, `GPXExport` (Dateiname, Schreiben), `DiagnosticCapture`, `FileConversion` (Dateimodus: Erkennen, Zusammenführen), `DeviceDrivers` (Gerätekatalog, Anbindung der Treiber), `HIDTransport` (USB-HID), `BluetoothTransport` (Bluetooth-RFCOMM, GNS 2000), `TestSupport` |
 | `Vendor/Licenses/` | Lizenztexte für das App-Bundle: GPL-3.0 (Kopie von `LICENSE`) und die MIT-Lizenz von GPSLoggerKit |
 | `Scripts/` | Release, Bundle-Prüfung, Lokalisierungsprüfung |
 

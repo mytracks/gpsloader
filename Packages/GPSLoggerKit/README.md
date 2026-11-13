@@ -1,10 +1,10 @@
 # GPSLoggerKit
 
-Native Swift reader for GPS logger file formats (and, later, logger protocols), producing a common
-data model and GPX 1.1 output.
+Native Swift reader for GPS logger file formats and logger protocols, producing a common data model
+and GPX 1.1 output.
 
-- Platforms: macOS 12+, iOS/iPadOS 27+. File formats and GPX output work on both; device transports
-  (serial, HID, Bluetooth) will be macOS only.
+- Platforms: macOS 12+, iOS/iPadOS 27+. File formats, logger protocols and GPX output build on both;
+  the device transports (serial, HID, Bluetooth) belong to the app and are macOS only.
 - Swift 6 language mode, no third-party dependencies.
 - License: MIT (see `LICENSE`).
 
@@ -36,6 +36,22 @@ let gpx = GPXWriter(creator: "MyApp 1.0").data(for: result.recording, createdAt:
 ```
 
 `result.warnings` reports skipped or damaged records, grouped by kind with a count.
+
+### Logger protocols
+
+A logger protocol (`DeviceProtocol`) reads a `Recording` from a `DeviceConnection` and may erase the
+logger memory. The connection (write, read with timeout, read until a terminator, discard input, set the
+baud rate) is provided by the app, e.g. over a serial port or Bluetooth RFCOMM; tests use a simulated
+device. Timeout, disconnection and cancellation are the connection's own errors; protocol errors are
+`DeviceProtocolError`.
+
+| Protocol | Devices | Connection | Erase |
+|---|---|---|---|
+| `GNS2000Device` | GNS 2000, GNS 2000 plus | Bluetooth RFCOMM, SDP service „GNS GPS“ | yes |
+
+```swift
+let recording = try await GNS2000Device().read(connection, DeviceReporter(progress: { done, total, _ in }))
+```
 
 ### Adding formats
 

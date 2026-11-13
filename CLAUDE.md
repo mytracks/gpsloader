@@ -39,7 +39,7 @@ Sie ersetzt die Logger-Funktionen der App myTracks. Vertrieb per Download, nicht
 - Kein gpsbabel in der App (entschieden am 2026-11-13, Change `remove-gpsbabel`); alle Treiber sind nativ.
   Das gpsbabel-1.7.0-Binary der Alt-App (Commit `e0d1f18`) dient nur der Black-Box-Gegenprüfung: in den
   Scratchpad kopieren, nie ins Repository; Aufruf als Prozess mit Argument-Array, nie über eine Shell.
-- Noch offene native Treiber: BG728, GNS2000 und WSG-2000 NAL.
+- Noch offene native Treiber: BG728 und WSG-2000 NAL. GNS2000 läuft über IOBluetooth/RFCOMM (Change `gns2000-driver`).
 - Bluetooth-Logger nur über `/dev/cu.*`.
 - Keine Python- oder Perl-Abhängigkeit, kein `system()`/`popen()`.
 - Protokoll- und Parser-Logik in UI-unabhängigen Swift-Packages, ohne Hardware testbar.

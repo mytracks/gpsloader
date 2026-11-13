@@ -1,5 +1,6 @@
 import DeviceDrivers
 import Foundation
+import GPSLoggerKit
 import GPSLoggerKitGPL
 import IOKit.hid
 import LoggerCore
