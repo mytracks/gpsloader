@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Document>
+    <name>GPS device</name>
+    <snippet>Created Mi. Nov. 4 18:36:42 2026 GMT</snippet>
+    <LookAt>
+      <gx:TimeSpan>
+        <begin>2026-05-02T18:00:00Z</begin>
+        <end>2026-05-02T18:05:00Z</end>
+      </gx:TimeSpan>
+      <longitude>8.022500</longitude>
+      <latitude>50.012500</latitude>
+      <range>1300.000000</range>
+    </LookAt>
+    <!-- Normal track style -->
+    <Style id="track_n">
+      <IconStyle>
+        <scale>.5</scale>
+        <Icon>
+          <href>https://earth.google.com/images/kml-icons/track-directional/track-none.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <!-- Highlighted track style -->
+    <Style id="track_h">
+      <IconStyle>
+        <scale>1.2</scale>
+        <Icon>
+          <href>https://earth.google.com/images/kml-icons/track-directional/track-none.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <StyleMap id="track">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#track_n</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#track_h</styleUrl>
+      </Pair>
+    </StyleMap>
+    <!-- Normal waypoint style -->
+    <Style id="waypoint_n">
+      <IconStyle>
+        <Icon>
+          <href>https://maps.google.com/mapfiles/kml/pal4/icon61.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <!-- Highlighted waypoint style -->
+    <Style id="waypoint_h">
+      <IconStyle>
+        <scale>1.2</scale>
+        <Icon>
+          <href>https://maps.google.com/mapfiles/kml/pal4/icon61.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <StyleMap id="waypoint">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#waypoint_n</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#waypoint_h</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="lineStyle">
+      <LineStyle>
+        <color>99ffac59</color>
+        <width>6</width>
+      </LineStyle>
+    </Style>
+    <Folder>
+      <name>Waypoints</name>
+      <Placemark>
+        <name>Brunnen</name>
+        <description>Trinkwasser</description>
+        <TimeStamp>
+          <when>2026-05-02T18:05:00Z</when>
+        </TimeStamp>
+        <styleUrl>#waypoint</styleUrl>
+        <Point>
+          <coordinates>8.025000,50.015000,131.00</coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Tracks</name>
+      <Folder>
+        <name>Abendlauf</name>
+        <snippet/>
+        <description>
+<![CDATA[<table>
+<tr><td><b>Distance</b> 2170.7 ft </td></tr>
+<tr><td><b>Min Alt</b> 395.341 ft </td></tr>
+<tr><td><b>Max Alt</b> 410.925 ft </td></tr>
+<tr><td><b>Min Speed</b> 7.4 mph </td></tr>
+<tr><td><b>Max Speed</b> 29.6 mph </td></tr>
+<tr><td><b>Avg Speed</b> 18.5 mph </td></tr>
+<tr><td><b>Start Time</b>2026-05-02T18:00:00Z</td></tr>
+<tr><td><b>End Time</b>2026-05-02T18:01:20Z</td></tr>
+</table>]]>
+</description>
+        <TimeSpan>
+          <begin>2026-05-02T18:00:00Z</begin>
+          <end>2026-05-02T18:01:20Z</end>
+        </TimeSpan>
+        <Folder>
+          <name>Points</name>
+          <Placemark>
+            <name>Abendlauf-0</name>
+            <snippet/>
+            <description><![CDATA[
+<table>
+<tr><td>Longitude: 8.020000 </td></tr>
+<tr><td>Latitude: 50.010000 </td></tr>
+<tr><td>Altitude: 395.341 ft </td></tr>
+<tr><td>Heading: 6.7 </td></tr>
+<tr><td>Time: 2026-05-02T18:00:00Z </td></tr>
+</table>
+]]></description>
+            <LookAt>
+              <longitude>8.020000</longitude>
+              <latitude>50.010000</latitude>
+              <tilt>66</tilt>
+            </LookAt>
+            <TimeStamp>
+              <when>2026-05-02T18:00:00Z</when>
+            </TimeStamp>
+            <styleUrl>#track</styleUrl>
+            <Point>
+              <coordinates>8.020000,50.010000,120.50</coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>Abendlauf-1</name>
+            <snippet/>
+            <description><![CDATA[
+<table>
+<tr><td>Longitude: 8.021000 </td></tr>
+<tr><td>Latitude: 50.011000 </td></tr>
+<tr><td>Altitude: 396.982 ft </td></tr>
+<tr><td>Speed: 29.6 mph </td></tr>
+<tr><td>Heading: 32.7 </td></tr>
+<tr><td>Time: 2026-05-02T18:00:10Z </td></tr>
+</table>
+]]></description>
+            <LookAt>
+              <longitude>8.021000</longitude>
+              <latitude>50.011000</latitude>
+              <tilt>66</tilt>
+            </LookAt>
+            <TimeStamp>
+              <when>2026-05-02T18:00:10Z</when>
+            </TimeStamp>
+            <styleUrl>#track</styleUrl>
+            <Point>
+              <coordinates>8.021000,50.011000,121.00</coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>Abendlauf-2</name>
+            <snippet/>
+            <description><![CDATA[
+<table>
+<tr><td>Longitude: 8.022000 </td></tr>
+<tr><td>Latitude: 50.012000 </td></tr>
+<tr><td>Altitude: 400.262 ft </td></tr>
+<tr><td>Speed: 29.6 mph </td></tr>
+<tr><td>Heading: 32.7 </td></tr>
+<tr><td>Time: 2026-05-02T18:00:20Z </td></tr>
+</table>
+]]></description>
+            <LookAt>
+              <longitude>8.022000</longitude>
+              <latitude>50.012000</latitude>
+              <tilt>66</tilt>
+            </LookAt>
+            <TimeStamp>
+              <when>2026-05-02T18:00:20Z</when>
+            </TimeStamp>
+            <styleUrl>#track</styleUrl>
+            <Point>
+              <coordinates>8.022000,50.012000,122.00</coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>Abendlauf-3</name>
+            <snippet/>
+            <description><![CDATA[
+<table>
+<tr><td>Longitude: 8.023000 </td></tr>
+<tr><td>Latitude: 50.013000 </td></tr>
+<tr><td>Altitude: 403.543 ft </td></tr>
+<tr><td>Speed: 7.4 mph </td></tr>
+<tr><td>Heading: 32.7 </td></tr>
+<tr><td>Time: 2026-05-02T18:01:00Z </td></tr>
+</table>
+]]></description>
+            <LookAt>
+              <longitude>8.023000</longitude>
+              <latitude>50.013000</latitude>
+              <tilt>66</tilt>
+            </LookAt>
+            <TimeStamp>
+              <when>2026-05-02T18:01:00Z</when>
+            </TimeStamp>
+            <styleUrl>#track</styleUrl>
+            <Point>
+              <coordinates>8.023000,50.013000,123.00</coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>Abendlauf-4</name>
+            <snippet/>
+            <description><![CDATA[
+<table>
+<tr><td>Longitude: 8.024000 </td></tr>
+<tr><td>Latitude: 50.014000 </td></tr>
+<tr><td>Altitude: 406.824 ft </td></tr>
+<tr><td>Speed: 29.6 mph </td></tr>
+<tr><td>Heading: 32.7 </td></tr>
+<tr><td>Time: 2026-05-02T18:01:10Z </td></tr>
+</table>
+]]></description>
+            <LookAt>
+              <longitude>8.024000</longitude>
+              <latitude>50.014000</latitude>
+              <tilt>66</tilt>
+            </LookAt>
+            <TimeStamp>
+              <when>2026-05-02T18:01:10Z</when>
+            </TimeStamp>
+            <styleUrl>#track</styleUrl>
+            <Point>
+              <coordinates>8.024000,50.014000,124.00</coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>Abendlauf-5</name>
+            <snippet/>
+            <description><![CDATA[
+<table>
+<tr><td>Longitude: 8.025000 </td></tr>
+<tr><td>Latitude: 50.015000 </td></tr>
+<tr><td>Altitude: 410.925 ft </td></tr>
+<tr><td>Speed: 29.6 mph </td></tr>
+<tr><td>Heading: 32.7 </td></tr>
+<tr><td>Time: 2026-05-02T18:01:20Z </td></tr>
+</table>
+]]></description>
+            <LookAt>
+              <longitude>8.025000</longitude>
+              <latitude>50.015000</latitude>
+              <tilt>66</tilt>
+            </LookAt>
+            <TimeStamp>
+              <when>2026-05-02T18:01:20Z</when>
+            </TimeStamp>
+            <styleUrl>#track</styleUrl>
+            <Point>
+              <coordinates>8.025000,50.015000,125.25</coordinates>
+            </Point>
+          </Placemark>
+        </Folder>
+        <Placemark>
+          <name>Path</name>
+          <styleUrl>#lineStyle</styleUrl>
+          <MultiGeometry>
+            <LineString>
+              <tessellate>1</tessellate>
+              <coordinates>
+8.020000,50.010000,120.50
+8.021000,50.011000,121.00
+8.022000,50.012000,122.00
+</coordinates>
+            </LineString>
+            <LineString>
+              <tessellate>1</tessellate>
+              <coordinates>
+8.023000,50.013000,123.00
+8.024000,50.014000,124.00
+8.025000,50.015000,125.25
+</coordinates>
+            </LineString>
+          </MultiGeometry>
+        </Placemark>
+      </Folder>
+    </Folder>
+  </Document>
+</kml>

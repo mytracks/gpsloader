@@ -1,7 +1,7 @@
 # diagnostic-capture Specification
 
 ## Purpose
-Zeichnet die Kommunikation mit Geräten und gpsbabel vollständig auf. Anwender können Fehler an Geräten melden, die dem Entwickler nicht zur Verfügung stehen. Aufzeichnungen dienen zugleich als wiederholbare Test-Fixtures.
+Zeichnet die Kommunikation mit Geräten vollständig auf. Anwender können Fehler an Geräten melden, die dem Entwickler nicht zur Verfügung stehen. Aufzeichnungen dienen zugleich als wiederholbare Test-Fixtures.
 
 ## Requirements
 
@@ -15,21 +15,6 @@ Der Anwender SHALL den Diagnose-Mitschnitt in der App ein- und ausschalten könn
 #### Scenario: Einschalten
 - **WHEN** der Anwender den Mitschnitt einschaltet und danach einen Vorgang startet
 - **THEN** wird dieser Vorgang aufgezeichnet
-
-### Requirement: Inhalt der Aufzeichnung
-Eine Aufzeichnung MUST enthalten:
-- Kopfdaten: App-Version, macOS-Version, Architektur, ob unter Rosetta, Treiber, Port und Parameter
-- alle gesendeten und empfangenen Bytes in der tatsächlichen Reihenfolge, je mit Zeitstempel in Millisekunden
-- Ereignisse wie Öffnen, Schließen, Zeitüberschreitung, Abbruch und Fehler
-- bei gpsbabel: Argumentliste, Standardausgabe, Fehlerausgabe und Exit-Code
-
-#### Scenario: Serieller Dialog
-- **WHEN** ein Treiber bei eingeschaltetem Mitschnitt 16 Bytes sendet und 3 Bytes empfängt
-- **THEN** enthält die Aufzeichnung einen Eintrag „gesendet“ mit den 16 Bytes und danach einen Eintrag „empfangen“ mit den 3 Bytes, jeweils mit Zeitstempel
-
-#### Scenario: gpsbabel-Aufruf
-- **WHEN** bei eingeschaltetem Mitschnitt gpsbabel aufgerufen wird
-- **THEN** enthält die Aufzeichnung die vollständige Argumentliste, die Ausgaben und den Exit-Code
 
 ### Requirement: Export für den Support
 Der Anwender SHALL die Aufzeichnung des letzten Vorgangs als Datei an einem gewählten Ort speichern können. Vor dem Speichern MUST die App darauf hinweisen, dass die Aufzeichnung Positionsdaten enthält.
@@ -62,3 +47,17 @@ Aufzeichnungen MUST ausschließlich lokal gespeichert werden. Die App SHALL nur 
 #### Scenario: Elfter Vorgang
 - **WHEN** bei eingeschaltetem Mitschnitt der elfte Vorgang aufgezeichnet wird
 - **THEN** wird die älteste Aufzeichnung gelöscht
+
+### Requirement: Inhalt des Mitschnitts
+Eine Aufzeichnung MUST enthalten:
+- Kopfdaten: App-Version, macOS-Version, Architektur, ob unter Rosetta, Treiber, Port und Parameter
+- alle gesendeten und empfangenen Bytes in der tatsächlichen Reihenfolge, je mit Zeitstempel in Millisekunden
+- Ereignisse wie Öffnen, Schließen, Zeitüberschreitung, Abbruch und Fehler
+
+#### Scenario: Serieller Dialog
+- **WHEN** ein Treiber bei eingeschaltetem Mitschnitt 16 Bytes sendet und 3 Bytes empfängt
+- **THEN** enthält die Aufzeichnung einen Eintrag „gesendet“ mit den 16 Bytes und danach einen Eintrag „empfangen“ mit den 3 Bytes, jeweils mit Zeitstempel
+
+#### Scenario: App unter Rosetta
+- **WHEN** der Anwender die App selbst unter Rosetta gestartet hat und einen Vorgang aufzeichnet
+- **THEN** vermerken die Kopfdaten, dass die App unter Rosetta läuft

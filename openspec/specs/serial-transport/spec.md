@@ -81,3 +81,10 @@ Treiber MUST über eine Transport-Abstraktion kommunizieren. So lässt sich ders
 #### Scenario: Unerwarteter Befehl im Mock
 - **WHEN** ein Treiber einen Befehl sendet, den der Mock-Transport nicht erwartet
 - **THEN** schlägt der Test mit einer Meldung fehl, die erwarteten und tatsächlichen Befehl nennt
+
+### Requirement: Baudrate wechseln
+Ein geöffneter Port SHALL seine Baudrate auf jede unterstützte Rate umstellen können, ohne geschlossen zu werden. Eine nicht unterstützte Rate MUST mit einem Protokollfehler abgelehnt werden.
+
+#### Scenario: Wechsel nach der Verhandlung
+- **WHEN** ein Treiber den Port mit 9600 Baud öffnet und danach auf 115200 Baud umstellt
+- **THEN** laufen alle weiteren Lese- und Schreibvorgänge mit 115200 Baud

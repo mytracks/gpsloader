@@ -20,7 +20,7 @@ public struct CaptureLine: Codable, Sendable, Equatable {
     public var params: [String: String]?
 
     // Entry fields
-    /// "header", "tx", "rx", "event" or "process".
+    /// "header", "tx", "rx" or "event".
     public var kind: String
     /// Milliseconds since the start of the capture.
     public var t: Int?
@@ -29,12 +29,6 @@ public struct CaptureLine: Codable, Sendable, Equatable {
     public var ascii: String?
     public var name: String?
     public var detail: String?
-    public var executable: String?
-    public var arguments: [String]?
-    public var stdout: String?
-    public var stderr: String?
-    public var exit: Int32?
-    public var duration: Double?
 
     public init(kind: String) {
         self.kind = kind

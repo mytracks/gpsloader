@@ -1,12 +1,10 @@
 #if DEBUG
 import AppKit
-import GPSBabelRuntime
 import LoggerCore
 
 /// Debug-only launch arguments for verifying UI states without screen recording permission:
 ///
 ///     -DebugSnapshotDirectory <dir>     render all visible windows to PNG (repeatedly, see times below)
-///     -DebugSimulatedStatus <checking|ready|rosetta|broken>
 ///     -DebugDemo <scenario>             start reading with the demo driver (scenarios of DemoDriver)
 ///     -DebugDemoErase <supported|experimental>   start erasing with the demo driver
 ///     -DebugShowAbout YES
@@ -14,19 +12,12 @@ import LoggerCore
 ///     -DebugCancelAfter <seconds>       press "Cancel" on running operations
 ///     -DebugSaveDirectory <dir>         save results there without the save panel (see SessionPresenter)
 ///     -DebugConvert <path>[,<path>…]    convert these files as if chosen in "Convert Files…" (ConversionPresenter)
+///     -DebugReadDevice <catalog id> [-DebugPort <path>] [-DebugErase YES]   read/erase a catalog device
 ///     -DebugQuitAfter <seconds>
 @MainActor
 enum DebugAutomation {
     static func run(mainWindow: MainWindowController) {
         let defaults = UserDefaults.standard
-
-        switch defaults.string(forKey: "DebugSimulatedStatus") {
-        case "checking": AppEnvironment.shared.simulatedStatus = .checking
-        case "ready": AppEnvironment.shared.simulatedStatus = .ready(version: "1.7.0")
-        case "rosetta": AppEnvironment.shared.simulatedStatus = .rosettaMissing
-        case "broken": AppEnvironment.shared.simulatedStatus = .broken(reason: "Simulated: dyld: Library not loaded: QtCoreGpsBabel")
-        default: break
-        }
 
         if defaults.bool(forKey: "DebugShowAbout") {
             (NSApp.delegate as? AppDelegate)?.showAbout(nil)
@@ -38,6 +29,13 @@ enum DebugAutomation {
         if let mode = defaults.string(forKey: "DebugDemoErase") {
             let erase: EraseSupport = mode == "experimental" ? .experimental : .supported
             mainWindow.sessionPresenter.erase(with: DemoDriver(scenario: .success, erase: erase))
+        }
+
+        // -DebugReadDevice <catalog id> [-DebugPort <path>] [-DebugErase YES]: read (or erase) a device of the
+        // catalog without the UI, e.g. against a simulated logger on a pseudo terminal (change device-mode).
+        if let deviceID = defaults.string(forKey: "DebugReadDevice") {
+            mainWindow.devicePanel.debugRun(entryID: deviceID, portPath: defaults.string(forKey: "DebugPort"),
+                                            erase: defaults.bool(forKey: "DebugErase"))
         }
 
         if let paths = defaults.string(forKey: "DebugConvert") {

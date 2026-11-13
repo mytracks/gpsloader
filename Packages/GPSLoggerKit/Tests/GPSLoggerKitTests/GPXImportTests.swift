@@ -170,7 +170,8 @@ struct GPXImportTests {
         let withComment = Data("<?xml version=\"1.0\"?>\n<!-- exported -->\n<!DOCTYPE gpx>\n<gpx version=\"1.0\"></gpx>".utf8)
         #expect(GPXFileFormat().matches(prefix: withComment))
         let kml = Data("<?xml version=\"1.0\"?><kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document/></kml>".utf8)
-        #expect(FileFormats.detect(prefix: kml, fileName: "a.xml") == nil)
+        #expect(!GPXFileFormat().matches(prefix: kml))
+        #expect(FileFormats.detect(prefix: kml, fileName: "a.xml")?.id == .kml)
     }
 
     /// Writing and reading again yields the same model (also the iOS substitute for the XSD checks).

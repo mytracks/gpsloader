@@ -6,8 +6,6 @@ public enum LoggerErrorKind: String, Sendable, CaseIterable {
     case portBusy
     case timeout
     case protocolError
-    case rosettaMissing
-    case gpsbabelFailed
     case writeFailed
     case cancelled
 }
@@ -15,7 +13,7 @@ public enum LoggerErrorKind: String, Sendable, CaseIterable {
 /// A user presentable error with a localized message and a technical detail.
 public struct LoggerError: Error, Sendable, Equatable, LocalizedError {
     public var kind: LoggerErrorKind
-    /// Technical detail (port name, gpsbabel stderr, errno text, ...). Not localized.
+    /// Technical detail (port name, protocol message, errno text, ...). Not localized.
     public var detail: String
 
     public init(_ kind: LoggerErrorKind, detail: String = "") {

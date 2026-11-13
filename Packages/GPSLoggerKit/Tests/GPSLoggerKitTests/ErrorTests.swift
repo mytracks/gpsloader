@@ -33,8 +33,25 @@ struct ErrorTests {
         for kind in ImportWarningKind.allCases {
             let message = ImportWarning(kind: kind, count: 3, fileName: "a.nmea").message(localization: localization)
             #expect(!message.hasPrefix("warning."), "missing translation for \(kind)")
-            #expect(message.contains("3") && message.contains("a.nmea"))
+            if kind.isPerFile {
+                #expect(message.contains("a.nmea") && !message.contains("3"))
+            } else {
+                #expect(message.contains("3") && message.contains("a.nmea"))
+            }
         }
+    }
+
+    /// Scenario "Unvollständige Binärdatei" (message part) and the wrong file checksum.
+    @Test func perFileWarningsNameOnlyTheFile() {
+        let truncated = ImportWarning(kind: .truncatedFile, count: 1, fileName: "ride.fit")
+        #expect(truncated.message(localization: "de") == "„ride.fit“ ist unvollständig. Nur der lesbare Anfang wurde übernommen.")
+        #expect(truncated.message(localization: "en") == "“ride.fit” is incomplete. Only the readable beginning was used.")
+        let checksum = ImportWarning(kind: .fileChecksumMismatch, count: 1, fileName: "ride.fit")
+        #expect(checksum.message(localization: "de") == "Die Prüfsumme von „ride.fit“ stimmt nicht. Die Datei wurde trotzdem gelesen.")
+        #expect(checksum.message(localization: "en") == "The checksum of “ride.fit” is wrong. The file was read anyway.")
+        let times = ImportWarning(kind: .missingTimes, count: 1, fileName: "tour.kml")
+        #expect(times.message(localization: "de") == "„tour.kml“ enthält Tracks ohne Zeitangaben.")
+        #expect(times.message(localization: "en") == "“tour.kml” contains tracks without times.")
     }
 
     @Test func collectorCountsPerKindAndKeepsTheFirstLine() {

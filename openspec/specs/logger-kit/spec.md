@@ -42,7 +42,16 @@ Das Paket SHALL einen Katalog aller unterstützten Dateiformate bereitstellen. J
 
 #### Scenario: Katalog abfragen
 - **WHEN** eine App den Katalog abfragt
-- **THEN** enthält er mindestens die Formate NMEA 0183 (Kennung `nmea`) und GPX (Kennung `gpx`) mit ihren Dateiendungen
+- **THEN** enthält er mindestens diese Formate mit ihren Dateiendungen:
+  - NMEA 0183 (Kennung `nmea`)
+  - GPX (Kennung `gpx`)
+  - IGC (Kennung `igc`)
+  - Garmin FIT (Kennung `fit`)
+  - TCX (Kennung `tcx`)
+  - Suunto SML (Kennung `suunto-sml`)
+  - KML und KMZ (Kennung `kml`, Endungen `kml` und `kmz`)
+  - Columbus V-900 (Kennung `v900`, Endung `csv`)
+  - iBlue-CSV (Kennung `iblue-csv`, Endung `csv`)
 
 ### Requirement: Formaterkennung
 Das Paket SHALL zu einer Datei anhand ihres Inhalts das passende Format vorschlagen. Die Dateiendung SHALL dabei nur als Hinweis dienen. Erkennt kein Format den Inhalt, SHALL das Ergebnis „unbekannt“ lauten.
@@ -73,6 +82,17 @@ Ist eine Datei gar nicht lesbar oder enthält sie kein einziges verwertbares Ele
 - **WHEN** eine Datei leer ist
 - **THEN** endet das Einlesen mit einem Fehler, der die Datei nennt
 
+### Requirement: Warnungen bei Binärdateien
+Bei Binärformaten SHALL zwei Fälle je eine eigene Warnung ergeben, die die Datei nennt: eine falsche Prüfsumme der ganzen Datei, deren Inhalt trotzdem gelesen wurde, und eine vorzeitig endende Datei, deren lesbarer Anfang übernommen wurde. Die Meldungen MUST auf Deutsch und Englisch vorliegen.
+
+#### Scenario: Unvollständige Binärdatei
+- **WHEN** eine Binärdatei nach der Hälfte endet
+- **THEN** enthält die Aufzeichnung die Punkte der ersten Hälfte, und eine Warnung nennt die Datei als unvollständig
+
+#### Scenario: Falsche Prüfsumme
+- **WHEN** die Prüfsumme einer sonst lesbaren Binärdatei nicht stimmt
+- **THEN** enthält die Aufzeichnung alle Punkte der Datei, und eine Warnung nennt die Datei
+
 ### Requirement: Abbruch
 Das Einlesen MUST sich abbrechen lassen. Nach einem Abbruch SHALL das Einlesen spätestens nach dem nächsten Datenblock mit dem Ergebnis „abgebrochen“ enden, ohne Teilergebnis.
 
@@ -97,3 +117,14 @@ Enthält eine eingelesene Aufzeichnung keine Trackpunkte, aber Wegpunkte, SHALL 
 #### Scenario: Datei nur mit Wegpunkten
 - **WHEN** eine Datei nur 20 Wegpunkte enthält und die Umwandlung gewünscht ist
 - **THEN** enthält die Aufzeichnung einen Track mit 20 Punkten sowie die 20 Wegpunkte
+
+### Requirement: Erweiterbarer Formatkatalog
+Das Paket SHALL einen Katalog aus seinen eigenen Formaten und zusätzlichen Formaten anderer Pakete bilden können. Erkennung, Suche nach Kennung und Einlesen SHALL auf einem solchen Katalog genauso arbeiten wie auf dem eigenen. Die eigenen Formate SHALL dabei vorn stehen. Eine doppelte Kennung MUST beim Bilden des Katalogs als Programmierfehler gelten. Das Paket MUST dafür keine Kenntnis der anderen Pakete haben.
+
+#### Scenario: Zusätzliches Format erkennen
+- **WHEN** ein Katalog aus den eigenen Formaten und einem zusätzlichen Testformat gebildet wird und eine Datei dieses Testformats geprüft wird
+- **THEN** schlägt die Erkennung das Testformat vor, und eine NMEA-Datei wird weiterhin als NMEA 0183 erkannt
+
+#### Scenario: Standardkatalog unverändert
+- **WHEN** eine App den Katalog wie bisher ohne Zusätze abfragt
+- **THEN** enthält er genau die eigenen Formate des Pakets

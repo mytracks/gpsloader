@@ -125,15 +125,6 @@ public final class CaptureRecorder: DiagnosticSink, Sendable {
             line.name = name
             line.detail = detail
             return line
-        case let .process(record):
-            var line = CaptureLine(kind: "process")
-            line.executable = record.executable
-            line.arguments = record.arguments
-            line.stdout = record.standardOutput
-            line.stderr = record.standardError
-            line.exit = record.exitCode
-            line.duration = (record.duration * 1000).rounded() / 1000
-            return line
         }
     }
 

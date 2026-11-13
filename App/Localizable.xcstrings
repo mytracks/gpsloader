@@ -31,16 +31,6 @@
         }
       }
     },
-    "All supported devices can be used.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alle unterstützten Geräte können verwendet werden."
-          }
-        }
-      }
-    },
     "Another operation is already using %@. Wait until it has finished.": {
       "localizations": {
         "de": {
@@ -67,26 +57,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wird abgebrochen …"
-          }
-        }
-      }
-    },
-    "Check Again": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Erneut prüfen"
-          }
-        }
-      }
-    },
-    "Checking gpsbabel…": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "gpsbabel wird geprüft …"
           }
         }
       }
@@ -191,16 +161,6 @@
         }
       }
     },
-    "Copy Command": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Befehl kopieren"
-          }
-        }
-      }
-    },
     "Details: %@": {
       "localizations": {
         "de": {
@@ -231,12 +191,12 @@
         }
       }
     },
-    "Devices that use gpsbabel only work after Rosetta has been installed. Devices with built-in drivers work without Rosetta.": {
+    "Device:": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Geräte, die gpsbabel nutzen, funktionieren erst nach der Installation von Rosetta. Geräte mit eingebauten Treibern funktionieren auch ohne Rosetta."
+            "value": "Gerät:"
           }
         }
       }
@@ -261,22 +221,22 @@
         }
       }
     },
-    "Environment": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Umgebung"
-          }
-        }
-      }
-    },
     "Erase": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Löschen"
+          }
+        }
+      }
+    },
+    "Erase Memory…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speicher löschen …"
           }
         }
       }
@@ -351,32 +311,12 @@
         }
       }
     },
-    "GPL 2.0": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "GPL 2.0"
-          }
-        }
-      }
-    },
     "GPL 3.0": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "GPL 3.0"
-          }
-        }
-      }
-    },
-    "GPSBabel 1.7.0 source code": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quellcode von GPSBabel 1.7.0"
           }
         }
       }
@@ -401,32 +341,22 @@
         }
       }
     },
-    "Install Rosetta manually": {
+    "License": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rosetta manuell installieren"
+            "value": "Lizenz"
           }
         }
       }
     },
-    "Install Rosetta…": {
+    "MIT License": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rosetta installieren …"
-          }
-        }
-      }
-    },
-    "LGPL 3.0": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LGPL 3.0"
+            "value": "MIT-Lizenz"
           }
         }
       }
@@ -441,22 +371,32 @@
         }
       }
     },
-    "OK": {
+    "No serial port found. Connect the logger or pair it via Bluetooth.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "OK"
+            "value": "Kein serieller Anschluss gefunden. Schließen Sie den Logger an oder koppeln Sie ihn über Bluetooth."
           }
         }
       }
     },
-    "Qt 5.12.9 source code": {
+    "Port:": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quellcode von Qt 5.12.9"
+            "value": "Anschluss:"
+          }
+        }
+      }
+    },
+    "Ported formats and drivers": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Portierte Formate und Treiber"
           }
         }
       }
@@ -471,6 +411,16 @@
         }
       }
     },
+    "Read": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auslesen"
+          }
+        }
+      }
+    },
     "Reading %@…": {
       "localizations": {
         "de": {
@@ -481,32 +431,12 @@
         }
       }
     },
-    "Ready – gpsbabel %@": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bereit – gpsbabel %@"
-          }
-        }
-      }
-    },
     "Record Diagnostic Capture": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Diagnose-Mitschnitt aufzeichnen"
-          }
-        }
-      }
-    },
-    "Rosetta is not installed": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rosetta ist nicht installiert"
           }
         }
       }
@@ -561,6 +491,36 @@
         }
       }
     },
+    "Some file formats and device drivers are based on the source code of these projects:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einige Dateiformate und Gerätetreiber beruhen auf dem Quellcode dieser Projekte:"
+          }
+        }
+      }
+    },
+    "Source code": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quellcode"
+          }
+        }
+      }
+    },
+    "Source code of gpsloader": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quellcode von gpsloader"
+          }
+        }
+      }
+    },
     "The GPX file has been saved. Some data was skipped:": {
       "localizations": {
         "de": {
@@ -587,16 +547,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Die Daten wurden gelöscht."
-          }
-        }
-      }
-    },
-    "The first start under Rosetta can take a few seconds.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der erste Start unter Rosetta kann einige Sekunden dauern."
           }
         }
       }
@@ -641,16 +591,6 @@
         }
       }
     },
-    "The system dialog for installing Rosetta could not be opened. Open Terminal, enter the following command and confirm with your administrator password:": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der Systemdialog zur Installation von Rosetta konnte nicht geöffnet werden. Öffnen Sie das Terminal, geben Sie den folgenden Befehl ein und bestätigen Sie mit Ihrem Administratorpasswort:"
-          }
-        }
-      }
-    },
     "Third-party software": {
       "localizations": {
         "de": {
@@ -691,22 +631,22 @@
         }
       }
     },
-    "gpsbabel cannot be started": {
+    "gpsloader contains GPSLoggerKit (copyright 2026 Dirk Stichling), distributed under the MIT License. Its source code is part of the source code of gpsloader.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "gpsbabel kann nicht gestartet werden"
+            "value": "gpsloader enthält GPSLoggerKit (Copyright 2026 Dirk Stichling), verbreitet unter der MIT-Lizenz. Sein Quellcode ist Teil des Quellcodes von gpsloader."
           }
         }
       }
     },
-    "gpsloader includes GPSBabel 1.7.0 (copyright the GPSBabel authors), distributed under the GNU General Public License version 2 or later. GPSBabel runs as a separate program and uses Qt Core 5.12.9 (copyright The Qt Company Ltd. and other contributors), distributed under the GNU Lesser General Public License version 3. The complete source code of both is available at the links below.": {
+    "gpsloader is free software, distributed under the GNU General Public License version 3 or later. You may redistribute and modify it under the terms of that license.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "gpsloader enthält GPSBabel 1.7.0 (Copyright der GPSBabel-Autoren), verbreitet unter der GNU General Public License Version 2 oder neuer. GPSBabel läuft als eigenständiges Programm und verwendet Qt Core 5.12.9 (Copyright The Qt Company Ltd. und weitere Mitwirkende), verbreitet unter der GNU Lesser General Public License Version 3. Der vollständige Quellcode beider Projekte ist über die folgenden Links erhältlich."
+            "value": "gpsloader ist freie Software und wird unter der GNU General Public License Version 3 oder neuer verbreitet. Sie dürfen die App unter den Bedingungen dieser Lizenz weitergeben und verändern."
           }
         }
       }

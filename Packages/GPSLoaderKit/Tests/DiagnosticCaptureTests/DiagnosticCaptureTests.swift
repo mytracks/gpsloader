@@ -91,19 +91,13 @@ struct DiagnosticCaptureTests {
         #expect(text.contains("$PMTKLOX,0,12*6E\\\\r\\\\n"))
     }
 
-    /// Scenario "gpsbabel-Aufruf".
-    @Test func recordsProcessInvocations() throws {
-        let recorder = CaptureRecorder(environment: environment)
-        recorder.record(.process(ProcessRecord(executable: "/x/gpsbabel", arguments: ["-i", "mtk", "-f", "/dev/cu.a b"],
-                                               standardOutput: "out", standardError: "err", exitCode: 1,
-                                               duration: 1.23456)))
-        let entry = try #require(try CaptureFormat.decode(recorder.encoded()).entries.first)
-        #expect(entry.kind == "process")
-        #expect(entry.arguments == ["-i", "mtk", "-f", "/dev/cu.a b"])
-        #expect(entry.stdout == "out")
-        #expect(entry.stderr == "err")
-        #expect(entry.exit == 1)
-        #expect(entry.duration == 1.235)
+    /// Scenario "App unter Rosetta": the header notes that the app itself runs translated.
+    @Test func headerNotesRosetta() throws {
+        var translated = environment
+        translated.isTranslated = true
+        let recorder = CaptureRecorder(environment: translated)
+        #expect(try CaptureFormat.decode(recorder.encoded()).header.translated == true)
+        #expect(try CaptureFormat.decode(CaptureRecorder(environment: environment).encoded()).header.translated == false)
     }
 
     @Test func rejectsForeignFiles() {

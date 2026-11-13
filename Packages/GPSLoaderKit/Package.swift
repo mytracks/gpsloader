@@ -9,14 +9,16 @@ let package = Package(
     products: [
         .library(name: "LoggerCore", targets: ["LoggerCore"]),
         .library(name: "SerialTransport", targets: ["SerialTransport"]),
-        .library(name: "GPSBabelRuntime", targets: ["GPSBabelRuntime"]),
         .library(name: "GPXExport", targets: ["GPXExport"]),
         .library(name: "DiagnosticCapture", targets: ["DiagnosticCapture"]),
         .library(name: "FileConversion", targets: ["FileConversion"]),
         .library(name: "TestSupport", targets: ["TestSupport"]),
+        .library(name: "DeviceDrivers", targets: ["DeviceDrivers"]),
+        .library(name: "HIDTransport", targets: ["HIDTransport"]),
     ],
     dependencies: [
         .package(path: "../GPSLoggerKit"),
+        .package(path: "../GPSLoggerKitGPL"),
     ],
     targets: [
         .target(
@@ -25,10 +27,27 @@ let package = Package(
             resources: [.process("Resources")]
         ),
         .target(name: "SerialTransport", dependencies: ["LoggerCore"]),
-        .target(name: "GPSBabelRuntime", dependencies: ["LoggerCore"]),
         .target(name: "GPXExport", dependencies: ["LoggerCore", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]),
         .target(name: "DiagnosticCapture", dependencies: ["LoggerCore"]),
-        .target(name: "FileConversion", dependencies: [.product(name: "GPSLoggerKit", package: "GPSLoggerKit")]),
+        .target(
+            name: "FileConversion",
+            dependencies: [
+                .product(name: "GPSLoggerKit", package: "GPSLoggerKit"),
+                .product(name: "GPSLoggerKitGPL", package: "GPSLoggerKitGPL"),
+            ]
+        ),
+        .target(
+            name: "DeviceDrivers",
+            dependencies: [
+                "LoggerCore", "SerialTransport", "DiagnosticCapture",
+                .product(name: "GPSLoggerKit", package: "GPSLoggerKit"),
+                .product(name: "GPSLoggerKitGPL", package: "GPSLoggerKitGPL"),
+            ]
+        ),
+        .target(
+            name: "HIDTransport",
+            dependencies: ["DeviceDrivers", "LoggerCore", .product(name: "GPSLoggerKitGPL", package: "GPSLoggerKitGPL")]
+        ),
         .target(
             name: "TestSupport",
             dependencies: ["LoggerCore", "DiagnosticCapture", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]
@@ -39,7 +58,6 @@ let package = Package(
             dependencies: ["LoggerCore", "TestSupport", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]
         ),
         .testTarget(name: "SerialTransportTests", dependencies: ["SerialTransport", "LoggerCore"]),
-        .testTarget(name: "GPSBabelRuntimeTests", dependencies: ["GPSBabelRuntime", "LoggerCore", "TestSupport"]),
         .testTarget(
             name: "GPXExportTests",
             dependencies: ["GPXExport", "LoggerCore", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]
@@ -50,6 +68,15 @@ let package = Package(
             resources: [.copy("Fixtures")]
         ),
         .testTarget(name: "TestSupportTests", dependencies: ["TestSupport", "LoggerCore"]),
+        .testTarget(
+            name: "DeviceDriversTests",
+            dependencies: [
+                "DeviceDrivers", "LoggerCore", "SerialTransport", "TestSupport", "DiagnosticCapture",
+                .product(name: "GPSLoggerKit", package: "GPSLoggerKit"),
+                .product(name: "GPSLoggerKitGPL", package: "GPSLoggerKitGPL"),
+            ]
+        ),
+        .testTarget(name: "HIDTransportTests", dependencies: ["HIDTransport", "DeviceDrivers", "LoggerCore"]),
         .testTarget(
             name: "FileConversionTests",
             dependencies: ["FileConversion", .product(name: "GPSLoggerKit", package: "GPSLoggerKit")]

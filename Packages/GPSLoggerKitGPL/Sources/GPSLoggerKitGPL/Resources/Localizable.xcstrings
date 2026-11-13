@@ -1,0 +1,193 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "format.alantrl": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alan Map500 (.trl)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alan Map500 (.trl)"
+          }
+        }
+      }
+    },
+    "format.gopal": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medion GoPal (.trk)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medion GoPal (.trk)"
+          }
+        }
+      }
+    },
+    "format.m241-bin": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Holux-Speicherabbild (M-241, GPSport 245)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Holux memory dump (M-241, GPSport 245)"
+          }
+        }
+      }
+    },
+    "format.magellan": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Magellan Meridian/eXplorist (.log, .upt)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Magellan Meridian/eXplorist (.log, .upt)"
+          }
+        }
+      }
+    },
+    "format.mtk-bin": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MTK-Speicherabbild (iBlue, Qstarz …)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MTK memory dump (iBlue, Qstarz, …)"
+          }
+        }
+      }
+    },
+    "format.sbn": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Locosys SBN (SiRF binär)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Locosys SBN (SiRF binary)"
+          }
+        }
+      }
+    },
+    "format.sbp": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Locosys SBP (GT-31, BGT-31)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Locosys SBP (GT-31, BGT-31)"
+          }
+        }
+      }
+    },
+    "format.skytraq-bin": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SkyTraq-Speicherabbild"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SkyTraq memory dump"
+          }
+        }
+      }
+    },
+    "format.wbt-bin": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wintec-Speicherabbild (WBT-100/200)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wintec memory dump (WBT-100/200)"
+          }
+        }
+      }
+    },
+    "format.wbt-tk1": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wintec TK1 (WBT-201, G-Rays 2)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wintec TK1 (WBT-201, G-Rays 2)"
+          }
+        }
+      }
+    },
+    "format.wintec-tes": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wintec TES (WBT-202)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wintec TES (WBT-202)"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

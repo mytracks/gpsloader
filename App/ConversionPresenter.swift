@@ -5,7 +5,7 @@ import GPXExport
 import LoggerCore
 import UniformTypeIdentifiers
 
-/// Converts files of the formats supported by GPSLoggerKit into one GPX file (spec `file-conversion`):
+/// Converts files of the formats in the app catalog (GPSLoggerKit and GPSLoggerKitGPL) into one GPX file (spec `file-conversion`):
 /// choose → detect → ask about unrecognized files → read with progress → save → show warnings.
 @MainActor
 final class ConversionPresenter {
@@ -26,7 +26,7 @@ final class ConversionPresenter {
 
     /// Names of the supported formats for the main window, e.g. "NMEA 0183, GPX, IGC (flight recorder)".
     static var supportedFormatNames: String {
-        ListFormatter.localizedString(byJoining: FileFormats.all.map(\.displayName))
+        ListFormatter.localizedString(byJoining: AppFormats.catalog.all.map(\.displayName))
     }
 
     // MARK: - Choosing files

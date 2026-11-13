@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Document>
+    <name>Radtour</name>
+    <Folder>
+      <name>Aufzeichnungen</name>
+      <Placemark>
+        <name>Radtour Mai</name>
+        <gx:MultiTrack>
+          <altitudeMode>absolute</altitudeMode>
+          <gx:interpolate>0</gx:interpolate>
+          <gx:Track>
+            <when>2026-05-03T09:00:00Z</when>
+            <when>2026-05-03T09:00:05Z</when>
+            <when>2026-05-03T09:00:10Z</when>
+            <gx:coord>8.040000 50.030000 150</gx:coord>
+            <gx:coord>8.040500 50.030500 151.5</gx:coord>
+            <gx:coord>8.041000 50.031000 153</gx:coord>
+          </gx:Track>
+          <gx:Track>
+            <when>2026-05-03T09:10:00Z</when>
+            <when>2026-05-03T09:10:05Z</when>
+            <gx:coord>8.042000 50.032000 155</gx:coord>
+            <gx:coord>8.042500 50.032500 156</gx:coord>
+          </gx:Track>
+        </gx:MultiTrack>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>

@@ -13,26 +13,6 @@ public struct DiagnosticHeader: Sendable, Equatable {
     }
 }
 
-/// Everything recorded about one external process invocation (e.g. gpsbabel).
-public struct ProcessRecord: Sendable, Equatable {
-    public var executable: String
-    public var arguments: [String]
-    public var standardOutput: String
-    public var standardError: String
-    public var exitCode: Int32?
-    public var duration: TimeInterval
-
-    public init(executable: String, arguments: [String], standardOutput: String, standardError: String,
-                exitCode: Int32?, duration: TimeInterval) {
-        self.executable = executable
-        self.arguments = arguments
-        self.standardOutput = standardOutput
-        self.standardError = standardError
-        self.exitCode = exitCode
-        self.duration = duration
-    }
-}
-
 /// One entry of a diagnostic capture (spec `diagnostic-capture`).
 public enum DiagnosticEvent: Sendable, Equatable {
     case header(DiagnosticHeader)
@@ -42,8 +22,6 @@ public enum DiagnosticEvent: Sendable, Equatable {
     case received(source: String, bytes: [UInt8])
     /// Something happened: open, close, timeout, cancel, error, ...
     case event(source: String, name: String, detail: String?)
-    /// An external process finished (or was killed).
-    case process(ProcessRecord)
 }
 
 /// Receives diagnostic events.

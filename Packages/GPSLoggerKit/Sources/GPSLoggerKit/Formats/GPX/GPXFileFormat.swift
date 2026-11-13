@@ -10,22 +10,7 @@ public struct GPXFileFormat: FileFormat {
 
     /// The first element of the document is `gpx` (with or without namespace prefix).
     public func matches(prefix: Data) -> Bool {
-        let text = String(decoding: prefix, as: UTF8.self)
-        var rest = text[...]
-        while let open = rest.firstIndex(of: "<") {
-            rest = rest[rest.index(after: open)...]
-            guard let next = rest.first else { return false }
-            if next == "?" || next == "!" {
-                // XML declaration, comment, DOCTYPE: skip to the end of the markup.
-                guard let close = rest.firstIndex(of: ">") else { return false }
-                rest = rest[rest.index(after: close)...]
-                continue
-            }
-            let name = rest.prefix { !$0.isWhitespace && $0 != ">" && $0 != "/" }
-            let localName = name.split(separator: ":").last ?? name
-            return localName == "gpx"
-        }
-        return false
+        XMLSniffer.rootElementLocalName(in: prefix) == "gpx"
     }
 
     public func read(_ inputs: [FileInput]) throws -> ImportResult {
@@ -104,7 +89,7 @@ private final class GPXParserHandler: NSObject, XMLParserDelegate {
             parser.abortParsing()
             return
         }
-        let name = elementName.split(separator: ":").last.map(String.init) ?? elementName
+        let name = XMLSniffer.localName(elementName)
         if stack.isEmpty {
             sawRoot = name == "gpx"
             if !sawRoot {

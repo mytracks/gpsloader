@@ -13,7 +13,7 @@ public actor SerialPort: ByteTransport {
     public static let supportedBaudRates: Set<Int> = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400]
 
     public nonisolated let identifier: String
-    public let baudRate: Int
+    public private(set) var baudRate: Int
 
     private var fd: Int32 = -1
     private var pending: [UInt8] = []
@@ -85,6 +85,38 @@ public actor SerialPort: ByteTransport {
 
     public func close() async {
         closeDescriptor()
+    }
+
+    /// Switches the baud rate of the open port (spec `serial-transport`, "Baudrate wechseln").
+    /// Output still queued is sent at the old rate first (`TCSADRAIN`).
+    public func setBaudRate(_ rate: Int) async throws {
+        guard Self.supportedBaudRates.contains(rate) else {
+            throw LoggerError(.protocolError, detail: "Unsupported baud rate \(rate)")
+        }
+        let descriptor = try openDescriptor()
+        var attributes = termios()
+        guard tcgetattr(descriptor, &attributes) == 0 else {
+            throw LoggerError(.protocolError, detail: "\(identifier): tcgetattr: \(Self.describe(errno: errno))")
+        }
+        cfsetspeed(&attributes, speed_t(rate))
+        guard tcsetattr(descriptor, TCSADRAIN, &attributes) == 0 else {
+            throw LoggerError(.protocolError, detail: "\(identifier): tcsetattr: \(Self.describe(errno: errno))")
+        }
+        baudRate = rate
+    }
+
+    /// Drops received bytes that were not read yet, including those buffered by the driver.
+    public func discardInput() async {
+        pending = []
+        if fd >= 0 { tcflush(fd, TCIFLUSH) }
+    }
+
+    /// The speed currently configured on the open descriptor (for tests).
+    public func configuredSpeed() -> Int? {
+        guard fd >= 0 else { return nil }
+        var attributes = termios()
+        guard tcgetattr(fd, &attributes) == 0 else { return nil }
+        return Int(cfgetospeed(&attributes))
     }
 
     private func closeDescriptor() {

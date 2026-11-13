@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2">
+  <Courses>
+    <Course>
+      <Name>Elbe</Name>
+      <Lap>
+        <TotalTimeSeconds>300</TotalTimeSeconds>
+        <DistanceMeters>1000</DistanceMeters>
+        <Intensity>Active</Intensity>
+      </Lap>
+      <Track>
+        <Trackpoint>
+          <Time>2026-06-01T10:00:00Z</Time>
+          <Position><LatitudeDegrees>50.0000</LatitudeDegrees><LongitudeDegrees>8.0000</LongitudeDegrees></Position>
+          <AltitudeMeters>100</AltitudeMeters>
+        </Trackpoint>
+        <Trackpoint>
+          <Time>2026-06-01T10:01:00Z</Time>
+          <Position><LatitudeDegrees>50.0010</LatitudeDegrees><LongitudeDegrees>8.0010</LongitudeDegrees></Position>
+          <AltitudeMeters>101</AltitudeMeters>
+        </Trackpoint>
+        <Trackpoint>
+          <Time>2026-06-01T10:02:00Z</Time>
+          <Position><LatitudeDegrees>50.0020</LatitudeDegrees><LongitudeDegrees>8.0020</LongitudeDegrees></Position>
+          <AltitudeMeters>102</AltitudeMeters>
+        </Trackpoint>
+      </Track>
+      <CoursePoint>
+        <Name>Fähre</Name>
+        <Time>2026-06-01T10:01:00Z</Time>
+        <Position><LatitudeDegrees>50.0010</LatitudeDegrees><LongitudeDegrees>8.0010</LongitudeDegrees></Position>
+        <AltitudeMeters>101</AltitudeMeters>
+        <PointType>Generic</PointType>
+        <Notes>Abfahrt jede halbe Stunde</Notes>
+      </CoursePoint>
+      <CoursePoint>
+        <Name>Ziel</Name>
+        <Time>2026-06-01T10:02:00Z</Time>
+        <Position><LatitudeDegrees>50.0020</LatitudeDegrees><LongitudeDegrees>8.0020</LongitudeDegrees></Position>
+        <PointType>Summit</PointType>
+      </CoursePoint>
+    </Course>
+  </Courses>
+</TrainingCenterDatabase>

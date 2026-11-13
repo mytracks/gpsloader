@@ -1,6 +1,5 @@
 #if DEBUG
 import Foundation
-import GPSBabelRuntime
 import GPSLoggerKit
 import LoggerCore
 
@@ -11,7 +10,6 @@ struct DemoDriver: LoggerDriver {
         case failure
         case timeout
         case empty
-        case childProcess
     }
 
     let scenario: Scenario
@@ -67,13 +65,6 @@ struct DemoDriver: LoggerDriver {
         case .empty:
             context.progress(.indeterminate(step: "Connecting"))
             try await pause(0.5)
-            return Recording()
-
-        case .childProcess:
-            // Runs /bin/sleep through the same runner gpsbabel uses (task 7.7).
-            context.progress(.indeterminate(step: "Running /bin/sleep 60"))
-            _ = try await ProcessRunner(executableURL: URL(fileURLWithPath: "/bin/sleep"),
-                                        diagnostics: context.diagnostics).run(["60"], timeout: 120)
             return Recording()
         }
     }

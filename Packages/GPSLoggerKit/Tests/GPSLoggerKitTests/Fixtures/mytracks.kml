@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.2"><Document><name>Sonntagsrunde</name><Style id="trackstyle"><LineStyle><color>ffff0000</color><width>4</width></LineStyle></Style><Style id="camerastyle"><IconStyle><Icon><href>http://www.mytracks4mac.com/kml/shapes/kml_camera.png</href></Icon></IconStyle></Style><Style id="waypointstyle"><IconStyle><Icon><href>http://www.mytracks4mac.com/kml/shapes/kml_pin_yellow2.png</href></Icon><hotSpot x="8" y="5" xunits="pixels" yunits="pixels"></hotSpot></IconStyle></Style><Placemark><name>Aussicht</name><styleUrl>#waypointstyle</styleUrl><Point><coordinates>8.031000,50.021000,212</coordinates></Point></Placemark><Placemark><name>Bank</name><styleUrl>#waypointstyle</styleUrl><Point><coordinates>8.034000,50.024000,205</coordinates></Point></Placemark><Placemark><name>Sonntagsrunde</name><styleUrl>#trackstyle</styleUrl><LineString><coordinates>
+			8.030000,50.020000,210
+			8.031000,50.021000,212
+			8.032000,50.022000,209
+			8.033000,50.023000,207
+			8.034000,50.024000,205
+</coordinates></LineString></Placemark></Document></kml>

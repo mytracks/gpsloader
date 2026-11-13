@@ -72,6 +72,17 @@ public enum ImportWarningKind: String, Sendable, Hashable, CaseIterable {
     case invalidCoordinate
     /// Points without a date; they have no time.
     case missingDate
+    /// The checksum of a whole (binary) file is wrong; its content was read anyway.
+    case fileChecksumMismatch
+    /// A (binary) file ends early; only its readable beginning was used.
+    case truncatedFile
+    /// A file contains tracks without any times (e.g. KML paths); reported once per file.
+    case missingTimes
+
+    /// Kinds that concern a file as a whole; their message names only the file, not a count.
+    public var isPerFile: Bool {
+        self == .fileChecksumMismatch || self == .truncatedFile || self == .missingTimes
+    }
 }
 
 /// A summarized, non-fatal problem: how often it occurred in which file, and where first.
@@ -90,9 +101,10 @@ public struct ImportWarning: Sendable, Hashable {
     }
 
     /// Localized description, e.g. "3 records with a wrong checksum were skipped in “a.nmea”."
+    /// Per-file kinds (``ImportWarningKind/isPerFile``) only name the file.
     public func message(localization: String? = nil) -> String {
         let format = LocalizedStrings.string("warning.\(kind.rawValue)", localization: localization)
-        return String(format: format, count, fileName)
+        return kind.isPerFile ? String(format: format, fileName) : String(format: format, count, fileName)
     }
 }
 

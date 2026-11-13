@@ -47,9 +47,7 @@ public struct IGCFileFormat: FileFormat {
 
     /// The file name without directory and extension, e.g. "flight1" for "flight1.igc".
     static func trackName(for fileName: String) -> String {
-        let base = (fileName as NSString).lastPathComponent
-        let name = (base as NSString).deletingPathExtension
-        return name.isEmpty ? base : name
+        baseName(ofFile: fileName)
     }
 }
 

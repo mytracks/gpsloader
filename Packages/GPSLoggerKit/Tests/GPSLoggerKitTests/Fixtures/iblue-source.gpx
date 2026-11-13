@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.0" creator="gpsloader test fixture" xmlns="http://www.topografix.com/GPX/1/0">
+<trk><name>iBlue</name><trkseg>
+<trkpt lat="50.030000" lon="8.040000"><ele>150.0</ele><time>2026-11-05T09:00:00Z</time><speed>1.5</speed><fix>3d</fix><sat>8</sat><hdop>1.1</hdop><vdop>1.6</vdop><pdop>1.9</pdop></trkpt>
+<trkpt lat="50.030100" lon="8.040150"><ele>151.0</ele><time>2026-11-05T09:00:05Z</time><speed>2.5</speed><fix>3d</fix><sat>9</sat><hdop>1.0</hdop><vdop>1.5</vdop><pdop>1.8</pdop></trkpt>
+<trkpt lat="50.030200" lon="8.040300"><ele>152.0</ele><time>2026-11-05T09:00:10Z</time><speed>3.0</speed><fix>2d</fix><sat>5</sat><hdop>2.2</hdop><vdop>3.1</vdop><pdop>3.8</pdop></trkpt>
+<trkpt lat="50.030300" lon="8.040450"><ele>153.0</ele><time>2026-11-05T09:00:15Z</time><speed>0.0</speed></trkpt>
+</trkseg></trk>
+</gpx>

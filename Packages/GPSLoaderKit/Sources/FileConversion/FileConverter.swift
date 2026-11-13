@@ -1,5 +1,14 @@
 import Foundation
 import GPSLoggerKit
+import GPSLoggerKitGPL
+
+/// The formats of the app: GPSLoggerKit followed by GPSLoggerKitGPL (spec `file-conversion`, "Unterstützte Formate").
+public enum AppFormats {
+    /// The catalog used by the file conversion.
+    public static let catalog = FormatCatalog.standard.adding(GPLFileFormats.all)
+    /// Sources of the ported formats, for the about window.
+    public static let credits: [Credit] = GPLFileFormats.credits
+}
 
 /// The files of one conversion, grouped by detected format (spec `file-conversion`).
 public struct ConversionPlan: Sendable {
@@ -31,19 +40,20 @@ public struct ConversionPlan: Sendable {
     var firstFileName: String? { groups.first?.inputs.first?.name }
 }
 
-/// Converts files of the formats supported by GPSLoggerKit into one recording (spec `file-conversion`).
+/// Converts files of the formats in a catalog (by default ``AppFormats/catalog``) into one recording
+/// (spec `file-conversion`).
 public enum FileConverter {
-    /// Loads the files (memory mapped) and detects their formats.
+    /// Loads the files (memory mapped) and detects their formats in `catalog`.
     /// - Throws: `GPSLoggerError(.unreadable)` for a file that cannot be read, `.empty` for an empty file.
-    public static func plan(for urls: [URL]) throws -> ConversionPlan {
+    public static func plan(for urls: [URL], catalog: FormatCatalog = AppFormats.catalog) throws -> ConversionPlan {
         var order: [FileFormatID] = []
         var inputsByFormat: [FileFormatID: [FileInput]] = [:]
         var unrecognized: [String] = []
         for url in urls {
             let input = try FileInput.load(url)
             guard !input.data.isEmpty else { throw GPSLoggerError(.empty, fileName: input.name) }
-            guard let format = FileFormats.detect(prefix: input.data.prefix(FileFormats.sniffLength),
-                                                  fileName: input.name) else {
+            guard let format = catalog.detect(prefix: input.data.prefix(FileFormats.sniffLength),
+                                              fileName: input.name) else {
                 unrecognized.append(input.name)
                 continue
             }
@@ -56,8 +66,10 @@ public enum FileConverter {
 
     /// Reads all groups of the plan, merges their results (tracks first, then waypoints, both in group order)
     /// and post-processes them: week rollover correction per group, waypoints as track on the merged result.
+    /// `catalog` must be the catalog the plan was made with.
     /// - Throws: `GPSLoggerError` of the formats, `.noUsableData` if the plan is empty, or `CancellationError`.
-    public static func convert(_ plan: ConversionPlan, referenceDate: Date = Date()) async throws -> ImportResult {
+    public static func convert(_ plan: ConversionPlan, catalog: FormatCatalog = AppFormats.catalog,
+                               referenceDate: Date = Date()) async throws -> ImportResult {
         guard let firstName = plan.firstFileName else {
             throw GPSLoggerError(.noUsableData, fileName: plan.unrecognized.first ?? "")
         }
@@ -67,7 +79,7 @@ public enum FileConverter {
         var warnings: [ImportWarning] = []
         for group in plan.groups {
             try Task.checkCancellation()
-            guard let format = FileFormats.format(withID: group.formatID) else { continue }
+            guard let format = catalog.format(withID: group.formatID) else { continue }
             let result = try await FileFormats.read(group.inputs, format: format, options: options)
             recording.tracks += result.recording.tracks
             recording.waypoints += result.recording.waypoints

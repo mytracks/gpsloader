@@ -103,6 +103,23 @@
         }
       }
     },
+    "format.fit": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garmin FIT"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garmin FIT"
+          }
+        }
+      }
+    },
     "format.gpx": {
       "extractionState": "manual",
       "localizations": {
@@ -116,6 +133,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "GPX"
+          }
+        }
+      }
+    },
+    "format.iblue-csv": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iBlue 747/757 (CSV)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iBlue 747/757 (CSV)"
           }
         }
       }
@@ -137,6 +171,23 @@
         }
       }
     },
+    "format.kml": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KML/KMZ (Google Earth)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KML/KMZ (Google Earth)"
+          }
+        }
+      }
+    },
     "format.nmea": {
       "extractionState": "manual",
       "localizations": {
@@ -154,6 +205,57 @@
         }
       }
     },
+    "format.suunto-sml": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suunto SML (Ambit)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suunto SML (Ambit)"
+          }
+        }
+      }
+    },
+    "format.tcx": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TCX (Garmin Training Center)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TCX (Garmin Training Center)"
+          }
+        }
+      }
+    },
+    "format.v900": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Columbus V-900 (CSV)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Columbus V-900 (CSV)"
+          }
+        }
+      }
+    },
     "warning.checksumMismatch": {
       "extractionState": "manual",
       "localizations": {
@@ -167,6 +269,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "%ld records with a wrong checksum were skipped in “%@”."
+          }
+        }
+      }
+    },
+    "warning.fileChecksumMismatch": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Prüfsumme von „%@“ stimmt nicht. Die Datei wurde trotzdem gelesen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The checksum of “%@” is wrong. The file was read anyway."
           }
         }
       }
@@ -218,6 +337,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "%ld positions in “%@” have no date and therefore no time."
+          }
+        }
+      }
+    },
+    "warning.missingTimes": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ enthält Tracks ohne Zeitangaben."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” contains tracks without times."
+          }
+        }
+      }
+    },
+    "warning.truncatedFile": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ ist unvollständig. Nur der lesbare Anfang wurde übernommen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” is incomplete. Only the readable beginning was used."
           }
         }
       }

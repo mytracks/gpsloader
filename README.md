@@ -9,9 +9,6 @@ Planung und Anforderungen: `openspec/` (spec-getrieben mit OpenSpec), Hintergrun
 
 - macOS mit **Xcode 27** (Swift 6.4, macOS-27-SDK); Deployment Target der App ist macOS 12.
 - **XcodeGen** (`brew install xcodegen`). Das Xcode-Projekt wird aus `project.yml` erzeugt und nicht eingecheckt.
-- Für Tests, die das gebündelte gpsbabel wirklich ausführen, auf Apple Silicon **Rosetta 2**:
-  `softwareupdate --install-rosetta --agree-to-license`.
-  Ohne Rosetta laufen alle automatischen Tests trotzdem; die App zeigt dann „Rosetta fehlt“.
 - Zum Signieren: Zertifikate „Apple Development“ und „Developer ID Application“ des Teams `4TNB35NY7G`.
 
 ## Bauen und starten
@@ -27,8 +24,13 @@ Alternativ nach `xcodegen generate` das Projekt `gpsloader.xcodeproj` in Xcode �
 ## Bedienung
 
 - **Dateimodus:** „Ablage > Dateien konvertieren …“ (⌘O), die Schaltfläche im Bereich „Dateien“ oder Dateien
-  per Drag & Drop auf das Hauptfenster. Das Format wird am Inhalt erkannt (alle Formate von `GPSLoggerKit`,
-  derzeit NMEA 0183, GPX und IGC). Mehrere Dateien ergeben eine GPX-Datei.
+  per Drag & Drop auf das Hauptfenster. Das Format wird am Inhalt erkannt. Mehrere Dateien ergeben eine GPX-Datei.
+  - `GPSLoggerKit`: NMEA 0183, GPX, IGC, Garmin FIT, TCX, Suunto SML, KML/KMZ, Columbus V-900 und iBlue 747/757 (CSV).
+  - `GPSLoggerKitGPL`: Speicherabbilder von SkyTraq-, MTK- und Holux-Loggern, Wintec TES/BIN/TK1, Locosys SBP/SBN
+    und Medion-GoPal-Tracks.
+- **Direktmodus:** Im Bereich „Gerät“ Gerät und Anschluss wählen, dann „Auslesen“ bzw. „Speicher löschen …“.
+  Native Treiber (`GPSLoggerKitGPL`) für SkyTraq, MTK/Holux, Wintec, Navilink und i-GotU (GT-800 seriell,
+  übrige Modelle über USB-HID; Löschen experimentell).
 
 ## Tests
 
@@ -58,7 +60,7 @@ Debug-Builds enthalten einen Demo-Treiber und Startargumente, um UI-Zustände oh
 
 ```sh
 build/DerivedData/Build/Products/Debug/gpsloader.app/Contents/MacOS/gpsloader \
-    -DebugDemo success -DebugSimulatedStatus ready -AppleLanguages '(de)'
+    -DebugDemo success -AppleLanguages '(de)'
 ```
 
 Dateikonvertierung ohne Dialoge (schreibt nach `-DebugSaveDirectory`, Bildschirmfotos nach `-DebugSnapshotDirectory`):
@@ -66,6 +68,13 @@ Dateikonvertierung ohne Dialoge (schreibt nach `-DebugSaveDirectory`, Bildschirm
 ```sh
 build/DerivedData/Build/Products/Debug/gpsloader.app/Contents/MacOS/gpsloader \
     -DebugConvert /pfad/a.nmea,/pfad/b.igc -DebugSaveDirectory /tmp/out -DebugQuitAfter 5
+```
+
+Gerät aus dem Katalog auslesen, z. B. gegen ein simuliertes Gerät an einem Pseudo-Terminal:
+
+```sh
+build/DerivedData/Build/Products/Debug/gpsloader.app/Contents/MacOS/gpsloader \
+    -DebugReadDevice skytraq.venus -DebugPort /dev/ttys012 -DebugSaveDirectory /tmp/out -DebugQuitAfter 10
 ```
 
 ## Release
@@ -87,18 +96,27 @@ xcrun notarytool store-credentials gpsloader-notary --apple-id <Apple-ID> --team
 | Ort | Inhalt |
 |---|---|
 | `App/` | AppKit-App (UI, Lokalisierung `Localizable.xcstrings`) |
-| `RosettaInstaller/` | Hilfs-App nur für x86_64; ihr Start löst den Rosetta-Installationsdialog von macOS aus |
-| `Packages/GPSLoggerKit/` | Eigenständiges Paket (MIT, macOS 12+ und iOS 27+): Datenmodell, Dateiformate (NMEA, GPX, IGC), GPX-Ausgabe. Wird später in ein eigenes Repository ausgelagert; siehe dessen `README.md` und `PROVENANCE.md` |
-| `Packages/GPSLoaderKit/` | `LoggerCore` (Treibervertrag, Session), `SerialTransport`, `GPSBabelRuntime`, `GPXExport` (Dateiname, Schreiben), `DiagnosticCapture`, `FileConversion` (Dateimodus: Erkennen, Zusammenführen), `TestSupport` |
-| `Vendor/gpsbabel-1.7.0/` | gpsbabel 1.7.0 (x86_64) und Qt Core 5.12.9 aus myTracks, Lizenztexte, Herkunftsnachweis |
-| `Scripts/` | Signieren der Helfer (Build-Phase), Release, Bundle-Prüfung, Lokalisierungsprüfung |
+| `Packages/GPSLoggerKit/` | Eigenständiges Paket (MIT, macOS 12+ und iOS 27+): Datenmodell, Dateiformate (NMEA, GPX, IGC, FIT, TCX, Suunto SML, KML/KMZ, V-900, iBlue-CSV), GPX-Ausgabe. Wird später in ein eigenes Repository ausgelagert; siehe dessen `README.md` und `PROVENANCE.md` |
+| `Packages/GPSLoggerKitGPL/` | Paket für Formate und Treiber, die aus GPL-Quellen portiert sind (GPL-3.0-or-later, nur macOS). Ergänzt den Katalog von GPSLoggerKit; Regeln für Portierungen in `Packages/GPSLoggerKitGPL/README.md` |
+| `Packages/GPSLoaderKit/` | `LoggerCore` (Treibervertrag, Session), `SerialTransport`, `GPXExport` (Dateiname, Schreiben), `DiagnosticCapture`, `FileConversion` (Dateimodus: Erkennen, Zusammenführen), `DeviceDrivers` (Gerätekatalog, Anbindung der Treiber), `HIDTransport` (USB-HID), `TestSupport` |
+| `Vendor/Licenses/` | Lizenztexte für das App-Bundle: GPL-3.0 (Kopie von `LICENSE`) und die MIT-Lizenz von GPSLoggerKit |
+| `Scripts/` | Release, Bundle-Prüfung, Lokalisierungsprüfung |
 
-## gpsbabel
+## Ohne gpsbabel
 
-gpsloader liefert **gpsbabel 1.7.0** als eigenständiges Programm mit (`Contents/Helpers/gpsbabel`), weil neuere
-Versionen viele Logger-Formate (u. a. `wbt`, `navilink`, `magellan`) nicht mehr kennen. Das Binary ist nur für
-x86_64 verfügbar und braucht auf Apple Silicon Rosetta 2. Herkunft und Prüfsummen: `Vendor/gpsbabel-1.7.0/PROVENANCE.md`.
+gpsloader liest alle Formate und Geräte mit eigenen Swift-Treibern (GPSLoggerKit und GPSLoggerKitGPL). Bis
+2026-11-13 lag gpsbabel 1.7.0 samt Qt bei; seit dem Change `remove-gpsbabel` enthält die App keine
+Hilfsprogramme mehr und braucht auch auf Apple Silicon kein Rosetta. Für Black-Box-Gegenprüfungen von
+Portierungen wird das gpsbabel-1.7.0-Binary aus der myTracks-Historie (Commit `e0d1f18`) in einen
+temporären Ordner kopiert, nie ins Repository.
 
-Lizenzen: gpsbabel steht unter der GNU GPL v2 (oder später), Qt unter der GNU LGPL v3. Die Lizenztexte liegen im
-App-Bundle unter `Contents/Resources/Licenses`. Der Quellcode beider Projekte muss zusammen mit dem Download
-angeboten werden.
+Nicht mehr unterstützt werden die 45 Formate von Karten- und Navigationsprogrammen, die myTracks über gpsbabel
+anbot (z. B. OziExplorer, Garmin MapSource, CompeGPS); die Liste steht im Proposal von `remove-gpsbabel`.
+
+## Lizenz
+
+- gpsloader (App, `GPSLoaderKit`) und `GPSLoggerKitGPL` stehen unter der **GNU GPL Version 3
+  oder später** (GPL-3.0-or-later, siehe `LICENSE`). Wer die App weitergibt, muss den vollständigen Quellcode
+  anbieten.
+- `GPSLoggerKit` steht unter der **MIT-Lizenz** (`Packages/GPSLoggerKit/LICENSE`) und enthält keinen aus
+  GPL-Quellen abgeleiteten Code.

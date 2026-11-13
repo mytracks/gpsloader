@@ -286,7 +286,7 @@ struct IGCFixtureTests {
     @Test func gpxFromIGCIsSchemaValid() throws {
         let result = try FileFormats.readSynchronously([try fixture("flight-crlf.igc"), try fixture("flight-midnight.igc")],
                                                        format: IGCFileFormat())
-        let data = try GPXWriter(creator: "GPSLoggerKit tests").data(for: result.recording, createdAt: Date())
+        let data = GPXWriter(creator: "GPSLoggerKit tests").data(for: result.recording, createdAt: Date())
         try GPXSchemaValidator.validate(data)
     }
     #endif

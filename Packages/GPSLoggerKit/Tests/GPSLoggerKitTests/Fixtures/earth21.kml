@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+<Document>
+  <name>Alte Wanderung</name>
+  <Placemark>
+    <name>Gipfel</name>
+    <description><![CDATA[<b>Aussicht</b> nach Süden]]></description>
+    <Point><coordinates>8.055,50.045,402</coordinates></Point>
+  </Placemark>
+  <Placemark>
+    <name>Wanderweg</name>
+    <LineString>
+      <tessellate>1</tessellate>
+      <altitudeMode>clampToGround</altitudeMode>
+      <coordinates>8.050,50.040,380 8.052,50.042,390 8.055,50.045,402</coordinates>
+    </LineString>
+  </Placemark>
+</Document>
+</kml>

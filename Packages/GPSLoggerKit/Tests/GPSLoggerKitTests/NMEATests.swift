@@ -335,7 +335,9 @@ struct NMEADetectionTests {
 
     @Test func csvIsNotNMEA() {
         let csv = Data("INDEX,TAG,DATE,TIME,LATITUDE N/S,LONGITUDE E/W,HEIGHT\n1,T,021126,120000,51.741157N,8.680967E,94\n".utf8)
-        #expect(FileFormats.detect(prefix: csv, fileName: "track.csv") == nil)
+        // A V-900 log: not NMEA, but its own format since change csv-logger-import.
+        #expect(FileFormats.detect(prefix: csv, fileName: "track.csv")?.id == .v900)
+        #expect(!NMEAFileFormat().matches(prefix: csv))
     }
 
     @Test func twoSentencesAreNotEnough() {

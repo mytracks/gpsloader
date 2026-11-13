@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Where the complete source code of this version is available (GPL). Set GPSLOADER_SOURCE_CODE_URL in project.yml. -->
+	<key>GPSLoaderSourceCodeURL</key>
+	<string>$(GPSLOADER_SOURCE_CODE_URL)</string>
+</dict>
+</plist>

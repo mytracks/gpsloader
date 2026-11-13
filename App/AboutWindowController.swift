@@ -1,17 +1,21 @@
 import AppKit
+import FileConversion
 
-/// About window with version, copyright and the license notices for gpsbabel and Qt
-/// (spec `app-shell`, "Lizenzhinweise").
+/// About window with version, copyright, the app's license (GPL-3.0-or-later) and the notices for
+/// GPSLoggerKit and the sources of ported formats and drivers (spec `app-shell`, "Lizenzhinweise").
 @MainActor
 final class AboutWindowController: NSWindowController {
     static let shared = AboutWindowController()
 
     /// Where the corresponding source code is available.
-    /// The copy on the developer's website is still open (design.md, Open Questions); until then these
-    /// point to the upstream archives of exactly the bundled versions.
     enum SourceCode {
-        static let gpsbabel = URL(string: "https://github.com/GPSBabel/gpsbabel/releases/tag/gpsbabel_1_7_0")!
-        static let qt = URL(string: "https://download.qt.io/archive/qt/5.12/5.12.9/single/")!
+        /// Source code of the app itself (Info.plist `GPSLoaderSourceCodeURL`, build setting
+        /// `GPSLOADER_SOURCE_CODE_URL`); `nil` while it is not set.
+        static var app: URL? {
+            guard let text = Bundle.main.object(forInfoDictionaryKey: "GPSLoaderSourceCodeURL") as? String,
+                  text.hasPrefix("https://") else { return nil }
+            return URL(string: text)
+        }
     }
 
     private convenience init() {
@@ -38,35 +42,90 @@ final class AboutWindowController: NSWindowController {
         let copyrightLabel = NSTextField(labelWithString: copyright)
         copyrightLabel.textColor = .secondaryLabelColor
 
-        let licenseTitle = NSTextField(labelWithString: String(localized: "Third-party software"))
-        licenseTitle.font = .boldSystemFont(ofSize: NSFont.systemFontSize)
-        let notice = NSTextField(wrappingLabelWithString: String(localized: """
-        gpsloader includes GPSBabel 1.7.0 (copyright the GPSBabel authors), distributed under the GNU General Public \
-        License version 2 or later. GPSBabel runs as a separate program and uses Qt Core 5.12.9 (copyright The Qt \
-        Company Ltd. and other contributors), distributed under the GNU Lesser General Public License version 3. \
-        The complete source code of both is available at the links below.
+        let appLicenseTitle = title(String(localized: "License"))
+        let appLicense = wrappingLabel(String(localized: """
+        gpsloader is free software, distributed under the GNU General Public License version 3 or later. \
+        You may redistribute and modify it under the terms of that license.
         """))
-        notice.isSelectable = true
+        var appLicenseViews = [linkButton(String(localized: "GPL 3.0"), action: #selector(openGPL3(_:)))]
+        if SourceCode.app != nil {
+            appLicenseViews.append(linkButton(String(localized: "Source code of gpsloader"), action: #selector(openAppSource(_:))))
+        }
+        let appLicenseButtons = NSStackView(views: appLicenseViews)
 
-        let licenseButtons = NSStackView(views: [
-            linkButton(String(localized: "GPL 2.0"), action: #selector(openGPL2(_:))),
-            linkButton(String(localized: "LGPL 3.0"), action: #selector(openLGPL3(_:))),
-            linkButton(String(localized: "GPL 3.0"), action: #selector(openGPL3(_:))),
-        ])
-        let sourceButtons = NSStackView(views: [
-            linkButton(String(localized: "GPSBabel 1.7.0 source code"), action: #selector(openGPSBabelSource(_:))),
-            linkButton(String(localized: "Qt 5.12.9 source code"), action: #selector(openQtSource(_:))),
-        ])
+        let licenseTitle = title(String(localized: "Third-party software"))
+        let kitNotice = wrappingLabel(String(localized: """
+        gpsloader contains GPSLoggerKit (copyright 2026 Dirk Stichling), distributed under the MIT License. \
+        Its source code is part of the source code of gpsloader.
+        """))
+        let kitButtons = NSStackView(views: [linkButton(String(localized: "MIT License"), action: #selector(openMIT(_:)))])
+        var views: [NSView] = [icon, name, versionLabel, copyrightLabel, appLicenseTitle, appLicense, appLicenseButtons,
+                               licenseTitle, kitNotice, kitButtons]
+        var wrapping = [appLicense, kitNotice]
+        if !credits.isEmpty {
+            let creditsNotice = wrappingLabel(String(localized: "Some file formats and device drivers are based on the source code of these projects:"))
+            views += [title(String(localized: "Ported formats and drivers")), creditsNotice]
+            wrapping.append(creditsNotice)
+            for (index, credit) in credits.enumerated() {
+                // The text wraps at the window width; the button gets its own row below it.
+                let line = wrappingLabel("\(credit.project) – \(credit.authors) – \(credit.license)")
+                line.isSelectable = true
+                let button = linkButton(String(localized: "Source code"), action: #selector(openCreditSource(_:)))
+                button.tag = index
+                views += [line, NSStackView(views: [button])]
+                wrapping.append(line)
+            }
+        }
 
-        let stack = NSStackView(views: [icon, name, versionLabel, copyrightLabel, licenseTitle, notice,
-                                        licenseButtons, sourceButtons])
+        let stack = NSStackView(views: views)
         stack.orientation = .vertical
         stack.alignment = .leading
         stack.spacing = 8
         stack.setCustomSpacing(20, after: copyrightLabel)
+        stack.setCustomSpacing(20, after: appLicenseButtons)
+        stack.setCustomSpacing(20, after: kitButtons)
         stack.edgeInsets = NSEdgeInsets(top: 20, left: 24, bottom: 24, right: 24)
-        notice.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -48).isActive = true
+        for label in wrapping {
+            label.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -48).isActive = true
+        }
+        stack.widthAnchor.constraint(equalToConstant: 520).isActive = true
         window?.contentView = stack
+        window?.setContentSize(stack.fittingSize)
+    }
+
+    /// One source of ported formats as shown in the window.
+    struct CreditLine {
+        var project: String
+        var authors: String
+        var license: String
+        var sourceURL: URL
+    }
+
+    /// Sources of ported formats (GPSLoggerKitGPL); empty while there are none. Debug builds can add a line
+    /// for snapshots with the default `DebugCredit` = "project|authors|license|url".
+    private let credits: [CreditLine] = {
+        var lines = AppFormats.credits.map {
+            CreditLine(project: $0.project, authors: $0.authors, license: $0.license, sourceURL: $0.sourceURL)
+        }
+        #if DEBUG
+        let parts = UserDefaults.standard.string(forKey: "DebugCredit")?.split(separator: "|").map(String.init) ?? []
+        if parts.count == 4, let url = URL(string: parts[3]) {
+            lines.append(CreditLine(project: parts[0], authors: parts[1], license: parts[2], sourceURL: url))
+        }
+        #endif
+        return lines
+    }()
+
+    private func title(_ text: String) -> NSTextField {
+        let label = NSTextField(labelWithString: text)
+        label.font = .boldSystemFont(ofSize: NSFont.systemFontSize)
+        return label
+    }
+
+    private func wrappingLabel(_ text: String) -> NSTextField {
+        let label = NSTextField(wrappingLabelWithString: text)
+        label.isSelectable = true
+        return label
     }
 
     private func linkButton(_ title: String, action: Selector) -> NSButton {
@@ -86,9 +145,15 @@ final class AboutWindowController: NSWindowController {
         }
     }
 
-    @objc private func openGPL2(_ sender: Any?) { openLicense("GPL-2.0") }
-    @objc private func openLGPL3(_ sender: Any?) { openLicense("LGPL-3.0") }
     @objc private func openGPL3(_ sender: Any?) { openLicense("GPL-3.0") }
-    @objc private func openGPSBabelSource(_ sender: Any?) { NSWorkspace.shared.open(SourceCode.gpsbabel) }
-    @objc private func openQtSource(_ sender: Any?) { NSWorkspace.shared.open(SourceCode.qt) }
+    @objc private func openMIT(_ sender: Any?) { openLicense("MIT-GPSLoggerKit") }
+
+    @objc private func openAppSource(_ sender: Any?) {
+        if let url = SourceCode.app { NSWorkspace.shared.open(url) }
+    }
+
+    @objc private func openCreditSource(_ sender: NSButton) {
+        guard credits.indices.contains(sender.tag) else { return }
+        NSWorkspace.shared.open(credits[sender.tag].sourceURL)
+    }
 }

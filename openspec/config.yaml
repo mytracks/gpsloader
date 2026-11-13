@@ -19,8 +19,12 @@ context: |
   ## Vertrieb
   - Download von der Website des Entwicklers, NICHT über den Mac App Store.
   - Developer-ID-signiert, notarisiert, Hardened Runtime. Die App-Sandbox ist nicht erforderlich
-    (direkter Zugriff auf /dev/cu.*, IOKit/HID, IOBluetooth und das Starten von gpsbabel).
-  - Die App selbst ist ein Universal Binary (arm64 + x86_64).
+    (direkter Zugriff auf /dev/cu.*, IOKit/HID und IOBluetooth).
+  - Die App ist ein Universal Binary (arm64 + x86_64) ohne Hilfsprogramme und ohne Rosetta-Bezug.
+  - Lizenz der App (entschieden am 2026-11-10, Change gpl-driver-package): GPL-3.0-or-later für App,
+    GPSLoaderKit und GPSLoggerKitGPL; GPSLoggerKit bleibt MIT. Jede ausgelieferte
+    Version MUST ihren vollständigen Quellcode anbieten (Adresse: Build-Einstellung
+    GPSLOADER_SOURCE_CODE_URL, von Scripts/verify-bundle.sh für Release-Builds erzwungen).
 
   ## Technische Leitplanken (entschieden)
   - Minimales Deployment Target: macOS 12 (entschieden am 2026-11-02; das SDK von Xcode 27
@@ -31,27 +35,14 @@ context: |
     Sendable, value types, Swift Package Manager für die Modularisierung.
     APIs, die neuer als macOS 12 sind, nur mit `#available`-Fallback.
   - UI auf AppKit-Basis. SwiftUI nur, wo es unter macOS 12 zuverlässig funktioniert.
-  - Treiber-Architektur: ein gemeinsames Treiber-Protokoll (async, abbrechbar, mit Fortschritt)
-    mit zwei Arten von Implementierungen:
-    1. Native Swift-Treiber: BG728 (Maptaq Trip IQ), GNS2000 (IOBluetooth/RFCOMM),
-       i-GotU GT-800 (seriell), i-GotU GT-100/120/200e/600 (USB, vermutlich HID),
-       WSG-2000-NAL-Dateien sowie die NMEA-Vorverarbeitung (Dateien zusammenfügen, '@'-Zeilen entfernen).
-    2. gpsbabel-Treiber: alle übrigen Geräte und Dateiformate des Katalogs.
-    Die nativen Treiber wandern schrittweise in das Paket GPSLoggerKit (siehe unten). Was dort
-    nativ umgesetzt ist, läuft nicht mehr über gpsbabel.
-  - gpsbabel: Es wird AUSSCHLIESSLICH gpsbabel 1.7.0 verwendet, und zwar das fertige
-    x86_64-Binary mit QtCoreGpsBabel.framework (Qt 5.12.9) aus myTracks
-    (Herkunft: siehe docs/legacy-analysis.md, Abschnitt 3.1). gpsbabel wird NICHT selbst gebaut.
-    Grund: Neuere Versionen kennen wbt, navilink, magellan, itracku, wintec_tes, sbp, sbn
-    usw. nicht mehr.
-    gpsbabel läuft als eigenständiges Programm (Process mit Argument-Array, niemals über eine
-    Shell) und wird nur mitgeliefert, nicht eingebunden (Lizenz: GPL- bzw. LGPL-Text und
-    Quellcode-Angebot für gpsbabel und Qt beilegen).
-  - Rosetta 2: Auf Apple Silicon ist Rosetta Voraussetzung für alle gpsbabel-Geräte.
-    gpsloader muss fehlendes Rosetta vor dem Start von gpsbabel erkennen, das dem Anwender
-    verständlich erklären und die Installation anbieten. Native Treiber dürfen nicht von
-    Rosetta abhängen. Apple hat angekündigt, Rosetta nach macOS 27 nur noch eingeschränkt
-    anzubieten; das ist ein bekanntes, bewusst akzeptiertes Risiko.
+  - Treiber-Architektur: ein gemeinsames Treiber-Protokoll (async, abbrechbar, mit Fortschritt);
+    alle Treiber sind native Swift-Treiber in GPSLoggerKit bzw. GPSLoggerKitGPL (siehe unten).
+    Noch offen: BG728 (Maptaq Trip IQ), GNS2000 (IOBluetooth/RFCOMM) und WSG-2000-NAL-Dateien.
+  - Kein gpsbabel (entschieden am 2026-11-13, Change remove-gpsbabel): Die App liefert weder gpsbabel
+    noch Qt noch einen Rosetta-Installer aus und braucht kein Rosetta. Das gpsbabel-1.7.0-Binary der
+    Alt-App (x86_64, docs/legacy-analysis.md, Abschnitt 3.1; myTracks-Historie, Commit e0d1f18) dient
+    nur noch der Black-Box-Gegenprüfung von Portierungen; es wird in den Scratchpad kopiert, nie ins
+    Repository und nie in die App. Aufruf auch dort nur als Prozess mit Argument-Array, nie über eine Shell.
   - Bluetooth-Logger (außer GNS2000) werden nur über den seriellen Port /dev/cu.* angesprochen,
     den macOS nach dem Koppeln anlegt. Es gibt keine eigene RFCOMM-Brücke.
   - Keine Laufzeitabhängigkeit von Python, Perl oder anderen Interpretern.
@@ -80,22 +71,72 @@ context: |
     SkyTraq-Application-Notes, Locosys-Protokollspezifikation), der eigene myTracks-Code des
     Entwicklers sowie Black-Box-Beobachtung (Beispieldateien, Ausgaben des gpsbabel-Binaries,
     aufgezeichnete Gerätedialoge). Für jedes Format bzw. Protokoll nennt das Design die genutzten
-    Quellen.
+    Quellen. Portierungen aus GPL-Quellen gehören ausschließlich in GPSLoggerKitGPL (siehe unten);
+    an dieser Regel für GPSLoggerKit ändert das nichts.
   - Nativer Umfang (Auswahl des Entwicklers):
-    - Dateiformate: NMEA 0183, GPX als Eingang, Garmin FIT, TCX, Suunto Ambit SML/XML, IGC.
+    - Dateiformate: NMEA 0183, GPX als Eingang, Garmin FIT, TCX, Suunto Ambit SML/XML, IGC,
+      KML/KMZ (aufgenommen am 2026-11-04, Change kml-import).
     - Logger-Dateien: Wintec TES (WBT-202), NAL (WSG-2000), wbt-bin, wbt-tk1; Speicherabbilder
       mtk-bin, m241-bin, skytraq-bin; CSV-Logger Columbus V-900/Visiontac, Medion GoPal, iBlue747-CSV.
     - Direktes Auslesen (nur macOS): MTK (iBlue 747, Qstarz, Holux M-241/GPSport 245 …),
       SkyTraq Venus, Wintec WBT-100/200/201/G-Rays 2/WSG-1000, Locosys Navilink, i-GotU
       (GT-100/120/200/200e/600 über USB-HID, GT-800/Pro seriell).
-    - Weiterhin über gpsbabel (nur in der Mac-App): Locosys SBP/SBN, Magellan Meridian/SporTrak,
-      XAiOX iTrackU (gpsbabel), Alan Map500 und die übrigen Formate der myTracks-Formatliste.
+    - Entfallen (Entscheidung des Entwicklers vom 2026-11-13, Change remove-gpsbabel): die übrigen 45
+      Programmformate der myTracks-Formatliste (GPSBabel.m), Liste im Proposal von remove-gpsbabel.
+      Magellan, XAiOX iTrackU und Alan Map500 sind portiert (Changes magellan-port, itracku-port, alan-port).
   - Reihenfolge: zuerst ein Change für Paketgerüst, NMEA und GPX-Eingang (erledigt); danach je ein
     Change pro Familie. Umgestellt am 2026-11-03: Familien mit öffentlicher Spezifikation zuerst
-    (IGC, FIT/TCX/Suunto, SkyTraq, Navilink, MTK, CSV-Logger). Wintec und i-GotU kommen zuletzt,
+    (IGC, FIT/TCX/Suunto, KML/KMZ – eingeschoben am 2026-11-04 –, SkyTraq, Navilink, MTK, CSV-Logger). Wintec und i-GotU kommen zuletzt,
     weil es dafür keine öffentliche Spezifikation gibt; sie brauchen Beispieldateien und gpsbabel-
     Ausgaben des Entwicklers (Black-Box). Die NAL-Beschreibung in legacy-analysis.md stammt aus
     wsg2000.c und ist deshalb keine zulässige Quelle.
+
+  ## GPSLoggerKitGPL (entschieden am 2026-11-10, Change gpl-driver-package)
+  - Swift-Paket `Packages/GPSLoggerKitGPL` für Formate und Treiber, die aus Quelltext unter der GPL
+    oder einer damit vereinbaren Lizenz portiert werden. Lizenz GPL-3.0-or-later, nur macOS 12+
+    (kein iOS: App-Store-Bedingungen und GPL vertragen sich nicht). Hängt nur von GPSLoggerKit ab;
+    GPSLoggerKit hängt nie von ihm ab. Die App setzt ihren Katalog aus beiden Paketen zusammen.
+  - Zuordnung pro Familie: Das Proposal jeder neuen Familie legt fest, ob sie Clean-Room in
+    GPSLoggerKit oder als Portierung in GPSLoggerKitGPL entsteht, und trägt das Ergebnis unten ein.
+  - GPL-Quelltext darf nur in einem Change gelesen werden, dessen Proposal die Familie
+    GPSLoggerKitGPL zuordnet, und nur für diese Familie. Bei Arbeit an GPSLoggerKit wird kein
+    GPL-Quelltext gelesen; ein Change arbeitet entweder an GPSLoggerKit-Formaten oder an einer
+    Portierung, nicht an beidem. Braucht eine Portierung etwas Neues in GPSLoggerKit, dann nur in
+    allgemeiner Form und ohne Code aus der Vorlage; sonst gehören Hilfsfunktionen ins GPL-Paket.
+  - Kein Rückweg: Ist für eine Familie GPL-Quelltext gelesen, bleibt sie in GPSLoggerKitGPL.
+  - Zulässige Lizenzen der Vorlagen: GPL-2.0-or-later, GPL-3.0(-or-later), LGPL-2.1-or-later,
+    CC BY-SA 4.0, MIT, BSD, Apache 2.0, Public Domain. Nicht zulässig: GPL-2.0-only, CC BY-SA bis 3.0,
+    eigene Lizenzen und Quellen ohne Lizenz, solange die Urheber keine vereinbare Lizenz erteilen.
+  - gpsbabel-Vorlagen vom Tag `gpsbabel_1_7_0` (passend zum Binary der Alt-App); Quellen werden in
+    den Scratchpad geladen, nie ins Repository.
+  - Jede portierte Datei trägt einen Kopf mit Vorlage (Projekt, Pfad, Tag/Commit), Urheberhinweis und
+    Lizenz der Vorlage, Hinweis auf Übersetzung und Änderung mit Datum sowie
+    `SPDX-License-Identifier: GPL-3.0-or-later`. PROVENANCE.md des Pakets hat je Format einen
+    Abschnitt, `GPLFileFormats.credits` je Quellprojekt einen Eintrag (Anzeige im Über-Fenster).
+  - Zuordnung der Familien:
+    - GPSLoggerKit (Clean-Room, umgesetzt): NMEA, GPX, IGC, FIT, TCX, Suunto SML, KML/KMZ.
+    - WSG-2000 NAL: Black-Box in GPSLoggerKit. `wsg2000.c` steht unter einer eigenen
+      CC-BY-SA-ähnlichen Lizenz mit Zusatzbedingungen (GPLv2 nur als Absicht, Zeilen 5–13) und ist
+      damit keine zulässige Vorlage, solange der Autor keine vereinbare Lizenz erteilt.
+    - CSV-Logger Columbus V-900/Visiontac und iBlue-CSV: Clean-Room in GPSLoggerKit (Change
+      csv-logger-import, vom Entwickler bestätigt am 2026-11-13).
+    - GPSLoggerKitGPL (Portierung; Entscheidung des Entwicklers am 2026-11-13: „Portieren alles, was
+      möglich ist, in das GPL-Paket“). Vorlagen aus gpsbabel 1.7.0, GPL-2.0-or-later:
+      - SkyTraq: Dateiformat skytraq-bin portiert (Change skytraq-bin-port).
+      - MTK: mtk-bin und m241-bin portiert (Change mtk-bin-port).
+      - Wintec: wintec-tes, wbt-bin und wbt-tk1 portiert (Change wintec-file-port).
+      - Navilink/Locosys: sbp und sbn portiert (Change locosys-file-port).
+      - Medion GoPal: eigene Familie, getrennt von den CSV-Loggern; portiert (Change gopal-port).
+      - Magellan Meridian/SporTrak/eXplorist: Geräteprotokoll und SD-Dateien (magellan, magellanx)
+        portiert (Change magellan-port; Entscheidung des Entwicklers vom 2026-11-13).
+      - XAiOX iTrackU: Geräteprotokoll portiert (Change itracku-port; Entscheidung vom 2026-11-13).
+      - Alan Map500: Dateiformat alantrl portiert (Change alan-port; Entscheidung vom 2026-11-13).
+      - i-GotU: Geräteprotokoll aus eigenem myTracks-Code und igotu2gpx 0.3.0 (GPL-3.0-or-later),
+        Change igotu-driver. Löschen ist als „experimentell“ gekennzeichnet und warnt vor der Bestätigung
+        (entschieden vom Entwickler am 2026-11-13: Befehle nicht dokumentiert, keine Testgeräte).
+      - Direktmodus (Auftrag des Entwicklers vom 2026-11-13): Geräteprotokolle für SkyTraq, MTK/Holux, Wintec
+        und Navilink im GPL-Paket (Changes *-device-port), angebunden über DeviceConnection/DeviceProtocol
+        und das Modul DeviceDrivers (Change device-mode); USB-HID über das Modul HIDTransport.
 
   ## Umfang (entschieden)
   - Unterstützt wird der Gerätekatalog der Alt-App (docs/legacy-device-catalog.md) mit diesen Abweichungen:
@@ -107,13 +148,11 @@ context: |
   - Keine Übernahme von Logger-Konfigurationen aus myTracks.
   - Kein Echtzeit-Tracking.
   - Diagnose-Mitschnitt (bestätigt am 2026-11-02, umgesetzt in setup-foundation): alle gesendeten
-    und empfangenen Bytes bzw. gpsbabel-Ausgaben mit Zeitstempel in eine Datei, die Anwender dem
+    und empfangenen Bytes mit Zeitstempel in eine Datei, die Anwender dem
     Entwickler schicken können. Mitschnitte dienen zugleich als Test-Fixtures.
 
   ## Vorschläge aus der Exploration (noch nicht bestätigt)
-  - i-GotU-Löschen als "experimentell" kennzeichnen, mit Warnung (Befehle nicht dokumentiert, keine Testgeräte).
   - Wintec WPL 1000 / Navilock NL-456DL zurückstellen (nur ein x86-Binary ohne Quellcode vorhanden).
-  - "Holux GPSport 245 – alternative" als festen Ablauf mit zwei gpsbabel-Aufrufen übernehmen.
   - Rückweg zu myTracks: erzeugte GPX-Datei per "In myTracks öffnen" übergeben.
   - Updates über Sparkle, als eigener Change.
 
@@ -138,6 +177,8 @@ rules:
     - Immer einen Abschnitt "Nicht im Umfang" aufnehmen.
     - Berührt der Change einen der noch nicht bestätigten Vorschläge, die Entscheidung
       ausdrücklich beim Entwickler einholen und festhalten.
+    - Bei einer neuen Logger-Familie festlegen, ob sie in GPSLoggerKit (Clean-Room) oder in
+      GPSLoggerKitGPL (Portierung) entsteht, und die Entscheidung beim Entwickler einholen.
   specs:
     - Fließtext auf Deutsch. Jede Requirement-Aussage enthält das Schlüsselwort SHALL oder MUST,
       weil der OpenSpec-Validator das verlangt (z. B. "Die App SHALL …").
@@ -149,7 +190,8 @@ rules:
     - Auf Deutsch schreiben.
     - Relevante Alt-Quelldateien unter input/mytracks4mac/ mit Pfad (bei gelöschtem Code mit Commit) referenzieren.
     - "Swift-6-Concurrency explizit behandeln: Isolation, Sendable, Timeouts, Abbruch."
-    - Bei gpsbabel-Treibern das Verhalten ohne Rosetta behandeln.
+    - Bei Portierungen nach GPSLoggerKitGPL jede Vorlage mit Projekt, Pfad, Tag/Commit und der
+      zitierten Lizenzangabe (Datei und Zeile) nennen.
   tasks:
     - Auf Deutsch schreiben.
     - Zu jedem Protokoll-/Parser-Task gehört ein Test-Task mit Fixtures.

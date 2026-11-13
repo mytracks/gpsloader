@@ -11,7 +11,11 @@ import UniformTypeIdentifiers
 final class SessionPresenter {
     private weak var window: NSWindow?
     private var progressSheet: ProgressSheetController?
-    private(set) var runningSessions: [LoggerSession] = []
+    private(set) var runningSessions: [LoggerSession] = [] {
+        didSet { onRunningChange?() }
+    }
+    /// Called when a session starts or ends (the device panel updates its buttons).
+    var onRunningChange: (() -> Void)?
 
     init(window: NSWindow) {
         self.window = window
@@ -95,7 +99,7 @@ final class SessionPresenter {
         let sheet = ProgressSheetController(title: title) { session.cancel() }
         progressSheet = sheet
         // A child window instead of a sheet: AppKit refuses to quit while a sheet is shown, which would block
-        // quitting (and logout) during an operation and leave gpsbabel running (spec gpsbabel-runtime).
+        // quitting (and logout) during an operation.
         if let window, let progressWindow = sheet.window {
             let size = progressWindow.frame.size
             let parent = window.frame
@@ -197,16 +201,7 @@ final class SessionPresenter {
             text += (text.isEmpty ? "" : "\n\n") + String(localized: "Details: \(error.detail)")
         }
         alert.informativeText = text
-        if error.kind == .rosettaMissing {
-            alert.addButton(withTitle: String(localized: "Install Rosetta…"))
-            alert.addButton(withTitle: String(localized: "Cancel"))
-        }
-        let handle: (NSApplication.ModalResponse) -> Void = { response in
-            if error.kind == .rosettaMissing, response == .alertFirstButtonReturn {
-                RosettaInstallation.shared.start(presentingWindow: self.window)
-            }
-        }
-        if let window { alert.beginSheetModal(for: window, completionHandler: handle) } else { handle(alert.runModal()) }
+        if let window { alert.beginSheetModal(for: window) } else { alert.runModal() }
     }
 
     private func showMessage(_ message: String) {

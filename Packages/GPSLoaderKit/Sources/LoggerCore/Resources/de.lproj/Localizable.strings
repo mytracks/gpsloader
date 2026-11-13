@@ -7,10 +7,6 @@
 "error.timeout.recovery" = "Prüfen Sie die Verbindung und die Gerätewahl.";
 "error.protocolError.message" = "Das Gerät hat unerwartete Daten gesendet.";
 "error.protocolError.recovery" = "Versuchen Sie es erneut. Bleibt das Problem bestehen, zeichnen Sie einen Diagnose-Mitschnitt auf und senden Sie ihn an den Entwickler.";
-"error.rosettaMissing.message" = "Rosetta ist nicht installiert.";
-"error.rosettaMissing.recovery" = "Geräte, die gpsbabel nutzen, benötigen auf Macs mit Apple Silicon Rosetta. Installieren Sie Rosetta und versuchen Sie es erneut.";
-"error.gpsbabelFailed.message" = "gpsbabel hat einen Fehler gemeldet.";
-"error.gpsbabelFailed.recovery" = "Prüfen Sie die Verbindung und die Gerätewahl. Die Details enthalten die Ausgabe von gpsbabel.";
 "error.writeFailed.message" = "Die Datei konnte nicht geschrieben werden.";
 "error.writeFailed.recovery" = "Wählen Sie einen anderen Speicherort und prüfen Sie die Schreibrechte.";
 "error.cancelled.message" = "Der Vorgang wurde abgebrochen.";

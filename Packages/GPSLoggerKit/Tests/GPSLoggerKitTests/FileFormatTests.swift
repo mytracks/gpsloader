@@ -44,15 +44,22 @@ private let noProcessing = ImportOptions(correctWeekRollover: false)
 @Suite("File format contract")
 struct FileFormatTests {
     /// Scenario "Katalog abfragen".
-    @Test func catalogContainsNMEAGPXAndIGC() {
+    @Test func catalogContainsAllFormats() {
         let ids = FileFormats.all.map(\.id)
-        #expect(ids.contains(.nmea))
-        #expect(ids.contains(.gpx))
-        #expect(ids.contains(.igc))
+        #expect(ids == [.nmea, .gpx, .igc, .fit, .tcx, .suuntoSML, .kml, .v900, .iblueCSV])
+        #expect(FileFormatID.kml.rawValue == "kml")
+        #expect(FileFormatID.suuntoSML.rawValue == "suunto-sml")
         #expect(Set(ids).count == ids.count)
         #expect(FileFormats.format(withID: .nmea)?.fileExtensions.contains("nmea") == true)
         #expect(FileFormats.format(withID: .gpx)?.fileExtensions.contains("gpx") == true)
         #expect(FileFormats.format(withID: .igc)?.fileExtensions == ["igc"])
+        #expect(FileFormats.format(withID: .fit)?.fileExtensions == ["fit"])
+        #expect(FileFormats.format(withID: .tcx)?.fileExtensions == ["tcx", "xml"])
+        #expect(FileFormats.format(withID: .suuntoSML)?.fileExtensions == ["sml", "xml"])
+        #expect(FileFormats.format(withID: .kml)?.fileExtensions == ["kml", "kmz"])
+        #expect(FileFormats.format(withID: .v900)?.fileExtensions == ["csv"])
+        #expect(FileFormats.format(withID: .iblueCSV)?.fileExtensions == ["csv"])
+        #expect(FileFormatID.iblueCSV.rawValue == "iblue-csv")
         for format in FileFormats.all {
             #expect(!format.displayName.hasPrefix("format."))
         }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"
+    xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
+  <Folders/>
+  <Activities>
+    <Activity Sport="Biking">
+      <Id>2026-05-01T08:00:00Z</Id>
+      <Lap StartTime="2026-05-01T08:00:00Z">
+        <TotalTimeSeconds>120.0</TotalTimeSeconds>
+        <DistanceMeters>400.0</DistanceMeters>
+        <Calories>10</Calories>
+        <Intensity>Active</Intensity>
+        <TriggerMethod>Manual</TriggerMethod>
+        <Track>
+          <Trackpoint>
+            <Time>2026-05-01T08:00:00Z</Time>
+            <Position>
+              <LatitudeDegrees>53.55</LatitudeDegrees>
+              <LongitudeDegrees>9.99</LongitudeDegrees>
+            </Position>
+            <AltitudeMeters>12.5</AltitudeMeters>
+            <DistanceMeters>0.0</DistanceMeters>
+            <HeartRateBpm><Value>110</Value></HeartRateBpm>
+            <Extensions>
+              <ns3:TPX><ns3:Speed>3.2</ns3:Speed></ns3:TPX>
+            </Extensions>
+          </Trackpoint>
+          <Trackpoint>
+            <Time>2026-05-01T08:00:10Z</Time>
+            <HeartRateBpm><Value>112</Value></HeartRateBpm>
+          </Trackpoint>
+          <Trackpoint>
+            <Time>2026-05-01T08:00:20Z</Time>
+            <Position>
+              <LatitudeDegrees>53.5510</LatitudeDegrees>
+              <LongitudeDegrees>9.9910</LongitudeDegrees>
+            </Position>
+            <AltitudeMeters>13.0</AltitudeMeters>
+          </Trackpoint>
+        </Track>
+      </Lap>
+      <Lap StartTime="2026-05-01T08:05:00Z">
+        <TotalTimeSeconds>60.0</TotalTimeSeconds>
+        <DistanceMeters>200.0</DistanceMeters>
+        <Calories>5</Calories>
+        <Intensity>Active</Intensity>
+        <TriggerMethod>Manual</TriggerMethod>
+        <Track>
+          <Trackpoint>
+            <Time>2026-05-01T08:05:00Z</Time>
+            <Position>
+              <LatitudeDegrees>53.5520</LatitudeDegrees>
+              <LongitudeDegrees>9.9920</LongitudeDegrees>
+            </Position>
+            <AltitudeMeters>14.0</AltitudeMeters>
+          </Trackpoint>
+          <Trackpoint>
+            <Time>2026-05-01T08:06:00Z</Time>
+            <Position>
+              <LatitudeDegrees>53.5530</LatitudeDegrees>
+              <LongitudeDegrees>9.9930</LongitudeDegrees>
+            </Position>
+            <AltitudeMeters>15.0</AltitudeMeters>
+          </Trackpoint>
+        </Track>
+        <Extensions>
+          <ns3:LX><ns3:AvgSpeed>3.3</ns3:AvgSpeed></ns3:LX>
+        </Extensions>
+      </Lap>
+      <Creator xsi:type="Device_t">
+        <Name>Test Device</Name>
+        <UnitId>1</UnitId>
+        <ProductID>1</ProductID>
+        <Version><VersionMajor>1</VersionMajor><VersionMinor>0</VersionMinor></Version>
+      </Creator>
+    </Activity>
+  </Activities>
+  <Workouts>
+    <Workout Sport="Biking">
+      <Name>Intervalle</Name>
+      <Step xsi:type="Step_t">
+        <StepId>1</StepId>
+        <Duration xsi:type="Time_t"><Seconds>60</Seconds></Duration>
+        <Intensity>Active</Intensity>
+        <Target xsi:type="None_t"/>
+      </Step>
+    </Workout>
+  </Workouts>
+  <Author xsi:type="Application_t">
+    <Name>gpsloader tests</Name>
+    <Build><Version><VersionMajor>1</VersionMajor><VersionMinor>0</VersionMinor></Version></Build>
+    <LangID>DE</LangID>
+    <PartNumber>000-A0000-00</PartNumber>
+  </Author>
+</TrainingCenterDatabase>

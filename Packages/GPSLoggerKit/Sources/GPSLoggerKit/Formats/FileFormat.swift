@@ -17,6 +17,12 @@ public struct FileFormatID: RawRepresentable, Hashable, Sendable, ExpressibleByS
     public static let nmea: FileFormatID = "nmea"
     public static let gpx: FileFormatID = "gpx"
     public static let igc: FileFormatID = "igc"
+    public static let fit: FileFormatID = "fit"
+    public static let tcx: FileFormatID = "tcx"
+    public static let suuntoSML: FileFormatID = "suunto-sml"
+    public static let kml: FileFormatID = "kml"
+    public static let v900: FileFormatID = "v900"
+    public static let iblueCSV: FileFormatID = "iblue-csv"
 }
 
 /// The content of one input file.
@@ -92,21 +98,20 @@ public enum FileFormats {
     public static let sniffLength = 4096
 
     /// All supported formats.
-    public static let all: [any FileFormat] = [NMEAFileFormat(), GPXFileFormat(), IGCFileFormat()]
+    public static let all: [any FileFormat] = [
+        NMEAFileFormat(), GPXFileFormat(), IGCFileFormat(), FITFileFormat(), TCXFileFormat(), SuuntoSMLFileFormat(),
+        KMLFileFormat(), V900FileFormat(), IBlueCSVFileFormat(),
+    ]
 
     /// The format with the given identifier.
     public static func format(withID id: FileFormatID) -> (any FileFormat)? {
-        all.first { $0.id == id }
+        FormatCatalog.standard.format(withID: id)
     }
 
     /// Suggests a format by content. The file extension only decides which formats are checked first.
     /// - Returns: `nil` if no format recognizes the content ("unknown").
     public static func detect(prefix: Data, fileName: String? = nil) -> (any FileFormat)? {
-        let head = prefix.prefix(sniffLength)
-        let fileExtension = fileName.map { ($0 as NSString).pathExtension.lowercased() } ?? ""
-        let ordered = all.filter { $0.fileExtensions.contains(fileExtension) }
-            + all.filter { !$0.fileExtensions.contains(fileExtension) }
-        return ordered.first { $0.matches(prefix: head) }
+        FormatCatalog.standard.detect(prefix: prefix, fileName: fileName)
     }
 
     /// Reads the files with the given format and applies the post-processing chosen in `options`.
@@ -138,6 +143,14 @@ public enum FileFormats {
                             options: ImportOptions = ImportOptions()) async throws -> ImportResult {
         try readSynchronously(inputs, format: format, options: options)
     }
+}
+
+/// The file name without directory and extension, e.g. "flight1" for "flight1.igc".
+/// Used as track name by formats with one recording per file.
+func baseName(ofFile fileName: String) -> String {
+    let base = (fileName as NSString).lastPathComponent
+    let name = (base as NSString).deletingPathExtension
+    return name.isEmpty ? base : name
 }
 
 /// Cooperative cancellation for parsers: checks the task every `interval` units of work.
