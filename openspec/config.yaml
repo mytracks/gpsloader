@@ -25,6 +25,8 @@ context: |
     GPSLoaderKit und GPSLoggerKitGPL; GPSLoggerKit bleibt MIT. Jede ausgelieferte
     Version MUST ihren vollständigen Quellcode anbieten (Adresse: Build-Einstellung
     GPSLOADER_SOURCE_CODE_URL, von Scripts/verify-bundle.sh für Release-Builds erzwungen).
+    Bezugsquelle (entschieden am 2026-11-13): das öffentliche Repository
+    https://github.com/mytracks/gpsloader; jede Version wird dort vor dem Release gepusht.
 
   ## Technische Leitplanken (entschieden)
   - Minimales Deployment Target: macOS 12 (entschieden am 2026-11-02; das SDK von Xcode 27

@@ -69,8 +69,8 @@ targets:
         # Partial Info.plist, merged with the generated one: only GPSLoaderSourceCodeURL.
         INFOPLIST_FILE: App/Info.plist
         # Where the complete source code of the app is offered (GPL-3.0-or-later). Required for release builds
-        # (Scripts/verify-bundle.sh); still to be decided by the developer (change gpl-driver-package, task 6.2).
-        GPSLOADER_SOURCE_CODE_URL: ""
+        # (Scripts/verify-bundle.sh); public GitHub repository, decided by the developer on 2026-11-13.
+        GPSLOADER_SOURCE_CODE_URL: "https://github.com/mytracks/gpsloader"
         INFOPLIST_KEY_CFBundleDisplayName: gpsloader
         INFOPLIST_KEY_NSPrincipalClass: NSApplication
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities

@@ -17,8 +17,9 @@ Stand: 2026-11-13. Die Changes sind archiviert, diese Tests stehen aber noch aus
 - [ ] **Start ohne Rosetta** (`remove-gpsbabel` 3.3).
   - Release-Build auf einem Apple-Silicon-Mac ohne Rosetta und auf einem Intel-Mac starten.
   - Prüfen: Es erscheint kein Rosetta-Dialog, Dateimodus und Direktmodus funktionieren.
-- [ ] **Adresse des Quellcodes** (`gpl-driver-package` 6.2, offene Entscheidung des Entwicklers).
-  - Bezugsquelle festlegen (öffentliches Repository oder Archiv je Version) und `GPSLOADER_SOURCE_CODE_URL` in `project.yml` setzen.
+- [ ] **Adresse des Quellcodes** (`gpl-driver-package` 6.2).
+  - Entschieden am 2026-11-13: `GPSLOADER_SOURCE_CODE_URL` ist `https://github.com/mytracks/gpsloader`.
+  - Prüfen: Das Repository ist öffentlich, und der Stand des Releases ist dort gepusht.
   - Quellen von gpsbabel und Qt müssen dort nicht mehr liegen, weil beide nicht mehr mitgeliefert werden.
   - Prüfen: `Scripts/verify-bundle.sh` ist für den Release-Build grün, und der Link im Über-Fenster öffnet die Quelle.
 
