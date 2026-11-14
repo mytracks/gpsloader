@@ -8,19 +8,20 @@ final class AppEnvironment {
     static let shared = AppEnvironment()
 
     let appVersion: String
+    let build: String
     let reservations = PortReservations()
     let captureStore = CaptureStore()
 
     private init() {
         appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+        build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "0"
     }
 
     /// Creator string for GPX files.
     var gpxCreator: String { "gpsloader \(appVersion)" }
 
-    /// A new capture recorder if diagnostic capture is switched on.
-    func makeRecorderIfEnabled() -> CaptureRecorder? {
-        guard captureStore.isEnabled else { return nil }
-        return CaptureRecorder(environment: .current(appVersion: appVersion))
+    /// The capture of a new operation; diagnostic capture is always on (spec `diagnostic-capture`).
+    func makeCapture(header: DiagnosticHeader) -> OperationCapture {
+        OperationCapture(store: captureStore, environment: .current(appVersion: appVersion), header: header)
     }
 }

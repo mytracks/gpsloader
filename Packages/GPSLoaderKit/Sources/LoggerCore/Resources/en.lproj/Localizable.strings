@@ -6,7 +6,7 @@
 "error.timeout.message" = "The device did not respond in time.";
 "error.timeout.recovery" = "Check the connection and the selected device.";
 "error.protocolError.message" = "The device sent unexpected data.";
-"error.protocolError.recovery" = "Try again. If the problem persists, record a diagnostic capture and send it to the developer.";
+"error.protocolError.recovery" = "Try again. If the problem persists, create a support package (Help menu) and send it to the developer.";
 "error.writeFailed.message" = "The file could not be written.";
 "error.writeFailed.recovery" = "Choose a different location and check that you have write access.";
 "error.cancelled.message" = "The operation was cancelled.";

@@ -32,7 +32,7 @@ public protocol DiagnosticSink: Sendable {
     func record(_ event: DiagnosticEvent)
 }
 
-/// A sink that discards everything (diagnostic capture switched off).
+/// A sink that discards everything.
 public struct NullSink: DiagnosticSink {
     public init() {}
     public func record(_ event: DiagnosticEvent) {}

@@ -1,29 +1,18 @@
 import Foundation
 import LoggerCore
 
-/// Local storage of captures and the on/off setting (spec `diagnostic-capture`).
-///
-/// - The setting defaults to "off" and survives restarts (`UserDefaults`).
-/// - Only the captures of the last `maximumCount` operations are kept.
+/// Local storage of captures (spec `diagnostic-capture`). Every operation is recorded ("Aufzeichnung immer
+/// aktiv"); only the captures of the last `maximumCount` operations are kept.
 public struct CaptureStore: Sendable {
-    public static let enabledKey = "DiagnosticCaptureEnabled"
     public static let defaultMaximumCount = 10
 
     public let directory: URL
     public let maximumCount: Int
-    /// `nil` = standard user defaults; otherwise the suite name (used by tests).
-    private let defaultsSuiteName: String?
 
     public init(directory: URL = CaptureStore.defaultDirectory,
-                defaultsSuiteName: String? = nil,
                 maximumCount: Int = CaptureStore.defaultMaximumCount) {
         self.directory = directory
-        self.defaultsSuiteName = defaultsSuiteName
         self.maximumCount = maximumCount
-    }
-
-    private var defaults: UserDefaults {
-        defaultsSuiteName.flatMap { UserDefaults(suiteName: $0) } ?? .standard
     }
 
     /// `~/Library/Application Support/gpsloader/Captures`
@@ -32,11 +21,6 @@ public struct CaptureStore: Sendable {
             ?? FileManager.default.temporaryDirectory
         return base.appendingPathComponent("gpsloader", isDirectory: true)
             .appendingPathComponent("Captures", isDirectory: true)
-    }
-
-    public var isEnabled: Bool {
-        get { defaults.bool(forKey: Self.enabledKey) }
-        nonmutating set { defaults.set(newValue, forKey: Self.enabledKey) }
     }
 
     /// Stores a finished capture and removes the oldest ones beyond `maximumCount`.
@@ -83,5 +67,24 @@ public struct CaptureStore: Sendable {
             .filter { $0.isLetter || $0.isNumber || $0 == "-" }
         let random = UUID().uuidString.prefix(6)
         return "capture-\(stamp)-\(driver)-\(random).\(CaptureFormat.fileExtension)"
+    }
+}
+
+/// The capture of one operation: the recorder gets the header at once, `finish()` stores it whatever the
+/// outcome of the operation was (spec `diagnostic-capture`, "Aufzeichnung immer aktiv").
+public struct OperationCapture: Sendable {
+    public let recorder: CaptureRecorder
+    public let store: CaptureStore
+
+    public init(store: CaptureStore, environment: CaptureEnvironment, header: DiagnosticHeader) {
+        self.store = store
+        recorder = CaptureRecorder(environment: environment)
+        recorder.record(.header(header))
+    }
+
+    /// Stores the capture; `nil` if it could not be written.
+    @discardableResult
+    public func finish() -> URL? {
+        try? store.save(recorder)
     }
 }

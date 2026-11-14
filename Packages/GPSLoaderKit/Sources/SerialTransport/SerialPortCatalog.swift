@@ -3,6 +3,18 @@ import IOKit
 import IOKit.serial
 import LoggerCore
 
+/// What a serial port belongs to (spec `serial-transport`, "Art des Anschlusses").
+public enum SerialPortKind: String, Sendable, Hashable {
+    /// A USB device, e.g. a USB-serial adapter or a logger with a built-in chip.
+    case usb
+    /// A paired Bluetooth device (serial port profile).
+    case bluetooth
+    /// A port of macOS itself (`Bluetooth-Incoming-Port`, debug consoles); never a logger.
+    case system
+    /// Anything else, e.g. a pseudo terminal.
+    case other
+}
+
 /// A serial port present on the system (spec `serial-transport`, "Ports ermitteln").
 public struct SerialPortInfo: Sendable, Hashable, Identifiable {
     /// Callout device path, e.g. `/dev/cu.SLAB_USBtoUART`.
@@ -13,6 +25,9 @@ public struct SerialPortInfo: Sendable, Hashable, Identifiable {
     public var usbProductID: Int?
     public var usbProductName: String?
     public var usbVendorName: String?
+    /// Physical USB location; matches `USBDeviceInfo.locationID` of the device the port belongs to.
+    public var usbLocationID: Int?
+    public var kind: SerialPortKind
 
     public var id: String { path }
 
@@ -24,12 +39,26 @@ public struct SerialPortInfo: Sendable, Hashable, Identifiable {
     public var isUSB: Bool { usbVendorID != nil }
 
     public init(path: String, usbVendorID: Int? = nil, usbProductID: Int? = nil,
-                usbProductName: String? = nil, usbVendorName: String? = nil) {
+                usbProductName: String? = nil, usbVendorName: String? = nil, usbLocationID: Int? = nil,
+                isBluetooth: Bool = false) {
         self.path = path
         self.usbVendorID = usbVendorID
         self.usbProductID = usbProductID
         self.usbProductName = usbProductName
         self.usbVendorName = usbVendorName
+        self.usbLocationID = usbLocationID
+        kind = .other
+        kind = Self.kind(name: name, isUSB: usbVendorID != nil, isBluetooth: isBluetooth)
+    }
+
+    /// Design D1: system ports first (the incoming port also hangs below a Bluetooth device), then Bluetooth
+    /// (a parent has `BTAddress`), then USB (a parent has `idVendor`).
+    static func kind(name: String, isUSB: Bool, isBluetooth: Bool) -> SerialPortKind {
+        if name == "Bluetooth-Incoming-Port" { return .system }
+        if isBluetooth { return .bluetooth }
+        if isUSB { return .usb }
+        if name.lowercased().contains("debug") { return .system }
+        return .other
     }
 }
 
@@ -93,7 +122,9 @@ public enum SerialPortCatalog {
             usbVendorID: (property(service, key: "idVendor", searchParents: true) as? NSNumber)?.intValue,
             usbProductID: (property(service, key: "idProduct", searchParents: true) as? NSNumber)?.intValue,
             usbProductName: property(service, key: "USB Product Name", searchParents: true) as? String,
-            usbVendorName: property(service, key: "USB Vendor Name", searchParents: true) as? String
+            usbVendorName: property(service, key: "USB Vendor Name", searchParents: true) as? String,
+            usbLocationID: (property(service, key: "locationID", searchParents: true) as? NSNumber)?.intValue,
+            isBluetooth: property(service, key: "BTAddress", searchParents: true) != nil
         )
     }
 

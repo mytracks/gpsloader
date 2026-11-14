@@ -156,6 +156,8 @@ context: |
   - Diagnose-Mitschnitt (bestätigt am 2026-11-02, umgesetzt in setup-foundation): alle gesendeten
     und empfangenen Bytes mit Zeitstempel in eine Datei, die Anwender dem
     Entwickler schicken können. Mitschnitte dienen zugleich als Test-Fixtures.
+    Seit 2026-11-14 (Change support-package) läuft er immer mit; Anwender schicken ihn im
+    Support-Paket (ZIP, nur lokal gesichert, kein Versand durch die App).
 
   ## Vorschläge aus der Exploration (noch nicht bestätigt)
   - Wintec WPL 1000 / Navilock NL-456DL zurückstellen (nur ein x86-Binary ohne Quellcode vorhanden).

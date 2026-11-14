@@ -10,7 +10,8 @@ enum IGotUDevices {
 
     static func usb(_ id: String, _ name: String) -> DeviceEntry {
         DeviceEntry(id: "igotu.\(id)", name: name, driverID: "igotu",
-                    connection: .hid(vendorID: IGotUDevice.usbVendorID, productIDs: IGotUDevice.usbProductIDs)) {
+                    connection: .hid(vendorID: IGotUDevice.usbVendorID, productIDs: IGotUDevice.usbProductIDs),
+                    hints: [DeviceHint(.always, .connectDirectlyViaUSB)]) {
             IGotUDevice(variant: .hid)
         }
     }

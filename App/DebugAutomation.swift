@@ -5,19 +5,41 @@ import LoggerCore
 /// Debug-only launch arguments for verifying UI states without screen recording permission:
 ///
 ///     -DebugSnapshotDirectory <dir>     render all visible windows to PNG (repeatedly, see times below)
+///     -DebugSnapshotTimes <s>[,<s>…]   snapshot times instead of 1, 2.5 and 5 seconds
 ///     -DebugDemo <scenario>             start reading with the demo driver (scenarios of DemoDriver)
 ///     -DebugDemoErase <supported|experimental>   start erasing with the demo driver
 ///     -DebugShowAbout YES
-///     -DebugShowCaptureExport <seconds>  open "Save Latest Diagnostic Capture…" after the given delay
+///     -DebugShowSupportPackage <seconds> open "Create Support Package…" after the given delay
+///     -DebugSupportPackagePath <file>   write a support package with all available parts, without dialogs
+///     -DebugNoBluetoothPermission YES   treat the Bluetooth permission as missing in the support package
 ///     -DebugCancelAfter <seconds>       press "Cancel" on running operations
 ///     -DebugSaveDirectory <dir>         save results there without the save panel (see SessionPresenter)
 ///     -DebugConvert <path>[,<path>…]    convert these files as if chosen in "Convert Files…" (ConversionPresenter)
 ///     -DebugReadDevice <catalog id> [-DebugPort <path>] [-DebugErase YES]   read/erase a catalog device
+///     -DebugSelectDevice <catalog id> [-DebugPort <path>]   only select a catalog device (for snapshots)
+///     -DebugPorts <specs> / -DebugUSBDevices <specs>   fake port and USB lists (see DebugPorts in DevicePanel.swift)
+///     -DebugSection files|device        show this section of the main window first
+///     -DebugKeyEquivalent <key>         after 1.5 s, send ⌘<key> through the main menu (e.g. 2 for "Read Device")
 ///     -DebugQuitAfter <seconds>
 @MainActor
 enum DebugAutomation {
     static func run(mainWindow: MainWindowController) {
         let defaults = UserDefaults.standard
+
+        if let section = defaults.string(forKey: "DebugSection").flatMap(MainWindowSection.init(rawValue:)) {
+            mainWindow.select(section)
+        }
+        if let key = defaults.string(forKey: "DebugKeyEquivalent"), !key.isEmpty {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                MainActor.assumeIsolated {
+                    guard let event = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: .command, timestamp: 0,
+                                                       windowNumber: mainWindow.window?.windowNumber ?? 0, context: nil,
+                                                       characters: key, charactersIgnoringModifiers: key, isARepeat: false,
+                                                       keyCode: 0) else { return }
+                    _ = NSApp.mainMenu?.performKeyEquivalent(with: event)
+                }
+            }
+        }
 
         if defaults.bool(forKey: "DebugShowAbout") {
             (NSApp.delegate as? AppDelegate)?.showAbout(nil)
@@ -38,24 +60,32 @@ enum DebugAutomation {
                                             erase: defaults.bool(forKey: "DebugErase"))
         }
 
+        if let deviceID = defaults.string(forKey: "DebugSelectDevice") {
+            mainWindow.devicePanel.debugSelect(entryID: deviceID, portPath: defaults.string(forKey: "DebugPort"))
+        }
+
         if let paths = defaults.string(forKey: "DebugConvert") {
             let urls = paths.split(separator: ",").map { URL(fileURLWithPath: String($0)) }
-            mainWindow.conversionPresenter.convert(urls)
+            mainWindow.convertDropped(urls)
         }
 
         if let directory = defaults.string(forKey: "DebugSnapshotDirectory") {
-            for delay in [1.0, 2.5, 5.0] {
+            let times = defaults.string(forKey: "DebugSnapshotTimes")?.split(separator: ",").compactMap { Double($0) }
+            for delay in times ?? [1.0, 2.5, 5.0] {
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                     MainActor.assumeIsolated { snapshotWindows(to: URL(fileURLWithPath: directory), tag: "t\(delay)") }
                 }
             }
         }
 
-        let exportAfter = defaults.double(forKey: "DebugShowCaptureExport")
-        if exportAfter > 0 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + exportAfter) {
-                MainActor.assumeIsolated { DiagnosticsController.shared.saveLatestCapture(nil) }
+        let supportAfter = defaults.double(forKey: "DebugShowSupportPackage")
+        if supportAfter > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + supportAfter) {
+                MainActor.assumeIsolated { SupportPackageController.shared.createSupportPackage(nil) }
             }
+        }
+        if let path = defaults.string(forKey: "DebugSupportPackagePath") {
+            SupportPackageController.shared.debugBuild(to: path)
         }
 
         let cancelAfter = defaults.double(forKey: "DebugCancelAfter")
@@ -74,6 +104,10 @@ enum DebugAutomation {
                 MainActor.assumeIsolated {
                     // AppKit refuses to quit while the two-button question sheet is open; close it first.
                     mainWindow.conversionPresenter.cancel()
+                    // Alerts with completion handlers (errors offering the support package) also block quitting.
+                    for window in NSApp.windows {
+                        if let sheet = window.attachedSheet { window.endSheet(sheet) }
+                    }
                     NSApp.terminate(nil)
                 }
             }

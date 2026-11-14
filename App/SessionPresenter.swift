@@ -3,6 +3,7 @@ import DiagnosticCapture
 import GPSLoggerKit
 import GPXExport
 import LoggerCore
+import SupportPackage
 import UniformTypeIdentifiers
 
 /// Runs read/erase operations for a driver and presents progress, results and errors
@@ -25,14 +26,16 @@ final class SessionPresenter {
 
     // MARK: - Reading
 
-    func read(with driver: any LoggerDriver) {
-        let (session, recorder) = makeSession(driver)
+    /// `failureHints` are added to the message when reading fails (spec `device-mode`,
+    /// "Hinweise zum Gerät"), e.g. "use USB instead of Bluetooth".
+    func read(with driver: any LoggerDriver, failureHints: [String] = []) {
+        let (session, capture) = makeSession(driver)
         Task {
             let outcome = await run(session, title: String(localized: "Reading \(driver.descriptor.name)…")) {
                 await session.read()
             }
-            self.finish(recorder)
-            await self.present(outcome, driver: driver)
+            capture.finish()
+            await self.present(outcome, driver: driver, failureHints: failureHints)
         }
     }
 
@@ -47,12 +50,12 @@ final class SessionPresenter {
         }
         confirmErase(descriptor) { confirmation in
             guard let confirmation else { return }
-            let (session, recorder) = self.makeSession(driver)
+            let (session, capture) = self.makeSession(driver)
             Task {
                 let outcome = await self.run(session, title: String(localized: "Erasing \(descriptor.name)…")) {
                     await session.erase(confirmation)
                 }
-                self.finish(recorder)
+                capture.finish()
                 await self.present(outcome, driver: driver)
             }
         }
@@ -84,13 +87,12 @@ final class SessionPresenter {
 
     // MARK: - Session plumbing
 
-    private func makeSession(_ driver: any LoggerDriver) -> (LoggerSession, CaptureRecorder?) {
+    private func makeSession(_ driver: any LoggerDriver) -> (LoggerSession, OperationCapture) {
+        AppLog.shared.log(.operation, "start \(driver.descriptor.id) (\(driver.descriptor.name)) on \(driver.resourceKey)")
         let environment = AppEnvironment.shared
-        let recorder = environment.makeRecorderIfEnabled()
-        recorder?.record(.header(DiagnosticHeader(driver: driver.descriptor.id, port: driver.resourceKey)))
-        let session = LoggerSession(driver: driver, reservations: environment.reservations,
-                                    diagnostics: recorder ?? NullSink() as any DiagnosticSink)
-        return (session, recorder)
+        let capture = environment.makeCapture(header: DiagnosticHeader(driver: driver.descriptor.id, port: driver.resourceKey))
+        let session = LoggerSession(driver: driver, reservations: environment.reservations, diagnostics: capture.recorder)
+        return (session, capture)
     }
 
     private func run(_ session: LoggerSession, title: String,
@@ -127,14 +129,11 @@ final class SessionPresenter {
         return outcome
     }
 
-    private func finish(_ recorder: CaptureRecorder?) {
-        guard let recorder else { return }
-        _ = try? AppEnvironment.shared.captureStore.save(recorder)
-    }
-
     // MARK: - Results
 
-    private func present(_ outcome: SessionOutcome, driver: any LoggerDriver) async {
+    private func present(_ outcome: SessionOutcome, driver: any LoggerDriver, failureHints: [String] = []) async {
+        AppLog.shared.log(outcome.isFailure ? .error : .operation,
+                          "end \(driver.descriptor.id) on \(driver.resourceKey): \(outcome.logDescription)")
         switch outcome {
         case let .recording(recording):
             save(recording, device: driver.descriptor.name)
@@ -143,7 +142,7 @@ final class SessionPresenter {
         case .erased:
             showMessage(String(localized: "The data has been erased."))
         case let .failed(error):
-            showError(error)
+            showError(error, offerSupportPackage: true, hints: failureHints)
         case .cancelled:
             break
         case let .rejected(reason):
@@ -191,17 +190,28 @@ final class SessionPresenter {
         if let window { panel.beginSheetModal(for: window, completionHandler: write) } else { write(panel.runModal()) }
     }
 
-    /// Spec "Einheitliche Fehlermeldungen": message, hint and technical detail.
-    func showError(_ error: LoggerError) {
+    /// Spec "Einheitliche Fehlermeldungen": message, hint and technical detail. Failed operations also offer
+    /// "Create Support Package…" (spec `support-package`, "Support-Paket erstellen").
+    func showError(_ error: LoggerError, offerSupportPackage: Bool = false, hints: [String] = []) {
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = error.errorDescription ?? error.kind.rawValue
-        var text = error.recoverySuggestion ?? ""
+        var text = (hints + [error.recoverySuggestion].compactMap { $0 }).joined(separator: "\n\n")
         if !error.detail.isEmpty {
             text += (text.isEmpty ? "" : "\n\n") + String(localized: "Details: \(error.detail)")
         }
         alert.informativeText = text
-        if let window { alert.beginSheetModal(for: window) } else { alert.runModal() }
+        guard offerSupportPackage else {
+            if let window { alert.beginSheetModal(for: window) } else { alert.runModal() }
+            return
+        }
+        alert.addButton(withTitle: String(localized: "OK"))
+        alert.addButton(withTitle: String(localized: "Create Support Package…"))
+        let handle: (NSApplication.ModalResponse) -> Void = { response in
+            guard response == .alertSecondButtonReturn else { return }
+            DispatchQueue.main.async { SupportPackageController.shared.createSupportPackage(nil) }
+        }
+        if let window { alert.beginSheetModal(for: window, completionHandler: handle) } else { handle(alert.runModal()) }
     }
 
     private func showMessage(_ message: String) {
@@ -282,5 +292,25 @@ final class ProgressSheetController: NSWindowController {
         stepLabel.stringValue = String(localized: "Cancelling…")
         (sender as? NSButton)?.isEnabled = false
         onCancel()
+    }
+}
+
+extension SessionOutcome {
+    var isFailure: Bool {
+        if case .failed = self { return true }
+        return false
+    }
+
+    /// One line for the app log; no positions.
+    var logDescription: String {
+        switch self {
+        case let .recording(recording):
+            return "\(recording.tracks.count) tracks, \(recording.trackPointCount) points, \(recording.waypoints.count) waypoints"
+        case .emptyDevice: return "empty"
+        case .erased: return "erased"
+        case let .failed(error): return "failed (\(error.kind.rawValue)) \(error.detail)"
+        case .cancelled: return "cancelled"
+        case let .rejected(reason): return "rejected (\(reason))"
+        }
     }
 }

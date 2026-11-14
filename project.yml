@@ -61,6 +61,8 @@ targets:
         product: HIDTransport
       - package: GPSLoaderKit
         product: BluetoothTransport
+      - package: GPSLoaderKit
+        product: SupportPackage
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: info.stichling.gpsloader
@@ -99,5 +101,6 @@ schemes:
         - package: GPSLoaderKit/DeviceDriversTests
         - package: GPSLoaderKit/HIDTransportTests
         - package: GPSLoaderKit/BluetoothTransportTests
+        - package: GPSLoaderKit/SupportPackageTests
     archive:
       config: Release

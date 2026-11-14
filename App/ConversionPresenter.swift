@@ -3,6 +3,7 @@ import FileConversion
 import GPSLoggerKit
 import GPXExport
 import LoggerCore
+import SupportPackage
 import UniformTypeIdentifiers
 
 /// Converts files of the formats in the app catalog (GPSLoggerKit and GPSLoggerKitGPL) into one GPX file (spec `file-conversion`):
@@ -50,6 +51,7 @@ final class ConversionPresenter {
     /// Converts the given files (from the open panel, drag & drop or debug automation).
     func convert(_ urls: [URL]) {
         guard !isConverting, !urls.isEmpty else { return }
+        AppLog.shared.log(.conversion, "start \(urls.count) files")
         isConverting = true
         showProgress()
         task = Task {
@@ -83,6 +85,8 @@ final class ConversionPresenter {
             return showMessage(String(localized: "The format of the chosen files is not supported."),
                                detail: plan.unrecognized.joined(separator: "\n"))
         }
+        AppLog.shared.log(.conversion, "formats \(plan.groups.map { "\($0.formatID.rawValue)×\($0.inputs.count)" }.joined(separator: ", ")), "
+            + "\(plan.unrecognized.count) unrecognized")
         var plan = plan
         let skipped = plan.unrecognized
         if !skipped.isEmpty {
@@ -100,6 +104,8 @@ final class ConversionPresenter {
         finish()
         switch result {
         case .success(let imported):
+            AppLog.shared.log(.conversion, "converted: \(imported.recording.tracks.count) tracks, "
+                + "\(imported.recording.trackPointCount) points, \(imported.recording.waypoints.count) waypoints, \(imported.warnings.count) warnings")
             let recognized = urls.filter { !skipped.contains($0.lastPathComponent) }
             save(imported, suggestedName: FileConverter.suggestedFileName(for: recognized.isEmpty ? urls : recognized),
                  directory: urls.first?.deletingLastPathComponent())
@@ -168,7 +174,8 @@ final class ConversionPresenter {
     // MARK: - Errors and messages
 
     private func present(_ error: Error) {
-        if error is CancellationError { return }
+        if error is CancellationError { return AppLog.shared.log(.conversion, "cancelled") }
+        AppLog.shared.log(.error, "conversion failed: \((error as? GPSLoggerError)?.kind.key ?? String(describing: type(of: error)))")
         if let error = error as? GPSLoggerError {
             let detail = error.failureReason.map { String(localized: "Details: \($0)") } ?? ""
             return showMessage(error.errorDescription ?? error.kind.key, detail: detail)
@@ -223,6 +230,8 @@ final class FileDropView: NSView {
     var onDrop: (([URL]) -> Void)?
     /// Drops are refused while this returns `false`.
     var acceptsDrops: () -> Bool = { true }
+    /// Called with `true` while acceptable files are dragged over the window (highlights the drop zone).
+    var onDragHighlight: ((Bool) -> Void)?
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -242,7 +251,13 @@ final class FileDropView: NSView {
     }
 
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
-        acceptsDrops() && !Self.regularFiles(in: sender.draggingPasteboard).isEmpty ? .copy : []
+        let accepted = acceptsDrops() && !Self.regularFiles(in: sender.draggingPasteboard).isEmpty
+        onDragHighlight?(accepted)
+        return accepted ? .copy : []
+    }
+
+    override func draggingExited(_ sender: NSDraggingInfo?) {
+        onDragHighlight?(false)
     }
 
     override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
@@ -250,6 +265,7 @@ final class FileDropView: NSView {
     }
 
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        onDragHighlight?(false)
         let urls = Self.regularFiles(in: sender.draggingPasteboard)
         guard acceptsDrops(), !urls.isEmpty else { return false }
         onDrop?(urls)

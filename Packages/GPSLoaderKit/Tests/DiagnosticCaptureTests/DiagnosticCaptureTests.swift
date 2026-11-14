@@ -173,16 +173,32 @@ struct DiagnosticCaptureTests {
 
     private func makeStore() -> (CaptureStore, URL) {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("captures-\(UUID().uuidString)")
-        let suite = "gpsloader.tests.\(UUID().uuidString)"
-        return (CaptureStore(directory: directory, defaultsSuiteName: suite), directory)
+        return (CaptureStore(directory: directory), directory)
     }
 
-    /// Scenario "Standardzustand".
-    @Test func captureIsOffByDefaultAndPersists() {
-        let (store, _) = makeStore()
-        #expect(store.isEnabled == false)
-        store.isEnabled = true
-        #expect(store.isEnabled)
+    /// Scenario "Erster Start": a fresh store records without any setting.
+    @Test func everyOperationIsRecorded() async throws {
+        let (store, directory) = makeStore()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let capture = OperationCapture(store: store, environment: environment,
+                                       header: DiagnosticHeader(driver: "test", port: "/dev/cu.test"))
+        let session = LoggerSession(driver: ClosureDriver(), reservations: PortReservations(), diagnostics: capture.recorder)
+        _ = await session.read()
+        let url = try #require(capture.finish())
+        #expect(store.captures().map(\.lastPathComponent) == [url.lastPathComponent])
+    }
+
+    /// Scenario "Fehlgeschlagener Vorgang": the capture of a failed operation is stored with the error.
+    @Test func failedOperationIsRecorded() async throws {
+        let (store, directory) = makeStore()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let capture = OperationCapture(store: store, environment: environment, header: DiagnosticHeader(driver: "test"))
+        let driver = ClosureDriver(read: { _ in throw LoggerError(.protocolError, detail: "Unexpected answer") })
+        let session = LoggerSession(driver: driver, reservations: PortReservations(), diagnostics: capture.recorder)
+        _ = await session.read()
+        let url = try #require(capture.finish())
+        let text = try String(contentsOf: url, encoding: .utf8)
+        #expect(text.contains("Unexpected answer"))
     }
 
     /// Scenario "Elfter Vorgang".

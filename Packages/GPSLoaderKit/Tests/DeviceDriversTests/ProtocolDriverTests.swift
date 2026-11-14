@@ -154,7 +154,7 @@ struct DeviceSelectionTests {
     private let hid = DeviceEntry(id: "c.hid", name: "C", driverID: "c", connection: .hid(vendorID: 1, productIDs: [2])) {
         HelloProtocol()
     }
-    private let ports = [SerialPortInfo(path: "/dev/cu.Bluetooth-Incoming-Port"),
+    private let ports = [SerialPortInfo(path: "/dev/cu.Bluetooth-Incoming-Port", isBluetooth: true),
                          SerialPortInfo(path: "/dev/cu.usbserial-1410", usbVendorID: 0x067B, usbProductID: 0x2303)]
 
     /// Scenario "Auswahl merken".
@@ -171,7 +171,9 @@ struct DeviceSelectionTests {
     @Test func newPortIsPickedUp() {
         #expect(DeviceSelection.port(preferring: nil, in: []) == nil)
         #expect(DeviceSelection.port(preferring: nil, in: ports) == "/dev/cu.usbserial-1410")
-        #expect(DeviceSelection.port(preferring: "/dev/cu.Bluetooth-Incoming-Port", in: ports) == "/dev/cu.Bluetooth-Incoming-Port")
+        // A system port is never kept or chosen (scenario "Systemanschlüsse").
+        #expect(DeviceSelection.port(preferring: "/dev/cu.Bluetooth-Incoming-Port", in: ports) == "/dev/cu.usbserial-1410")
+        #expect(DeviceSelection.port(preferring: nil, in: [ports[0], SerialPortInfo(path: "/dev/cu.debug-console")]) == nil)
     }
 
     /// Scenarios "Kein Anschluss" and "Gerät ohne Löschfunktion".
@@ -179,7 +181,7 @@ struct DeviceSelectionTests {
         let entries = [serial, readOnly, hid]
         let noPort = DeviceSelection(entryID: "a.serial", portPath: nil)
         #expect(!noPort.canRead(entries: entries, isRunning: false))
-        #expect(noPort.hint(entries: entries) == .noPort)
+        #expect(noPort.hints(entries: entries, ports: [], usbDevices: []) == [.noPort])
         let withPort = DeviceSelection(entryID: "a.serial", portPath: "/dev/cu.usbserial-1410")
         #expect(withPort.canRead(entries: entries, isRunning: false) && withPort.canErase(entries: entries, isRunning: false))
         #expect(!withPort.canRead(entries: entries, isRunning: true))
@@ -187,7 +189,7 @@ struct DeviceSelectionTests {
         #expect(readOnlySelection.canRead(entries: entries, isRunning: false))
         #expect(!readOnlySelection.canErase(entries: entries, isRunning: false))
         let hidSelection = DeviceSelection(entryID: "c.hid", portPath: nil)
-        #expect(hidSelection.canRead(entries: entries, isRunning: false) && hidSelection.hint(entries: entries) == nil)
+        #expect(hidSelection.canRead(entries: entries, isRunning: false) && hidSelection.hints(entries: entries, ports: ports, usbDevices: []).isEmpty)
     }
 }
 
@@ -291,7 +293,8 @@ struct GNS2000CatalogTests {
         #expect(entry.connection == .bluetooth(deviceNames: ["GNS 2000", "GNS 2000 plus"], serviceName: "GNS GPS"))
         #expect(!entry.needsPort && entry.eraseSupport == .supported)
         let selection = DeviceSelection(entryID: entry.id, portPath: nil)
-        #expect(selection.hint(entries: DeviceCatalog.entries) == nil)
+        // No port hint; the only hint asks to pair the device first.
+        #expect(selection.hints(entries: DeviceCatalog.entries, ports: [], usbDevices: []) == [.device(.pairInSystemSettings)])
         #expect(selection.canRead(entries: DeviceCatalog.entries, isRunning: false))
         #expect(selection.canErase(entries: DeviceCatalog.entries, isRunning: false))
     }

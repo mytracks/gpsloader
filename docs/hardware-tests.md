@@ -10,7 +10,7 @@ Stand: 2026-11-13. Die Changes sind archiviert, diese Tests stehen aber noch aus
 
   Es wird in einen temporären Ordner kopiert, nie ins Repository.
 - **Rosetta:** Auf Apple Silicon braucht dieses Binary Rosetta, die App selbst nicht.
-- **Bei Fehlern am Gerät:** in der App den Diagnose-Mitschnitt einschalten und die Datei sichern. Er dient zugleich als Test-Fixture.
+- **Bei Fehlern am Gerät:** in der App „Hilfe > Support-Paket erstellen …“ wählen (oder den Knopf in der Fehlermeldung) und das ZIP schicken. Der Diagnose-Mitschnitt läuft immer mit und liegt im Paket; er dient zugleich als Test-Fixture.
 
 ## Vor jedem Release
 
@@ -27,6 +27,10 @@ Stand: 2026-11-13. Die Changes sind archiviert, diese Tests stehen aber noch aus
 
 - [ ] **SkyTraq** (`skytraq-device-port` 3.2): einen SkyTraq-Logger auslesen und löschen. Prüfen: Punktanzahl und Zeiten wie gpsbabel (`-i skytraq`), danach ist der Logger leer.
 - [ ] **MTK und Holux** (`mtk-device-port` 3.2): einen MTK-Logger (z. B. Qstarz) und einen Holux M-241 auslesen und löschen. Prüfen: Ergebnisse wie gpsbabel, und das Logging läuft danach weiter.
+- [ ] **Hauptfenster** (`main-window-sections` 2.2): Umschalter in der Werkzeugleiste (der gewählte Teil ist lesbar beschriftet), ⌘1/⌘2, Drag & Drop aus dem Finder in beiden Bereichen, Klick auf die Ablagefläche. Prüfen: Ablauf wie in den Specs `app-shell` und `file-conversion`.
+- [ ] **Anschlüsse und Hinweise** (`device-ports-and-hints` 4.2): den Holux M-241 per USB anstecken und per Bluetooth koppeln.
+  - Prüfen: Beide Anschlüsse haben sprechende Namen; bei gewähltem Bluetooth-Anschluss erscheint der Hinweis „über USB verbinden“.
+  - Prüfen: Die vier Treiberseiten (Silicon Labs, Prolific, FTDI, WCH; `USBSerialChip` in `Packages/GPSLoaderKit/Sources/DeviceDrivers/PortPresentation.swift`) öffnen sich im Browser.
 - [ ] **Wochenüberlauf** (`device-week-rollover` 3.2): den Holux M-241, dessen Zeiten um 1024 Wochen zu früh lagen, erneut auslesen. Prüfen: Die Zeiten im GPX liegen im richtigen Jahr.
 - [ ] **Wintec** (`wintec-device-port` 3.2): einen WBT-201 bzw. G-Rays 2 auslesen. Prüfen: Ergebnis wie gpsbabel (`-i wbt`).
 - [ ] **Magellan** (`magellan-port` 3.2): einen Meridian oder SporTrak seriell auslesen. Prüfen: Track und Wegpunkte wie gpsbabel (`-t -w -i magellan`).

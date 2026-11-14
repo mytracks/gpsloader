@@ -11,6 +11,16 @@
         }
       }
     },
+    "A USB device with a %@ chip is connected, but macOS has not created a port for it. The driver is probably missing.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein USB-Gerät mit einem Chip von %@ ist angeschlossen, aber macOS hat keinen Anschluss dafür angelegt. Vermutlich fehlt der Treiber."
+          }
+        }
+      }
+    },
     "About %@": {
       "localizations": {
         "de": {
@@ -41,6 +51,26 @@
         }
       }
     },
+    "App log": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App-Protokoll"
+          }
+        }
+      }
+    },
+    "Bluetooth: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth: %@"
+          }
+        }
+      }
+    },
     "Cancel": {
       "localizations": {
         "de": {
@@ -57,6 +87,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wird abgebrochen …"
+          }
+        }
+      }
+    },
+    "Choose Files…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien auswählen …"
           }
         }
       }
@@ -81,12 +121,12 @@
         }
       }
     },
-    "Continue": {
+    "Connect the logger with its USB cable. No port needs to be chosen.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fortfahren"
+            "value": "Schließen Sie den Logger mit seinem USB-Kabel an. Ein Anschluss muss nicht gewählt werden."
           }
         }
       }
@@ -121,22 +161,22 @@
         }
       }
     },
+    "Convert Files": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien konvertieren"
+          }
+        }
+      }
+    },
     "Convert Files…": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Dateien konvertieren …"
-          }
-        }
-      }
-    },
-    "Convert files from memory cards or USB storage to GPX. Supported formats: %@. You can also drag files onto this window.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dateien von Speicherkarte oder USB-Speicher nach GPX konvertieren. Unterstützte Formate: %@. Sie können Dateien auch auf dieses Fenster ziehen."
           }
         }
       }
@@ -161,22 +201,42 @@
         }
       }
     },
+    "Crash reports (%lld)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Absturzberichte (%lld)"
+          }
+        }
+      }
+    },
+    "Create Support Package": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Support-Paket erstellen"
+          }
+        }
+      }
+    },
+    "Create Support Package…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Support-Paket erstellen …"
+          }
+        }
+      }
+    },
     "Details: %@": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Details: %@"
-          }
-        }
-      }
-    },
-    "Device": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gerät"
           }
         }
       }
@@ -201,12 +261,32 @@
         }
       }
     },
-    "Diagnostics": {
+    "Diagnostic captures contain all data exchanged with the device, including recorded positions. Only send the package to people you trust, for example the developer of gpsloader.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Diagnose"
+            "value": "Diagnose-Mitschnitte enthalten alle mit dem Gerät ausgetauschten Daten, auch die aufgezeichneten Positionen. Schicken Sie das Paket nur an Personen, denen Sie vertrauen, zum Beispiel an den Entwickler von gpsloader."
+          }
+        }
+      }
+    },
+    "Diagnostic captures of the last operations (%lld)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagnose-Mitschnitte der letzten Vorgänge (%lld)"
+          }
+        }
+      }
+    },
+    "Drag Files Here": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien hierher ziehen"
           }
         }
       }
@@ -301,12 +381,12 @@
         }
       }
     },
-    "Files": {
+    "Files from memory cards or USB storage are converted to one GPX file. Supported formats: %@.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dateien"
+            "value": "Dateien von Speicherkarte oder USB-Speicher werden zu einer GPX-Datei konvertiert. Unterstützte Formate: %@."
           }
         }
       }
@@ -317,6 +397,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "GPL 3.0"
+          }
+        }
+      }
+    },
+    "Help": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hilfe"
           }
         }
       }
@@ -381,6 +471,56 @@
         }
       }
     },
+    "OK": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "Open the Manufacturer’s Driver Page": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Treiberseite des Herstellers öffnen"
+          }
+        }
+      }
+    },
+    "Pair the %@ in System Settings > Bluetooth first. gpsloader then connects to it by itself.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koppeln Sie den %@ zuerst in den Systemeinstellungen unter „Bluetooth“. gpsloader verbindet sich dann selbst mit ihm."
+          }
+        }
+      }
+    },
+    "Paired Bluetooth devices": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gekoppelte Bluetooth-Geräte"
+          }
+        }
+      }
+    },
+    "Paired Bluetooth devices (no permission)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gekoppelte Bluetooth-Geräte (keine Berechtigung)"
+          }
+        }
+      }
+    },
     "Port:": {
       "localizations": {
         "de": {
@@ -421,6 +561,16 @@
         }
       }
     },
+    "Read Device": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gerät auslesen"
+          }
+        }
+      }
+    },
     "Reading %@…": {
       "localizations": {
         "de": {
@@ -431,32 +581,22 @@
         }
       }
     },
-    "Record Diagnostic Capture": {
+    "Save…": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Diagnose-Mitschnitt aufzeichnen"
+            "value": "Sichern …"
           }
         }
       }
     },
-    "Save Latest Diagnostic Capture…": {
+    "Section": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Letzten Diagnose-Mitschnitt sichern …"
-          }
-        }
-      }
-    },
-    "Save diagnostic capture?": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diagnose-Mitschnitt sichern?"
+            "value": "Bereich"
           }
         }
       }
@@ -471,12 +611,32 @@
         }
       }
     },
+    "Serial ports and USB devices": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serielle Anschlüsse und USB-Geräte"
+          }
+        }
+      }
+    },
     "Services": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Dienste"
+          }
+        }
+      }
+    },
+    "Settings of gpsloader": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen von gpsloader"
           }
         }
       }
@@ -521,22 +681,32 @@
         }
       }
     },
+    "System and app information": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System- und App-Informationen"
+          }
+        }
+      }
+    },
+    "The %@ cannot be read reliably over Bluetooth. Connect it with the USB cable and choose its USB port.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der %@ lässt sich über Bluetooth nicht zuverlässig auslesen. Verbinden Sie ihn mit dem USB-Kabel und wählen Sie seinen USB-Anschluss."
+          }
+        }
+      }
+    },
     "The GPX file has been saved. Some data was skipped:": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Die GPX-Datei wurde gespeichert. Einige Daten wurden übersprungen:"
-          }
-        }
-      }
-    },
-    "The capture contains all data exchanged with the device, including recorded positions. Only send it to people you trust, for example the developer of gpsloader.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der Mitschnitt enthält alle mit dem Gerät ausgetauschten Daten, einschließlich der aufgezeichneten Positionen. Senden Sie ihn nur an Personen, denen Sie vertrauen, zum Beispiel an den Entwickler von gpsloader."
           }
         }
       }
@@ -591,6 +761,16 @@
         }
       }
     },
+    "The support package collects information that helps the developer analyze a problem. It is only saved on your Mac; you decide whom to send it to.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Support-Paket sammelt Informationen, mit denen der Entwickler ein Problem untersuchen kann. Es wird nur auf Ihrem Mac gesichert; Sie entscheiden, wem Sie es schicken."
+          }
+        }
+      }
+    },
     "Third-party software": {
       "localizations": {
         "de": {
@@ -601,12 +781,52 @@
         }
       }
     },
+    "USB serial (%@)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB-Seriell (%@)"
+          }
+        }
+      }
+    },
+    "USB: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB: %@"
+          }
+        }
+      }
+    },
+    "USB: %@ (%@)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB: %1$@ (%2$@)"
+          }
+        }
+      }
+    },
     "Version %@ (%@)": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Version %1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "View": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Darstellung"
           }
         }
       }

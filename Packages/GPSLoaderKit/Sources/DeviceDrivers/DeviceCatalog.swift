@@ -14,6 +14,32 @@ public enum DeviceConnectionKind: Sendable, Equatable {
     case bluetooth(deviceNames: [String], serviceName: String)
 }
 
+/// A note shown for a device (spec `device-mode`, "Hinweise zum Gerät"); the app supplies the text.
+public struct DeviceHint: Sendable, Equatable {
+    public enum Condition: Sendable, Equatable {
+        case always
+        /// Only while a Bluetooth port is selected; also added to the message of a timeout.
+        case bluetoothPort
+    }
+
+    public enum Message: Sendable, Equatable {
+        /// Reading over Bluetooth is not reliable; connect the logger via USB (Holux M-241 on macOS 27).
+        case useUSBInsteadOfBluetooth
+        /// Pair the device in System Settings > Bluetooth first (GNS 2000).
+        case pairInSystemSettings
+        /// Connect the logger directly via USB; there is no port to choose (i-GotU over USB HID).
+        case connectDirectlyViaUSB
+    }
+
+    public var condition: Condition
+    public var message: Message
+
+    public init(_ condition: Condition, _ message: Message) {
+        self.condition = condition
+        self.message = message
+    }
+}
+
 /// One selectable device (spec `device-mode`, "Gerätekatalog").
 public struct DeviceEntry: Sendable, Identifiable {
     /// Stable identifier, e.g. "mtk.qstarz-bt-q1000"; stored as the user's selection.
@@ -22,15 +48,18 @@ public struct DeviceEntry: Sendable, Identifiable {
     /// Driver family, e.g. "mtk"; used for diagnostics.
     public var driverID: String
     public var connection: DeviceConnectionKind
+    /// Notes for the user (spec `device-mode`, "Hinweise zum Gerät").
+    public var hints: [DeviceHint]
     /// Creates the protocol for this device.
     public var makeProtocol: @Sendable () -> any DeviceProtocol
 
-    public init(id: String, name: String, driverID: String, connection: DeviceConnectionKind,
+    public init(id: String, name: String, driverID: String, connection: DeviceConnectionKind, hints: [DeviceHint] = [],
                 makeProtocol: @escaping @Sendable () -> any DeviceProtocol) {
         self.id = id
         self.name = name
         self.driverID = driverID
         self.connection = connection
+        self.hints = hints
         self.makeProtocol = makeProtocol
     }
 

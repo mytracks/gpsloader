@@ -8,8 +8,9 @@ enum MainMenuBuilder {
         mainMenu.addItem(makeAppMenuItem())
         mainMenu.addItem(makeFileMenuItem())
         mainMenu.addItem(makeEditMenuItem())
+        mainMenu.addItem(makeViewMenuItem())
         mainMenu.addItem(makeWindowMenuItem())
-        mainMenu.addItem(makeDiagnosticsMenuItem())
+        mainMenu.addItem(makeHelpMenuItem())
         return mainMenu
     }
 
@@ -70,16 +71,26 @@ enum MainMenuBuilder {
     }
 
     /// "Diagnose" menu (spec `diagnostic-capture`).
-    private static func makeDiagnosticsMenuItem() -> NSMenuItem {
+    /// "Help" with "Create Support Package…" (spec `support-package`).
+    private static func makeHelpMenuItem() -> NSMenuItem {
         let item = NSMenuItem()
-        let menu = NSMenu(title: String(localized: "Diagnostics"))
-        let controller = DiagnosticsController.shared
-        let toggle = menu.addItem(withTitle: String(localized: "Record Diagnostic Capture"),
-                                  action: #selector(DiagnosticsController.toggleCapture(_:)), keyEquivalent: "")
-        toggle.target = controller
-        let save = menu.addItem(withTitle: String(localized: "Save Latest Diagnostic Capture…"),
-                                action: #selector(DiagnosticsController.saveLatestCapture(_:)), keyEquivalent: "")
-        save.target = controller
+        let menu = NSMenu(title: String(localized: "Help"))
+        let create = menu.addItem(withTitle: String(localized: "Create Support Package…"),
+                                  action: #selector(SupportPackageController.createSupportPackage(_:)), keyEquivalent: "")
+        create.target = SupportPackageController.shared
+        item.submenu = menu
+        NSApp.helpMenu = menu
+        return item
+    }
+
+    /// "View" with the two sections of the main window (spec `app-shell`, "Bereiche des Hauptfensters").
+    private static func makeViewMenuItem() -> NSMenuItem {
+        let item = NSMenuItem()
+        let menu = NSMenu(title: String(localized: "View"))
+        menu.addItem(withTitle: MainWindowSection.files.title,
+                     action: #selector(MainWindowController.showFilesSection(_:)), keyEquivalent: "1")
+        menu.addItem(withTitle: MainWindowSection.device.title,
+                     action: #selector(MainWindowController.showDeviceSection(_:)), keyEquivalent: "2")
         item.submenu = menu
         return item
     }
