@@ -121,11 +121,14 @@ Scripts/verify-bundle.sh <App>          # Signaturen, Hardened Runtime, Architek
 ```
 
 Vor dem langen Build prüft `release.sh`, dass der Commit sauber und auf `origin` gepusht ist (GPL: Quelle jeder Version
-öffentlich), dass das Notarisierungsprofil funktioniert und dass das Developer-ID-Zertifikat da ist. Das ZIP für die
+öffentlich), dass die Anmeldung für die Notarisierung funktioniert und dass das Developer-ID-Zertifikat da ist. Das ZIP für die
 Anwender enthält die App mit angeheftetem Notarisierungs-Ticket (Stapling); daneben liegt `gpsloader-<Version>.zip.sha256`. Lehnt Apple ab, liegt das Protokoll in
 `build/release/notarization-log.json`.
 
-Einmalig das Keychain-Profil für die Notarisierung anlegen:
+Die Notarisierung meldet sich wie in myTracksNeo mit dem App-Store-Connect-API-Schlüssel
+`~/.appstoreconnect/private_keys/app-manager_<Key-ID>.p8` an. Die Issuer-ID kommt aus `NOTARY_ISSUER_ID`,
+sonst aus `~/.appstoreconnect/issuer_id`, sonst ist es die des Teams. Ohne Schlüssel nutzt das Skript ein
+Keychain-Profil, das man einmalig anlegt:
 
 ```sh
 xcrun notarytool store-credentials gpsloader-notary --apple-id <Apple-ID> --team-id 4TNB35NY7G
