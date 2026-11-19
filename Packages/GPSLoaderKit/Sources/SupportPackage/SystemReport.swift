@@ -1,6 +1,7 @@
 import DiagnosticCapture
 import Darwin
 import Foundation
+import LoggerCore
 import SerialTransport
 
 /// System and app facts for the support package (spec `support-package`, "Inhalt des Support-Pakets").
@@ -36,7 +37,7 @@ public struct SystemReport: Sendable, Equatable {
 
     public var text: String {
         """
-        gpsloader \(appVersion) (\(build))
+        \(ProductName.name) \(appVersion) (\(build))
         macOS: \(osVersion)
         Mac model: \(model)
         Architecture: \(architecture)\(isTranslated ? " (Rosetta)" : "")
@@ -89,7 +90,7 @@ public enum SupportText {
     }
 }
 
-/// Crash reports of gpsloader written by macOS.
+/// Crash reports of the app written by macOS, also those from the time it was called gpsloader.
 public enum CrashReports {
     /// `~/Library/Logs/DiagnosticReports` and its `Retired` folder.
     public static var defaultDirectories: [URL] {
@@ -99,12 +100,18 @@ public enum CrashReports {
         return [reports, reports.appendingPathComponent("Retired", isDirectory: true)]
     }
 
-    /// Reports whose name starts with "gpsloader", newest first, at most `limit`.
+    /// Whether a report file name belongs to the app: macOS names reports after the process, which was
+    /// "gpsloader" in earlier builds.
+    static func isCrashReportName(_ name: String) -> Bool {
+        name.hasPrefix(ProductName.name) || name.hasPrefix(ProductName.legacyName)
+    }
+
+    /// Reports whose name starts with "myTracks Loader" or "gpsloader", newest first, at most `limit`.
     public static func find(in directories: [URL] = defaultDirectories, limit: Int = 10) -> [URL] {
         let manager = FileManager.default
         let reports = directories.flatMap { directory -> [URL] in
             let urls = (try? manager.contentsOfDirectory(at: directory, includingPropertiesForKeys: [.contentModificationDateKey])) ?? []
-            return urls.filter { $0.lastPathComponent.hasPrefix("gpsloader") && ["ips", "crash", "diag", "hang"].contains($0.pathExtension) }
+            return urls.filter { isCrashReportName($0.lastPathComponent) && ["ips", "crash", "diag", "hang"].contains($0.pathExtension) }
         }
         func modified(_ url: URL) -> Date {
             (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast

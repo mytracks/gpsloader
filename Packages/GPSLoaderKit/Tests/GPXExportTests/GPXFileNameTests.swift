@@ -38,8 +38,11 @@ struct GPXExportTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("out.gpx")
         let createdAt = Date(timeIntervalSince1970: 1_793_629_805)
-        try GPXExport.write(recording, to: url, creator: "gpsloader 0.1.0", createdAt: createdAt)
-        #expect(try Data(contentsOf: url) == GPXWriter(creator: "gpsloader 0.1.0").data(for: recording, createdAt: createdAt))
+        try GPXExport.write(recording, to: url, creator: "myTracks Loader 0.1.0", createdAt: createdAt)
+        let data = try Data(contentsOf: url)
+        #expect(data == GPXWriter(creator: "myTracks Loader 0.1.0").data(for: recording, createdAt: createdAt))
+        // Scenario "Creator" (spec `gpx-export`).
+        #expect(String(decoding: data, as: UTF8.self).contains(#"creator="myTracks Loader 0.1.0""#))
     }
 
     /// Write errors arrive as `LoggerError(.writeFailed)`; scenario "Ziel nicht beschreibbar".

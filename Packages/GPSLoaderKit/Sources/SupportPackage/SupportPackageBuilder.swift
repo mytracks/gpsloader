@@ -50,12 +50,12 @@ public struct SupportPackageSources: Sendable {
 
 /// Writes the chosen parts into a folder and zips it (design D4: `NSFileCoordinator` with `.forUploading`).
 public enum SupportPackageBuilder {
-    /// "gpsloader-support-20261114-1030" in local time.
+    /// "myTracks-Loader-Support-20261114-1030" in local time.
     public static func baseName(for date: Date, timeZone: TimeZone = .current) -> String {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = timeZone
         let c = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-        return String(format: "gpsloader-support-%04d%02d%02d-%02d%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0,
+        return String(format: "\(ProductName.fileStem)-Support-%04d%02d%02d-%02d%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0,
                       c.hour ?? 0, c.minute ?? 0)
     }
 
@@ -68,7 +68,7 @@ public enum SupportPackageBuilder {
     public static func build(items: Set<SupportPackageItem>, sources: SupportPackageSources, to destination: URL,
                              date: Date = Date()) async throws {
         let manager = FileManager.default
-        let work = manager.temporaryDirectory.appendingPathComponent("gpsloader-support-\(UUID().uuidString)", isDirectory: true)
+        let work = manager.temporaryDirectory.appendingPathComponent("\(ProductName.fileStem)-Support-\(UUID().uuidString)", isDirectory: true)
         let folder = work.appendingPathComponent(baseName(for: date), isDirectory: true)
         defer { try? manager.removeItem(at: work) }
         do {
@@ -125,7 +125,7 @@ public enum SupportPackageBuilder {
         }
         if items.contains(.crashReports) {
             let count = try copy(sources.crashReports(), into: "crash-reports")
-            contents.append("crash-reports/ – crash reports of gpsloader (\(count) files)")
+            contents.append("crash-reports/ – crash reports of \(ProductName.name) (\(count) files)")
         }
         return contents
     }
@@ -133,14 +133,14 @@ public enum SupportPackageBuilder {
     static func readme(date: Date, appVersion: String, contents: [String]) -> String {
         let time = date.formatted(Date.ISO8601FormatStyle(timeZone: .current))
         return """
-        gpsloader support package
+        \(ProductName.name) support package
         Created: \(time)
         App version: \(appVersion)
 
         Contents:
         \(contents.map { "- " + $0 }.joined(separator: "\n"))
 
-        This package was saved by the user and is not sent anywhere by gpsloader.
+        This package was saved by the user and is not sent anywhere by \(ProductName.name).
 
         """
     }

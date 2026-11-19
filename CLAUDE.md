@@ -1,7 +1,9 @@
-# gpsloader
+# myTracks Loader (Repository `gpsloader`)
 
 Eigenständige macOS-App zum Auslesen von GPS-Loggern und zum Konvertieren von Logger-Dateien nach GPX.
 Sie ersetzt die Logger-Funktionen der App myTracks. Vertrieb per Download, nicht über den App Store.
+Für Anwender heißt die App „myTracks Loader“ (seit 2026-11-19, Change `rename-and-icon`); Repository, Target,
+Module und Bundle-ID heißen weiter `gpsloader`. Das Icon erzeugt `Scripts/make-app-icon.swift` (`App/AppIcon.icon`).
 
 ## Arbeitsweise
 

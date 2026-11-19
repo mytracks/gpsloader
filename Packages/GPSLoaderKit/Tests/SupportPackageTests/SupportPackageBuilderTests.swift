@@ -58,7 +58,13 @@ struct SupportPackageBuilderTests {
             #expect(entries.contains("\(base)/\(name)"), "missing \(name)")
         }
         #expect(SupportPackageBuilder.suggestedFileName(for: date) == base + ".zip")
-        #expect(base.hasPrefix("gpsloader-support-20261103-"))
+        #expect(base.hasPrefix("myTracks-Loader-Support-20261103-"))
+    }
+
+    /// Scenario "Vorgeschlagener Name" (local time).
+    @Test func suggestedName() throws {
+        let date = try #require(Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: 19, hour: 14, minute: 5)))
+        #expect(SupportPackageBuilder.suggestedFileName(for: date) == "myTracks-Loader-Support-20261119-1405.zip")
     }
 
     /// Scenario "Inhalt abgewählt"; Bluetooth is left out when it is not available.

@@ -5,7 +5,8 @@ schema: spec-driven
 # docs/legacy-device-catalog.md und werden hier nur referenziert.
 context: |
   ## Produkt
-  gpsloader (Arbeitstitel) ist eine kleine, eigenständige macOS-App. Sie liest GPS-Logger
+  myTracks Loader (Name entschieden am 2026-11-19, Change rename-and-icon; Repository, Target, Module und
+  Bundle-ID heißen weiter gpsloader) ist eine kleine, eigenständige macOS-App. Sie liest GPS-Logger
   aus und speichert die Aufzeichnungen als GPX-Dateien. Sie löst die Logger-Funktionen der
   seit fast 20 Jahren entwickelten App myTracks ab; dort werden diese Funktionen entfernt.
   Zielgruppe sind myTracks-Bestandskunden und andere Besitzer solcher Logger.

@@ -9,4 +9,4 @@
 ## 2. Abschluss
 
 - [x] 2.1 README (Bedienung) aktualisieren; `xcodebuild test` grün; `openspec validate --all --strict` grün.
-- [ ] 2.2 [manuell, Hardware] Der Entwickler prüft die Bedienung auf seinem Mac: Umschalter, ⌘1/⌘2, Drag & Drop aus dem Finder in beiden Bereichen, Ablagefläche anklicken. Prüfen: Ablauf wie in den Specs.
+- [x] 2.2 [manuell, Hardware] Der Entwickler prüft die Bedienung auf seinem Mac: Umschalter, ⌘1/⌘2, Drag & Drop aus dem Finder in beiden Bereichen, Ablagefläche anklicken. Prüfen: Ablauf wie in den Specs.

@@ -102,7 +102,7 @@ private final class ItemChoice {
         let rows: [(SupportPackageItem, String, Bool)] = [
             (.system, String(localized: "System and app information"), true),
             (.log, String(localized: "App log"), true),
-            (.settings, String(localized: "Settings of gpsloader"), true),
+            (.settings, String(localized: "Settings of myTracks Loader"), true),
             (.ports, String(localized: "Serial ports and USB devices"), true),
             (.bluetooth, bluetoothAvailable ? String(localized: "Paired Bluetooth devices")
                                             : String(localized: "Paired Bluetooth devices (no permission)"),
@@ -118,7 +118,7 @@ private final class ItemChoice {
             boxes[item] = box
             views.append(box)
         }
-        let note = NSTextField(wrappingLabelWithString: String(localized: "Diagnostic captures contain all data exchanged with the device, including recorded positions. Only send the package to people you trust, for example the developer of gpsloader."))
+        let note = NSTextField(wrappingLabelWithString: String(localized: "Diagnostic captures contain all data exchanged with the device, including recorded positions. Only send the package to people you trust, for example the developer of myTracks Loader."))
         note.textColor = .secondaryLabelColor
         note.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
         note.preferredMaxLayoutWidth = 340

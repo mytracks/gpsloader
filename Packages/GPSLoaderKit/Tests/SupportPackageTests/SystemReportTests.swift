@@ -8,7 +8,7 @@ struct SystemReportTests {
     @Test func systemText() {
         let report = SystemReport(appVersion: "1.0", build: "42", osVersion: "Version 27.0 (Build 27A100)", model: "Mac16,10",
                                   architecture: "arm64", isTranslated: false, languages: ["de-DE", "en"], timeZone: "Europe/Berlin")
-        #expect(report.text.contains("gpsloader 1.0 (42)"))
+        #expect(report.text.contains("myTracks Loader 1.0 (42)"))
         #expect(report.text.contains("Mac model: Mac16,10"))
         #expect(report.text.contains("Languages: de-DE, en"))
         #expect(!SystemReport.current(appVersion: "1", build: "1").model.isEmpty)
@@ -42,10 +42,16 @@ struct SystemReportTests {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("reports-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: directory) }
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        for name in ["gpsloader-2026-11-14-101010.ips", "Safari-2026-11-14-101010.ips", "gpsloader.txt"] {
-            try Data("x".utf8).write(to: directory.appendingPathComponent(name))
+        // Reports of the old and the new process name are found, newest first; others are not.
+        let names = ["gpsloader-2026-11-14-101010.ips", "myTracks Loader-2026-11-19-101010.ips",
+                     "Safari-2026-11-14-101010.ips", "gpsloader.txt"]
+        for (index, name) in names.enumerated() {
+            let url = directory.appendingPathComponent(name)
+            try Data("x".utf8).write(to: url)
+            try FileManager.default.setAttributes([.modificationDate: Date(timeIntervalSince1970: 1_800_000_000 + Double(index))],
+                                                  ofItemAtPath: url.path)
         }
         #expect(CrashReports.find(in: [directory, directory.appendingPathComponent("Retired")]).map(\.lastPathComponent)
-            == ["gpsloader-2026-11-14-101010.ips"])
+            == ["myTracks Loader-2026-11-19-101010.ips", "gpsloader-2026-11-14-101010.ips"])
     }
 }

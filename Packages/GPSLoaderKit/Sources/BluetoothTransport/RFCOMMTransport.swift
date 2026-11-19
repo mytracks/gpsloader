@@ -24,7 +24,7 @@ final class RFCOMMChannelHandle: NSObject {
     /// Opens the RFCOMM channel of `serviceName` on the first paired device named like one of `deviceNames`.
     func open(deviceNames: [String], serviceName: String, timeout: TimeInterval) async throws {
         if [.denied, .restricted].contains(CBManager.authorization) {
-            throw LoggerError(.deviceNotFound, detail: "Bluetooth access is not allowed for gpsloader. "
+            throw LoggerError(.deviceNotFound, detail: "Bluetooth access is not allowed for \(ProductName.name). "
                 + "Allow it in System Settings > Privacy & Security > Bluetooth.")
         }
         let paired = (IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice]) ?? []

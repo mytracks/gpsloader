@@ -162,7 +162,7 @@ final class DevicePanel: NSObject {
         case .useUSBInsteadOfBluetooth:
             String(localized: "The \(device) cannot be read reliably over Bluetooth. Connect it with the USB cable and choose its USB port.")
         case .pairInSystemSettings:
-            String(localized: "Pair the \(device) in System Settings > Bluetooth first. gpsloader then connects to it by itself.")
+            String(localized: "Pair the \(device) in System Settings > Bluetooth first. myTracks Loader then connects to it by itself.")
         case .connectDirectlyViaUSB:
             String(localized: "Connect the logger with its USB cable. No port needs to be chosen.")
         }

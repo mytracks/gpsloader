@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Builds, signs (Developer ID), notarizes and staples gpsloader and packs the ZIP for users (design.md D10).
+# Builds, signs (Developer ID), notarizes and staples myTracks Loader and packs the ZIP for users (design.md D10).
 #
 # Usage:
 #   Scripts/release.sh [--skip-notarize] [--allow-unpublished] [--profile <notarytool keychain profile>]
@@ -14,8 +14,8 @@
 # keychain profile, created once with:
 #   xcrun notarytool store-credentials gpsloader-notary --apple-id <id> --team-id 4TNB35NY7G
 #
-# Output: build/release/gpsloader-<version>.zip (notarized and stapled unless --skip-notarize)
-#         and gpsloader-<version>.zip.sha256.
+# Output: build/release/myTracks-Loader-<version>.zip (notarized and stapled unless --skip-notarize)
+#         and myTracks-Loader-<version>.zip.sha256. Hyphens, because GitHub turns spaces in asset names into dots.
 set -euo pipefail
 
 TEAM_ID="4TNB35NY7G"
@@ -41,7 +41,9 @@ ROOT="${0:A:h:h}"
 BUILD="${ROOT}/build/release"
 ARCHIVE="${BUILD}/gpsloader.xcarchive"
 EXPORT="${BUILD}/export"
-APP="${EXPORT}/gpsloader.app"
+APP_NAME="myTracks Loader"
+FILE_STEM="myTracks-Loader"
+APP="${EXPORT}/${APP_NAME}.app"
 
 step() { print -P "%F{cyan}==> $1%f"; }
 fail() { print -P "%F{red}release: $1%f" >&2; exit 1; }
@@ -129,8 +131,8 @@ xcodebuild -exportArchive \
 
 VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "${APP}/Contents/Info.plist")
 BUILD_NUMBER=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "${APP}/Contents/Info.plist")
-ZIP="${BUILD}/gpsloader-${VERSION}.zip"
-UPLOAD="${BUILD}/gpsloader-${VERSION}-notarization.zip"
+ZIP="${BUILD}/${FILE_STEM}-${VERSION}.zip"
+UPLOAD="${BUILD}/${FILE_STEM}-${VERSION}-notarization.zip"
 [[ -f "${ZIP}" ]] && rm -- "${ZIP}"
 [[ -f "${ZIP}.sha256" ]] && rm -- "${ZIP}.sha256"
 [[ -f "${UPLOAD}" ]] && rm -- "${UPLOAD}"

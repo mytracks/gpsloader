@@ -3,9 +3,9 @@ import LoggerCore
 import os
 
 /// The app's own log (spec `support-package`, "App-Protokoll"): one line per entry in
-/// `~/Library/Logs/gpsloader/gpsloader.log`, also sent to the unified log for Console.app.
+/// `~/Library/Logs/myTracks Loader/myTracks Loader.log`, also sent to the unified log for Console.app.
 ///
-/// When the file would grow beyond `maximumFileSize`, it is renamed to `gpsloader.1.log` (older ones move up
+/// When the file would grow beyond `maximumFileSize`, it is renamed to `myTracks Loader.1.log` (older ones move up
 /// one number) and a new file starts; at most `maximumFileCount` files are kept. Callers must not pass
 /// positions or file names.
 public final class AppLog: Sendable {
@@ -15,12 +15,17 @@ public final class AppLog: Sendable {
 
     public static let shared = AppLog()
 
-    /// `~/Library/Logs/gpsloader`
-    public static var defaultDirectory: URL {
+    /// `~/Library/Logs/myTracks Loader`
+    public static var defaultDirectory: URL { logsDirectory(named: ProductName.name) }
+
+    /// `~/Library/Logs/gpsloader` of earlier builds, moved by `LegacyFolderMigration` at start.
+    public static var legacyDirectory: URL { logsDirectory(named: ProductName.legacyName) }
+
+    private static func logsDirectory(named name: String) -> URL {
         let library = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first
             ?? FileManager.default.temporaryDirectory
         return library.appendingPathComponent("Logs", isDirectory: true)
-            .appendingPathComponent("gpsloader", isDirectory: true)
+            .appendingPathComponent(name, isDirectory: true)
     }
 
     public let directory: URL
@@ -46,6 +51,28 @@ public final class AppLog: Sendable {
         (0..<maximumFileCount).reversed().map(file).filter { FileManager.default.fileExists(atPath: $0.path) }
     }
 
+    /// Gives log files of earlier builds ("gpsloader.log", "gpsloader.N.log") the current names, as files older
+    /// than the existing ones, so that rotation and the support package include them. Files beyond
+    /// `maximumFileCount` are removed, as rotation would. Call once at start, before logging.
+    public func adoptLegacyFiles() {
+        let manager = FileManager.default
+        func legacy(_ index: Int) -> URL {
+            directory.appendingPathComponent(index == 0 ? "\(ProductName.legacyName).log" : "\(ProductName.legacyName).\(index).log")
+        }
+        let old = (0..<maximumFileCount).map(legacy).filter { manager.fileExists(atPath: $0.path) }
+        guard !old.isEmpty else { return }
+        var next = ((0..<maximumFileCount).last { manager.fileExists(atPath: file($0).path) } ?? -1) + 1
+        lock.withLock { _ in
+            for url in old {
+                if next < maximumFileCount, (try? manager.moveItem(at: url, to: file(next))) != nil {
+                    next += 1
+                } else {
+                    try? manager.removeItem(at: url)
+                }
+            }
+        }
+    }
+
     /// Appends one entry. Errors while writing are ignored: logging must never break the app.
     public func log(_ category: Category, _ message: String) {
         let time = now().formatted(Date.ISO8601FormatStyle(includingFractionalSeconds: true, timeZone: .current))
@@ -56,7 +83,7 @@ public final class AppLog: Sendable {
     }
 
     private func file(_ index: Int) -> URL {
-        directory.appendingPathComponent(index == 0 ? "gpsloader.log" : "gpsloader.\(index).log")
+        directory.appendingPathComponent(index == 0 ? "\(ProductName.name).log" : "\(ProductName.name).\(index).log")
     }
 
     private func write(_ line: Data) {

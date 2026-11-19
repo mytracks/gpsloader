@@ -54,7 +54,7 @@ public enum CaptureFormat {
         public var description: String {
             switch self {
             case .empty: "The capture is empty."
-            case .notACapture: "The file is not a gpsloader capture."
+            case .notACapture: "The file is not a \(ProductName.name) capture."
             case let .unsupportedVersion(version): "Unsupported capture version \(version)."
             case let .invalidLine(line): "Line \(line) is not valid JSON."
             }

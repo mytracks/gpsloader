@@ -1,4 +1,6 @@
 import AppKit
+import DiagnosticCapture
+import LoggerCore
 import SupportPackage
 
 @MainActor
@@ -7,10 +9,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     var sessionPresenter: SessionPresenter? { mainWindowController?.sessionPresenter }
 
+    /// Folders of earlier builds named "gpsloader", moved before the log and the capture store write anything
+    /// (spec `support-package`, "App-Protokoll"; design D2 of change rename-and-icon).
+    private var folderMigrations: [(String, LegacyFolderMigration.Outcome)] = []
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        folderMigrations = [
+            ("log", LegacyFolderMigration.migrate(from: AppLog.legacyDirectory, to: AppLog.defaultDirectory)),
+            ("support", LegacyFolderMigration.migrate(from: CaptureStore.legacySupportDirectory,
+                                                       to: CaptureStore.supportDirectory)),
+        ]
+        AppLog.shared.adoptLegacyFiles()
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         let environment = AppEnvironment.shared
         let system = SystemReport.current(appVersion: environment.appVersion, build: environment.build)
-        AppLog.shared.log(.app, "start gpsloader \(system.appVersion) (\(system.build)), macOS \(system.osVersion), "
+        for (folder, outcome) in folderMigrations where outcome != .nothingToMove {
+            AppLog.shared.log(outcome == .moved || outcome == .keptBoth ? .app : .error,
+                              "legacy \(folder) folder: \(outcome)")
+        }
+        AppLog.shared.log(.app, "start \(ProductName.name) \(system.appVersion) (\(system.build)), macOS \(system.osVersion), "
             + "\(system.model), \(system.architecture)\(system.isTranslated ? " (Rosetta)" : "")")
         NSApp.mainMenu = MainMenuBuilder.makeMainMenu()
 

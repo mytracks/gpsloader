@@ -1,11 +1,11 @@
 #!/bin/zsh
-# Verifies the signatures and architectures of a built gpsloader.app (used by release.sh, usable alone).
+# Verifies the signatures and architectures of a built myTracks Loader.app (used by release.sh, usable alone).
 #
-# Usage: Scripts/verify-bundle.sh path/to/gpsloader.app [--require-developer-id]
+# Usage: Scripts/verify-bundle.sh "path/to/myTracks Loader.app" [--require-developer-id]
 # --require-developer-id (implied for exported builds) is the release mode: it also requires the source code URL.
 set -euo pipefail
 
-APP="${1:?usage: verify-bundle.sh path/to/gpsloader.app [--require-developer-id]}"
+APP="${1:?usage: verify-bundle.sh \"path/to/myTracks Loader.app\" [--require-developer-id]}"
 REQUIRE_DEVELOPER_ID="${2:-}"
 [[ -z "${REQUIRE_DEVELOPER_ID}" && "${APP}" == *"/export/"* ]] && REQUIRE_DEVELOPER_ID="--require-developer-id"
 
@@ -39,7 +39,11 @@ check() {
     fi
     if [[ -n "${want_archs}" ]]; then
         local binary="${item}"
-        [[ -d "${item}" ]] && binary="${item}/Contents/MacOS/${item:t:r}"
+        if [[ -d "${item}" ]]; then
+            local executable
+            executable=$(/usr/libexec/PlistBuddy -c "Print :CFBundleExecutable" "${item}/Contents/Info.plist")
+            binary="${item}/Contents/MacOS/${executable}"
+        fi
         local archs
         archs=$(lipo -archs "${binary}")
         [[ "${archs}" == "${want_archs}" ]] || fail "${item:t}: architectures '${archs}', expected '${want_archs}'"
@@ -53,6 +57,11 @@ check "${APP}" runtime "x86_64 arm64"
 [[ ! -e "${APP}/Contents/Helpers" ]] || fail "unexpected Contents/Helpers (gpsbabel and RosettaInstaller are gone)"
 [[ ! -e "${APP}/Contents/Frameworks/QtCoreGpsBabel.framework" ]] || fail "unexpected QtCoreGpsBabel.framework"
 echo "ok: no helpers, no Qt"
+
+# App icon (change rename-and-icon): rendered by Xcode from App/AppIcon.icon.
+[[ -f "${APP}/Contents/Resources/AppIcon.icns" && -f "${APP}/Contents/Resources/Assets.car" ]] || fail "missing app icon"
+[[ "$(/usr/libexec/PlistBuddy -c "Print :CFBundleIconName" "${plist}" 2>/dev/null)" == "AppIcon" ]] || fail "CFBundleIconName is not AppIcon"
+echo "ok: app icon"
 
 for license in GPL-3.0 MIT-GPSLoggerKit; do
     [[ -f "${APP}/Contents/Resources/Licenses/${license}.txt" ]] || fail "missing license ${license}"

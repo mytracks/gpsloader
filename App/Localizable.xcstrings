@@ -31,16 +31,6 @@
         }
       }
     },
-    "About gpsloader": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Über gpsloader"
-          }
-        }
-      }
-    },
     "Another operation is already using %@. Wait until it has finished.": {
       "localizations": {
         "de": {
@@ -261,12 +251,12 @@
         }
       }
     },
-    "Diagnostic captures contain all data exchanged with the device, including recorded positions. Only send the package to people you trust, for example the developer of gpsloader.": {
+    "Diagnostic captures contain all data exchanged with the device, including recorded positions. Only send the package to people you trust, for example the developer of myTracks Loader.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Diagnose-Mitschnitte enthalten alle mit dem Gerät ausgetauschten Daten, auch die aufgezeichneten Positionen. Schicken Sie das Paket nur an Personen, denen Sie vertrauen, zum Beispiel an den Entwickler von gpsloader."
+            "value": "Diagnose-Mitschnitte enthalten alle mit dem Gerät ausgetauschten Daten, auch die aufgezeichneten Positionen. Schicken Sie das Paket nur an Personen, denen Sie vertrauen, zum Beispiel an den Entwickler von myTracks Loader."
           }
         }
       }
@@ -491,12 +481,12 @@
         }
       }
     },
-    "Pair the %@ in System Settings > Bluetooth first. gpsloader then connects to it by itself.": {
+    "Pair the %@ in System Settings > Bluetooth first. myTracks Loader then connects to it by itself.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Koppeln Sie den %@ zuerst in den Systemeinstellungen unter „Bluetooth“. gpsloader verbindet sich dann selbst mit ihm."
+            "value": "Koppeln Sie den %@ zuerst in den Systemeinstellungen unter „Bluetooth“. myTracks Loader verbindet sich dann selbst mit ihm."
           }
         }
       }
@@ -631,12 +621,12 @@
         }
       }
     },
-    "Settings of gpsloader": {
+    "Settings of myTracks Loader": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Einstellungen von gpsloader"
+            "value": "Einstellungen von myTracks Loader"
           }
         }
       }
@@ -671,12 +661,12 @@
         }
       }
     },
-    "Source code of gpsloader": {
+    "Source code of myTracks Loader": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quellcode von gpsloader"
+            "value": "Quellcode von myTracks Loader"
           }
         }
       }
@@ -851,22 +841,22 @@
         }
       }
     },
-    "gpsloader contains GPSLoggerKit (copyright 2026 Dirk Stichling), distributed under the MIT License. Its source code is part of the source code of gpsloader.": {
+    "myTracks Loader contains GPSLoggerKit (copyright 2026 Dirk Stichling), distributed under the MIT License. Its source code is part of the source code of myTracks Loader.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "gpsloader enthält GPSLoggerKit (Copyright 2026 Dirk Stichling), verbreitet unter der MIT-Lizenz. Sein Quellcode ist Teil des Quellcodes von gpsloader."
+            "value": "myTracks Loader enthält GPSLoggerKit (Copyright 2026 Dirk Stichling), verbreitet unter der MIT-Lizenz. Sein Quellcode ist Teil des Quellcodes von myTracks Loader."
           }
         }
       }
     },
-    "gpsloader is free software, distributed under the GNU General Public License version 3 or later. You may redistribute and modify it under the terms of that license.": {
+    "myTracks Loader is free software, distributed under the GNU General Public License version 3 or later. You may redistribute and modify it under the terms of that license.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "gpsloader ist freie Software und wird unter der GNU General Public License Version 3 oder neuer verbreitet. Sie dürfen die App unter den Bedingungen dieser Lizenz weitergeben und verändern."
+            "value": "myTracks Loader ist freie Software und wird unter der GNU General Public License Version 3 oder neuer verbreitet. Sie dürfen die App unter den Bedingungen dieser Lizenz weitergeben und verändern."
           }
         }
       }

@@ -5,24 +5,6 @@ Zeichnet die Kommunikation mit Geräten vollständig auf. Anwender können Fehle
 
 ## Requirements
 
-### Requirement: Aufzeichnung einschalten
-Der Anwender SHALL den Diagnose-Mitschnitt in der App ein- und ausschalten können. Standardmäßig MUST er ausgeschaltet sein. Der Zustand SHALL über einen Neustart der App hinweg erhalten bleiben.
-
-#### Scenario: Standardzustand
-- **WHEN** die App zum ersten Mal gestartet wird
-- **THEN** ist der Diagnose-Mitschnitt ausgeschaltet
-
-#### Scenario: Einschalten
-- **WHEN** der Anwender den Mitschnitt einschaltet und danach einen Vorgang startet
-- **THEN** wird dieser Vorgang aufgezeichnet
-
-### Requirement: Export für den Support
-Der Anwender SHALL die Aufzeichnung des letzten Vorgangs als Datei an einem gewählten Ort speichern können. Vor dem Speichern MUST die App darauf hinweisen, dass die Aufzeichnung Positionsdaten enthält.
-
-#### Scenario: Aufzeichnung sichern
-- **WHEN** der Anwender nach einem fehlgeschlagenen Vorgang „Diagnose-Mitschnitt sichern…“ wählt
-- **THEN** erhält er einen Hinweis auf enthaltene Positionsdaten und kann die Datei danach speichern
-
 ### Requirement: Lesbares und maschinenlesbares Format
 Das Format MUST zeilenweise, textbasiert und versioniert sein. Bytes SHALL als Hexadezimalzeichen erscheinen, druckbare ASCII-Zeichen zusätzlich als Text, damit Menschen die Datei lesen und Programme sie verarbeiten können.
 
@@ -61,3 +43,14 @@ Eine Aufzeichnung MUST enthalten:
 #### Scenario: App unter Rosetta
 - **WHEN** der Anwender die App selbst unter Rosetta gestartet hat und einen Vorgang aufzeichnet
 - **THEN** vermerken die Kopfdaten, dass die App unter Rosetta läuft
+
+### Requirement: Aufzeichnung immer aktiv
+Die App SHALL jeden Lese- und Löschvorgang aufzeichnen. Einen Schalter zum Abschalten SHALL es nicht geben. Aufzeichnungen MUST lokal bleiben, bis der Anwender sie in ein Support-Paket übernimmt.
+
+#### Scenario: Erster Start
+- **WHEN** die App zum ersten Mal gestartet wird und der Anwender ein Gerät ausliest
+- **THEN** liegt danach ein Mitschnitt dieses Vorgangs vor
+
+#### Scenario: Fehlgeschlagener Vorgang
+- **WHEN** ein Vorgang mit einem Fehler endet
+- **THEN** wird sein Mitschnitt ebenso gespeichert wie der eines erfolgreichen Vorgangs

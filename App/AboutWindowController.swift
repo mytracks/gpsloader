@@ -21,7 +21,7 @@ final class AboutWindowController: NSWindowController {
     private convenience init() {
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 440),
                               styleMask: [.titled, .closable], backing: .buffered, defer: false)
-        window.title = String(localized: "About gpsloader")
+        window.title = String(localized: "About \(AppName.current)")
         self.init(window: window)
         buildContent()
         window.center()
@@ -36,7 +36,7 @@ final class AboutWindowController: NSWindowController {
         let icon = NSImageView(image: NSApp.applicationIconImage)
         icon.widthAnchor.constraint(equalToConstant: 64).isActive = true
         icon.heightAnchor.constraint(equalToConstant: 64).isActive = true
-        let name = NSTextField(labelWithString: "gpsloader")
+        let name = NSTextField(labelWithString: AppName.current)
         name.font = .boldSystemFont(ofSize: 18)
         let versionLabel = NSTextField(labelWithString: String(localized: "Version \(version) (\(build))"))
         let copyrightLabel = NSTextField(labelWithString: copyright)
@@ -44,19 +44,19 @@ final class AboutWindowController: NSWindowController {
 
         let appLicenseTitle = title(String(localized: "License"))
         let appLicense = wrappingLabel(String(localized: """
-        gpsloader is free software, distributed under the GNU General Public License version 3 or later. \
+        myTracks Loader is free software, distributed under the GNU General Public License version 3 or later. \
         You may redistribute and modify it under the terms of that license.
         """))
         var appLicenseViews = [linkButton(String(localized: "GPL 3.0"), action: #selector(openGPL3(_:)))]
         if SourceCode.app != nil {
-            appLicenseViews.append(linkButton(String(localized: "Source code of gpsloader"), action: #selector(openAppSource(_:))))
+            appLicenseViews.append(linkButton(String(localized: "Source code of myTracks Loader"), action: #selector(openAppSource(_:))))
         }
         let appLicenseButtons = NSStackView(views: appLicenseViews)
 
         let licenseTitle = title(String(localized: "Third-party software"))
         let kitNotice = wrappingLabel(String(localized: """
-        gpsloader contains GPSLoggerKit (copyright 2026 Dirk Stichling), distributed under the MIT License. \
-        Its source code is part of the source code of gpsloader.
+        myTracks Loader contains GPSLoggerKit (copyright 2026 Dirk Stichling), distributed under the MIT License. \
+        Its source code is part of the source code of myTracks Loader.
         """))
         let kitButtons = NSStackView(views: [linkButton(String(localized: "MIT License"), action: #selector(openMIT(_:)))])
         var views: [NSView] = [icon, name, versionLabel, copyrightLabel, appLicenseTitle, appLicense, appLicenseButtons,

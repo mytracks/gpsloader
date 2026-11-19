@@ -43,7 +43,7 @@ final class MainWindowController: NSWindowController, NSMenuItemValidation, NSTo
             backing: .buffered,
             defer: false
         )
-        window.title = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "gpsloader"
+        window.title = AppName.current
         window.minSize = NSSize(width: 520, height: 360)
         self.init(window: window)
         sessionPresenter = SessionPresenter(window: window)

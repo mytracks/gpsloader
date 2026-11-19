@@ -13,7 +13,7 @@ Das Hauptfenster SHALL im Bereich „Gerät“ eine Auswahl aller Geräte des Ge
 - **THEN** sind Gerät und Anschluss wieder ausgewählt, sofern der Anschluss vorhanden ist
 
 ### Requirement: Anschluss wählen
-Für Geräte mit serieller Verbindung SHALL das Fenster die vorhandenen Anschlüsse `/dev/cu.*` mit ihren USB-Namen anbieten und die Liste bei An- und Abstecken ohne Neustart aktualisieren. Für Geräte ohne seriellen Anschluss SHALL die Anschlusswahl entfallen. Ist kein passender Anschluss vorhanden, SHALL das Fenster darauf hinweisen und das Auslesen nicht anbieten.
+Für serielle Geräte SHALL das Fenster die Anschlüsse `/dev/cu.*` ohne Systemanschlüsse und mit sprechenden Namen zeigen (USB: Produkt oder Chip-Hersteller; Bluetooth: „Bluetooth:“ und Gerätename; Pfad als Tooltip). Ein zum Gerät passender Anschluss SHALL oben stehen und vorausgewählt sein, danach USB-, dann Bluetooth-Anschlüsse. Die Liste SHALL beim An- und Abstecken aktuell bleiben. Fehlt ein Anschluss, SHALL das Fenster das melden und kein Auslesen anbieten. Andere Geräte haben keine Portwahl.
 
 #### Scenario: Logger angesteckt
 - **WHEN** der Anwender bei geöffnetem Fenster einen USB-Logger ansteckt
@@ -22,6 +22,14 @@ Für Geräte mit serieller Verbindung SHALL das Fenster die vorhandenen Anschlü
 #### Scenario: Kein Anschluss
 - **WHEN** ein serielles Gerät gewählt ist und kein Anschluss vorhanden ist
 - **THEN** ist „Auslesen“ deaktiviert, und ein Hinweis nennt den Grund
+
+#### Scenario: Passender Bluetooth-Anschluss
+- **WHEN** „Holux M-241“ gewählt ist und die Anschlüsse `/dev/cu.usbserial-1410` und `/dev/cu.HOLUX_M-241-SPPSlave` vorhanden sind
+- **THEN** steht „Bluetooth: HOLUX_M-241-SPPSlave“ oben und ist vorausgewählt
+
+#### Scenario: Systemanschlüsse
+- **WHEN** nur `/dev/cu.Bluetooth-Incoming-Port` und `/dev/cu.debug-console` vorhanden sind
+- **THEN** ist die Liste leer, und der Hinweis „kein Anschluss“ erscheint
 
 ### Requirement: Auslesen und Löschen starten
 „Auslesen“ SHALL den Treiber des gewählten Geräts mit dem gewählten Anschluss über die Sitzung (`logger-session`) starten. „Speicher löschen …“ SHALL nur für Geräte angeboten werden, deren Treiber löschen kann, und SHALL vorher die Bestätigung der Sitzung einholen. Während eines Vorgangs SHALL keiner der beiden Knöpfe einen zweiten Vorgang starten.
@@ -70,3 +78,25 @@ Der Adapter der Treiber SHALL auf jedes ausgelesene Ergebnis die Korrektur des G
 #### Scenario: Tracknamen nach der Korrektur
 - **WHEN** ein GNS 2000 Punkte liefert, deren Zeiten um 1024 Wochen zu früh liegen
 - **THEN** tragen die Tracks die Namen der korrigierten Zeiten, und es entsteht keine zusätzliche Trackgrenze
+
+### Requirement: Hinweise zum Gerät
+Der Gerätekatalog SHALL je Gerät Hinweise mit Bedingung festlegen können: immer oder bei gewähltem Bluetooth-Anschluss. Das Fenster SHALL die zutreffenden Hinweise unter der Anschlusswahl zeigen. Ein Hinweis mit Bedingung SHALL auch in der Fehlermeldung eines fehlgeschlagenen Lesevorgangs erscheinen, etwa bei Zeitüberschreitung oder unerwarteter Antwort.
+
+#### Scenario: M-241 über Bluetooth
+- **WHEN** „Holux M-241“ und ein Bluetooth-Anschluss gewählt sind
+- **THEN** rät ein Hinweis, den Logger über USB zu verbinden
+
+#### Scenario: Fehlschlag über Bluetooth
+- **WHEN** das Auslesen des M-241 über einen Bluetooth-Anschluss scheitert, weil das Gerät nicht oder unerwartet antwortet
+- **THEN** nennt die Fehlermeldung denselben Hinweis
+
+### Requirement: Fehlender Treiber
+Ist ein serielles Gerät gewählt und steckt ein USB-Gerät mit der Hersteller-ID eines bekannten USB-Seriell-Chips (Silicon Labs, Prolific, FTDI, WCH), zu dem kein Anschluss existiert, SHALL das Fenster auf den vermutlich fehlenden Treiber hinweisen und die Treiberseite des Herstellers verlinken.
+
+#### Scenario: Treiber fehlt
+- **WHEN** ein serielles Gerät gewählt ist und ein USB-Gerät mit der Hersteller-ID von Prolific (0x067B) steckt, aber kein Anschluss dazu existiert
+- **THEN** nennt ein Hinweis den fehlenden Prolific-Treiber und verlinkt die Treiberseite
+
+#### Scenario: Treiber vorhanden
+- **WHEN** zu dem USB-Gerät ein Anschluss existiert
+- **THEN** erscheint kein Hinweis auf einen fehlenden Treiber

@@ -6,7 +6,7 @@ Der Dateimodus von gpsloader: Dateien von Speicherkarte oder USB-Speicher, deren
 ## Requirements
 
 ### Requirement: Dateien auswählen
-Die App SHALL einen Befehl „Dateien konvertieren…“ im Menü „Ablage“ mit dem Kurzbefehl ⌘O und als Schaltfläche im Hauptfenster anbieten. Der Befehl SHALL einen Dateidialog öffnen, in dem eine oder mehrere Dateien gewählt werden können. Dateien, die auf das Hauptfenster gezogen werden, SHALL die App ebenso konvertieren.
+Die App SHALL den Befehl „Dateien konvertieren…“ im Menü „Ablage“ (⌘O) und als Schaltfläche im Bereich „Dateien konvertieren“ anbieten, dazu dort eine Ablagefläche. Der Befehl SHALL auf diesen Bereich schalten und einen Dateidialog für eine oder mehrere Dateien öffnen. Auf das Hauptfenster gezogene Dateien SHALL die App in jedem Bereich annehmen, auf „Dateien konvertieren“ schalten und konvertieren.
 
 #### Scenario: Auswahl über das Menü
 - **WHEN** der Anwender „Ablage > Dateien konvertieren…“ wählt und zwei NMEA-Dateien auswählt
@@ -19,6 +19,10 @@ Die App SHALL einen Befehl „Dateien konvertieren…“ im Menü „Ablage“ m
 #### Scenario: Ordner gezogen
 - **WHEN** der Anwender einen Ordner auf das Hauptfenster zieht
 - **THEN** nimmt die App ihn nicht an
+
+#### Scenario: Drag & Drop im Gerätebereich
+- **WHEN** der Bereich „Gerät auslesen“ gezeigt wird und der Anwender eine NMEA-Datei auf das Fenster zieht
+- **THEN** zeigt das Fenster den Bereich „Dateien konvertieren“, und die Konvertierung startet
 
 ### Requirement: Unterstützte Formate
 Die App SHALL alle Formate ihres Katalogs konvertieren. Der Katalog SHALL aus den Formaten von GPSLoggerKit und von GPSLoggerKitGPL bestehen. Das Format jeder Datei SHALL über die Formaterkennung auf diesem Katalog bestimmt werden. Kommt ein Format zu einem der beiden Pakete hinzu, SHALL es ohne Änderung an der App verfügbar sein. Der Dateidialog SHALL alle Dateien zur Auswahl zulassen, weil die Endung nur ein Hinweis ist.

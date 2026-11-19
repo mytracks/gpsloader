@@ -15,7 +15,7 @@ enum MainMenuBuilder {
     }
 
     private static var appName: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "gpsloader"
+        AppName.current
     }
 
     private static func makeAppMenuItem() -> NSMenuItem {

@@ -15,12 +15,21 @@ public struct CaptureStore: Sendable {
         self.maximumCount = maximumCount
     }
 
-    /// `~/Library/Application Support/gpsloader/Captures`
+    /// `~/Library/Application Support/myTracks Loader/Captures`
     public static var defaultDirectory: URL {
+        supportFolder(named: ProductName.name).appendingPathComponent("Captures", isDirectory: true)
+    }
+
+    /// The app's folder in Application Support (`myTracks Loader`).
+    public static var supportDirectory: URL { supportFolder(named: ProductName.name) }
+
+    /// `~/Library/Application Support/gpsloader` of earlier builds, moved by `LegacyFolderMigration` at start.
+    public static var legacySupportDirectory: URL { supportFolder(named: ProductName.legacyName) }
+
+    private static func supportFolder(named name: String) -> URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? FileManager.default.temporaryDirectory
-        return base.appendingPathComponent("gpsloader", isDirectory: true)
-            .appendingPathComponent("Captures", isDirectory: true)
+        return base.appendingPathComponent(name, isDirectory: true)
     }
 
     /// Stores a finished capture and removes the oldest ones beyond `maximumCount`.

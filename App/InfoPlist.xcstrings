@@ -8,7 +8,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "gpsloader"
+            "value" : "myTracks Loader"
           }
         }
       }
@@ -20,7 +20,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "gpsloader"
+            "value" : "myTracks Loader"
           }
         }
       }
@@ -32,13 +32,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "gpsloader verbindet sich über Bluetooth mit GPS-Loggern wie dem GNS 2000, um ihre Aufzeichnungen zu lesen."
+            "value" : "myTracks Loader verbindet sich über Bluetooth mit GPS-Loggern wie dem GNS 2000, um ihre Aufzeichnungen zu lesen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "gpsloader connects to GPS loggers such as the GNS 2000 over Bluetooth to read their recordings."
+            "value" : "myTracks Loader connects to GPS loggers such as the GNS 2000 over Bluetooth to read their recordings."
           }
         }
       }

@@ -125,6 +125,12 @@ enum DebugAutomation {
             let url = directory.appendingPathComponent("\(tag)-\(index)-\(safe).png")
             try? rep.representation(using: .png, properties: [:])?.write(to: url)
         }
+        // Menus cannot be captured as images; their titles go into a text file next to the snapshots.
+        if let appMenu = NSApp.mainMenu?.items.first?.submenu {
+            let lines = [appMenu.title] + appMenu.items.filter { !$0.isSeparatorItem }.map { "  " + $0.title }
+            try? (lines.joined(separator: "\n") + "\n").write(to: directory.appendingPathComponent("\(tag)-app-menu.txt"),
+                                                            atomically: true, encoding: .utf8)
+        }
     }
 }
 #endif
