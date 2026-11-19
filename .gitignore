@@ -12,6 +12,8 @@ build/
 .build/
 .swiftpm/
 Package.resolved
+# Fixed package versions of the app (release builds, change split-repositories)
+!Packages/GPSLoaderKit/Package.resolved
 
 # macOS
 .DS_Store

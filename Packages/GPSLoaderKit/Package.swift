@@ -19,8 +19,9 @@ let package = Package(
         .library(name: "SupportPackage", targets: ["SupportPackage"]),
     ],
     dependencies: [
-        .package(path: "../GPSLoggerKit"),
-        .package(path: "../GPSLoggerKitGPL"),
+        // Own repositories since change split-repositories; 0.x minor releases may break, so only 0.1.x.
+        .package(url: "https://github.com/mytracks/GPSLoggerKit.git", .upToNextMinor(from: "0.1.0")),
+        .package(url: "https://github.com/mytracks/GPSLoggerKitGPL.git", .upToNextMinor(from: "0.1.0")),
     ],
     targets: [
         .target(

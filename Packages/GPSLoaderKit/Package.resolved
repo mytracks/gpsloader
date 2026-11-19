@@ -1,0 +1,24 @@
+{
+  "originHash" : "84deb933b21056637725d65e7234ae02c027741a40e7c8f59ea4ff9bd95ac600",
+  "pins" : [
+    {
+      "identity" : "gpsloggerkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mytracks/GPSLoggerKit.git",
+      "state" : {
+        "revision" : "10ade05fed0ffb814143c636f4452fe8d737e385",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "gpsloggerkitgpl",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mytracks/GPSLoggerKitGPL.git",
+      "state" : {
+        "revision" : "9e4e968a64ef43f017e01a5facd4a3bc59d9320e",
+        "version" : "0.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}

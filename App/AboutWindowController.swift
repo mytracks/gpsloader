@@ -16,6 +16,9 @@ final class AboutWindowController: NSWindowController {
                   text.hasPrefix("https://") else { return nil }
             return URL(string: text)
         }
+
+        /// Repository of GPSLoggerKit (own repository since change split-repositories).
+        static let gpsLoggerKit = URL(string: "https://github.com/mytracks/GPSLoggerKit")!
     }
 
     private convenience init() {
@@ -56,9 +59,10 @@ final class AboutWindowController: NSWindowController {
         let licenseTitle = title(String(localized: "Third-party software"))
         let kitNotice = wrappingLabel(String(localized: """
         myTracks Loader contains GPSLoggerKit (copyright 2026 Dirk Stichling), distributed under the MIT License. \
-        Its source code is part of the source code of myTracks Loader.
+        Its source code is available in its own repository.
         """))
-        let kitButtons = NSStackView(views: [linkButton(String(localized: "MIT License"), action: #selector(openMIT(_:)))])
+        let kitButtons = NSStackView(views: [linkButton(String(localized: "MIT License"), action: #selector(openMIT(_:))),
+                                             linkButton(String(localized: "Source code of GPSLoggerKit"), action: #selector(openKitSource(_:)))])
         var views: [NSView] = [icon, name, versionLabel, copyrightLabel, appLicenseTitle, appLicense, appLicenseButtons,
                                licenseTitle, kitNotice, kitButtons]
         var wrapping = [appLicense, kitNotice]
@@ -151,6 +155,8 @@ final class AboutWindowController: NSWindowController {
     @objc private func openAppSource(_ sender: Any?) {
         if let url = SourceCode.app { NSWorkspace.shared.open(url) }
     }
+
+    @objc private func openKitSource(_ sender: Any?) { NSWorkspace.shared.open(SourceCode.gpsLoggerKit) }
 
     @objc private func openCreditSource(_ sender: NSButton) {
         guard credits.indices.contains(sender.tag) else { return }

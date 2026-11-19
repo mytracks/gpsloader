@@ -58,11 +58,22 @@ struct LicenseCopyTests {
         .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         .deletingLastPathComponent().deletingLastPathComponent()
 
+    /// The checkout of a package dependency: `.build/checkouts` of `swift test` or `SourcePackages/checkouts` of the
+    /// app build in `build/DerivedData`.
+    private static func checkout(_ name: String) throws -> URL {
+        let candidates = [
+            repository.appendingPathComponent("Packages/GPSLoaderKit/.build/checkouts/\(name)"),
+            repository.appendingPathComponent("build/DerivedData/SourcePackages/checkouts/\(name)"),
+        ]
+        return try #require(candidates.first { FileManager.default.fileExists(atPath: $0.appendingPathComponent("LICENSE").path) },
+                            "no checkout of \(name)")
+    }
+
     /// The copy bundled with the app (`Vendor/Licenses`) matches the license of GPSLoggerKit (design D5).
     @Test(.enabled(if: FileManager.default.fileExists(atPath: repository.appendingPathComponent("Vendor").path)))
     func mitLicenseCopyMatchesGPSLoggerKit() throws {
         let copy = try Data(contentsOf: Self.repository.appendingPathComponent("Vendor/Licenses/MIT-GPSLoggerKit.txt"))
-        let original = try Data(contentsOf: Self.repository.appendingPathComponent("Packages/GPSLoggerKit/LICENSE"))
+        let original = try Data(contentsOf: Self.checkout("GPSLoggerKit").appendingPathComponent("LICENSE"))
         #expect(copy == original)
     }
 
@@ -71,6 +82,6 @@ struct LicenseCopyTests {
     func gplLicenseFilesMatch() throws {
         let bundled = try Data(contentsOf: Self.repository.appendingPathComponent("Vendor/Licenses/GPL-3.0.txt"))
         #expect(try Data(contentsOf: Self.repository.appendingPathComponent("LICENSE")) == bundled)
-        #expect(try Data(contentsOf: Self.repository.appendingPathComponent("Packages/GPSLoggerKitGPL/LICENSE")) == bundled)
+        #expect(try Data(contentsOf: Self.checkout("GPSLoggerKitGPL").appendingPathComponent("LICENSE")) == bundled)
     }
 }

@@ -661,6 +661,16 @@
         }
       }
     },
+    "Source code of GPSLoggerKit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quellcode von GPSLoggerKit"
+          }
+        }
+      }
+    },
     "Source code of myTracks Loader": {
       "localizations": {
         "de": {
@@ -841,12 +851,12 @@
         }
       }
     },
-    "myTracks Loader contains GPSLoggerKit (copyright 2026 Dirk Stichling), distributed under the MIT License. Its source code is part of the source code of myTracks Loader.": {
+    "myTracks Loader contains GPSLoggerKit (copyright 2026 Dirk Stichling), distributed under the MIT License. Its source code is available in its own repository.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "myTracks Loader enthält GPSLoggerKit (Copyright 2026 Dirk Stichling), verbreitet unter der MIT-Lizenz. Sein Quellcode ist Teil des Quellcodes von myTracks Loader."
+            "value": "myTracks Loader enthält GPSLoggerKit (Copyright 2026 Dirk Stichling), verbreitet unter der MIT-Lizenz. Sein Quellcode ist in einem eigenen Repository verfügbar."
           }
         }
       }

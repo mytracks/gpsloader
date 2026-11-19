@@ -2,8 +2,14 @@
 # Builds, signs (Developer ID), notarizes and staples myTracks Loader and packs the ZIP for users (design.md D10).
 #
 # Usage:
-#   Scripts/release.sh [--skip-notarize] [--allow-unpublished] [--profile <notarytool keychain profile>]
+#   Scripts/release.sh [--publish [--dry-run]] [--skip-notarize] [--allow-unpublished] [--profile <name>]
 #
+#   --publish            after a successful notarization: Git tag <version>, push of the tag and a GitHub release
+#                        with release notes (docs/releases/<version>.md), the ZIP and its checksum; pre-release
+#                        below 1.0.0 (spec release-publishing, "GitHub-Release der App"). Not with --skip-notarize
+#                        or --allow-unpublished.
+#   --dry-run            with --publish: print the tag and release commands instead of running them; may then be
+#                        combined with --skip-notarize and --allow-unpublished to test the script
 #   --skip-notarize      only a signed ZIP (for own tests, not for users)
 #   --allow-unpublished  skip the check that the commit is clean and pushed to origin
 #   --profile            notarytool keychain profile (default gpsloader-notary), used without an API key
@@ -25,13 +31,17 @@ KEY_DIRECTORY="${HOME}/.appstoreconnect/private_keys"
 DEFAULT_ISSUER_ID="69a6de70-16e7-47e3-e053-5b8c7c11a4d1"
 SKIP_NOTARIZE=0
 ALLOW_UNPUBLISHED=0
+PUBLISH=0
+DRY_RUN=0
 
 while (( $# > 0 )); do
     case "$1" in
         --skip-notarize) SKIP_NOTARIZE=1 ;;
         --allow-unpublished) ALLOW_UNPUBLISHED=1 ;;
+        --publish) PUBLISH=1 ;;
+        --dry-run) DRY_RUN=1 ;;
         --profile) shift; PROFILE="${1:?--profile needs a name}" ;;
-        -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
+        -h|--help) sed -n '2,28p' "$0"; exit 0 ;;
         *) echo "Unknown option: $1" >&2; exit 2 ;;
     esac
     shift
@@ -49,8 +59,30 @@ step() { print -P "%F{cyan}==> $1%f"; }
 fail() { print -P "%F{red}release: $1%f" >&2; exit 1; }
 
 cd "${ROOT}"
+run() {
+    if (( DRY_RUN )); then print -r -- "would run: ${(q)@}"; else "$@"; fi
+}
 
 # --- Checks before the long build -------------------------------------------------------------------------
+
+(( DRY_RUN && ! PUBLISH )) && fail "--dry-run only works with --publish"
+if (( PUBLISH && ! DRY_RUN && (SKIP_NOTARIZE || ALLOW_UNPUBLISHED) )); then
+    fail "--publish needs a notarized build of a published commit (no --skip-notarize, no --allow-unpublished)"
+fi
+
+if (( PUBLISH )); then
+    # The version is checked before the build, so that a taken version does not fail after notarization.
+    VERSION=$(sed -n 's/^ *MARKETING_VERSION: *"\{0,1\}\([0-9][0-9.]*\)"\{0,1\}/\1/p' project.yml | head -1)
+    [[ "${VERSION}" =~ '^[0-9]+\.[0-9]+\.[0-9]+$' ]] || fail "no MARKETING_VERSION x.y.z in project.yml"
+    NOTES="docs/releases/${VERSION}.md"
+    step "Checking that ${APP_NAME} ${VERSION} can be published"
+    [[ -f "${NOTES}" ]] || fail "missing release notes ${NOTES}"
+    git rev-parse -q --verify "refs/tags/${VERSION}" >/dev/null && fail "tag ${VERSION} exists already"
+    [[ -z "$(git ls-remote --tags origin "refs/tags/${VERSION}")" ]] || fail "tag ${VERSION} exists on origin"
+    gh auth status >/dev/null 2>&1 || fail "gh is not signed in"
+    gh release view "${VERSION}" >/dev/null 2>&1 && fail "a GitHub release ${VERSION} exists already"
+    echo "ok: no tag or release ${VERSION} yet, release notes ${NOTES}"
+fi
 
 if (( ! SKIP_NOTARIZE && ! ALLOW_UNPUBLISHED )); then
     # GPL-3.0-or-later: the source of every released version is public (openspec/config.yaml).
@@ -98,6 +130,13 @@ mkdir -p "${BUILD}"
 
 step "Generating Xcode project"
 xcodegen generate --quiet
+# Fixed package versions (spec release-publishing, "Pakete in der App per Version"; design D3): XcodeGen writes no
+# Package.resolved, so the versioned one of GPSLoaderKit is copied in and the build may use nothing else.
+RESOLVED="${ROOT}/Packages/GPSLoaderKit/Package.resolved"
+[[ -f "${RESOLVED}" ]] || fail "missing ${RESOLVED}"
+SWIFTPM="${ROOT}/gpsloader.xcodeproj/project.xcworkspace/xcshareddata/swiftpm"
+mkdir -p "${SWIFTPM}"
+cp "${RESOLVED}" "${SWIFTPM}/Package.resolved"
 
 step "Archiving (Release, universal)"
 xcodebuild archive \
@@ -106,6 +145,7 @@ xcodebuild archive \
     -configuration Release \
     -destination 'generic/platform=macOS' \
     -archivePath "${ARCHIVE}" \
+    -onlyUsePackageVersionsFromResolvedFile \
     -quiet
 
 step "Exporting with Developer ID"
@@ -129,7 +169,11 @@ xcodebuild -exportArchive \
     -exportOptionsPlist "${BUILD}/ExportOptions.plist" \
     -quiet
 
-VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "${APP}/Contents/Info.plist")
+BUNDLE_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "${APP}/Contents/Info.plist")
+if (( PUBLISH )); then
+    [[ "${BUNDLE_VERSION}" == "${VERSION}" ]] || fail "bundle version ${BUNDLE_VERSION} differs from project.yml (${VERSION})"
+fi
+VERSION="${BUNDLE_VERSION}"
 BUILD_NUMBER=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "${APP}/Contents/Info.plist")
 ZIP="${BUILD}/${FILE_STEM}-${VERSION}.zip"
 UPLOAD="${BUILD}/${FILE_STEM}-${VERSION}-notarization.zip"
@@ -193,3 +237,16 @@ else
 fi
 echo "Version ${VERSION} (${BUILD_NUMBER}), commit $(git rev-parse --short HEAD)"
 cat "${ZIP}.sha256"
+
+# --- GitHub release ---------------------------------------------------------------------------------------
+
+if (( PUBLISH )); then
+    PRERELEASE=()
+    [[ "${VERSION}" == 0.* ]] && PRERELEASE=(--prerelease)
+    step "Publishing ${APP_NAME} ${VERSION} on GitHub"
+    run git tag -a "${VERSION}" -m "${APP_NAME} ${VERSION}"
+    run git push origin "${VERSION}"
+    run gh release create "${VERSION}" "${ZIP}" "${ZIP}.sha256" --verify-tag --title "${APP_NAME} ${VERSION}" \
+        --notes-file "${NOTES}" "${PRERELEASE[@]}"
+    if (( DRY_RUN )); then echo "Dry run: nothing was tagged or published."; else echo "Published ${APP_NAME} ${VERSION}."; fi
+fi
