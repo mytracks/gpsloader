@@ -25,6 +25,8 @@ Stand: 2026-11-13. Die Changes sind archiviert, diese Tests stehen aber noch aus
 
 ## Direktmodus – Entwickler
 
+- [ ] **Release 0.1.0 von GitHub** (`split-repositories` 6.2): `myTracks-Loader-0.1.0.zip` von https://github.com/mytracks/gpsloader/releases/tag/0.1.0 auf einem Apple-Silicon-Mac und einem Intel-Mac laden, entpacken, starten und ein Gerät auslesen. Prüfen: Die App startet ohne Gatekeeper-Warnung, und das Auslesen gelingt.
+
 - [ ] **SkyTraq** (`skytraq-device-port` 3.2): einen SkyTraq-Logger auslesen und löschen. Prüfen: Punktanzahl und Zeiten wie gpsbabel (`-i skytraq`), danach ist der Logger leer.
 - [ ] **MTK und Holux** (`mtk-device-port` 3.2): einen MTK-Logger (z. B. Qstarz) und einen Holux M-241 auslesen und löschen. Prüfen: Ergebnisse wie gpsbabel, und das Logging läuft danach weiter.
 - [x] **Hauptfenster** (`main-window-sections` 2.2): Umschalter in der Werkzeugleiste (beide Segmente lesbar beschriftet, im hellen und dunklen Modus: bestätigt vom Entwickler am 2026-11-19; in den Snapshots der Debug-Automation fehlt die Beschriftung des gewählten Segments, das liegt an der Aufnahme), ⌘1/⌘2, Drag & Drop aus dem Finder in beiden Bereichen, Klick auf die Ablagefläche. Prüfen: Ablauf wie in den Specs `app-shell` und `file-conversion`. Ergebnis: Alles bestätigt vom Entwickler am 2026-11-19 (Beschriftung hell/dunkel, ⌘1/⌘2, Drag & Drop aus dem Finder, Klick auf die Ablagefläche).

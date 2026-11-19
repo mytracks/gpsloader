@@ -49,7 +49,7 @@ Schritte mit „[Freigabe]“ sind von außen sichtbar und werden erst nach ausd
 
 ## 6. Release
 
-- [ ] 6.1 [Freigabe] myTracks Loader 0.1.0 mit `Scripts/release.sh --publish` veröffentlichen. Prüfen:
+- [x] 6.1 [Freigabe] myTracks Loader 0.1.0 mit `Scripts/release.sh --publish` veröffentlichen. Prüfen:
   - Auf GitHub gibt es das Pre-release `0.1.0` mit ZIP und Prüfsumme.
   - Das heruntergeladene ZIP besteht die Gatekeeper-Prüfung.
   - `Package.resolved` des Tags nennt `0.1.0` beider Pakete.
