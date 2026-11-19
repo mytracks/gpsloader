@@ -34,18 +34,18 @@ Schritte mit „[Freigabe]“ sind von außen sichtbar und werden erst nach ausd
 
 ## 4. gpsloader umstellen
 
-- [ ] 4.1 `Packages/GPSLoaderKit/Package.swift` auf beide URLs mit `.upToNextMinor(from: "0.1.0")` umstellen (D2). `Packages/GPSLoggerKit` und `Packages/GPSLoggerKitGPL` entfernen. Prüfen: `swift test` in `Packages/GPSLoaderKit` und `xcodebuild test` sind grün.
-- [ ] 4.2 `Package.resolved` versionieren, `.gitignore` einschränken und das Übernehmen in `release.sh` ergänzen (D3, offene Frage XcodeGen klären). Prüfen: Ein Release-Build aus einem frischen Checkout löst genau die Versionen aus der versionierten Datei auf (Build-Log, `-onlyUsePackageVersionsFromResolvedFile`).
+- [x] 4.1 `Packages/GPSLoaderKit/Package.swift` auf beide URLs mit `.upToNextMinor(from: "0.1.0")` umstellen (D2). `Packages/GPSLoggerKit` und `Packages/GPSLoggerKitGPL` entfernen. Prüfen: `swift test` in `Packages/GPSLoaderKit` und `xcodebuild test` sind grün.
+- [x] 4.2 `Package.resolved` versionieren, `.gitignore` einschränken und das Übernehmen in `release.sh` ergänzen (D3, offene Frage XcodeGen klären). Prüfen: Ein Release-Build aus einem frischen Checkout löst genau die Versionen aus der versionierten Datei auf (Build-Log, `-onlyUsePackageVersionsFromResolvedFile`).
 - [x] 4.3 Über-Fenster: Quelle von GPSLoggerKit ist `https://github.com/mytracks/GPSLoggerKit` (D8). Prüfen: Snapshot des Über-Fensters (de/en); der Link öffnet das Repository.
-- [ ] 4.4 `Scripts/release.sh --publish` mit den Prüfungen vor dem Build, Tag und `gh release create` (D7) und `docs/releases/0.1.0.md`. Prüfen:
+- [x] 4.4 `Scripts/release.sh --publish` mit den Prüfungen vor dem Build, Tag und `gh release create` (D7) und `docs/releases/0.1.0.md`. Prüfen:
   - Ohne Release-Notes bricht das Skript vor dem Build ab, ebenso bei vorhandenem Tag und mit `--publish --skip-notarize`.
   - Ohne `--publish` entsteht weder Tag noch Release.
   - Ein Trockenlauf zeigt die Befehle für Tag und Release.
 
 ## 5. OpenSpec und Dokumentation in gpsloader
 
-- [ ] 5.1 `openspec/config.yaml` aufteilen (D6): App-Kontext, Vertrieb über GitHub-Releases, Verweise auf die Paket-Repositories, Regel „ein Change arbeitet in genau einem Repository“. Prüfen: Keine Regel steht doppelt oder fehlt; ein Abgleich mit der alten Datei ist im Commit beschrieben.
-- [ ] 5.2 `CLAUDE.md` und `README.md`: Aufteilung der Repositories, lokaler Override (D4), Ablauf für paketübergreifende Änderungen, Releases. Prüfen: Die Befehle im README laufen in einem frischen Checkout.
+- [x] 5.1 `openspec/config.yaml` aufteilen (D6): App-Kontext, Vertrieb über GitHub-Releases, Verweise auf die Paket-Repositories, Regel „ein Change arbeitet in genau einem Repository“. Prüfen: Keine Regel steht doppelt oder fehlt; ein Abgleich mit der alten Datei ist im Commit beschrieben.
+- [x] 5.2 `CLAUDE.md` und `README.md`: Aufteilung der Repositories, lokaler Override (D4), Ablauf für paketübergreifende Änderungen, Releases. Prüfen: Die Befehle im README laufen in einem frischen Checkout.
 
 ## 6. Release
 

@@ -49,18 +49,14 @@ konvertieren“, ⌘2 „Gerät auslesen“). Die App merkt sich den zuletzt gew
 
 ## Tests
 
-Die Geräte- und Protokolllogik liegt im lokalen Swift-Package `Packages/GPSLoaderKit` und ist ohne Hardware testbar:
+Anbindung der Treiber, Transporte, Sitzung und Support-Paket liegen im lokalen Swift-Package `Packages/GPSLoaderKit`
+und sind ohne Hardware testbar:
 
 ```sh
-swift test --package-path Packages/GPSLoggerKit
 swift test --package-path Packages/GPSLoaderKit
 ```
 
-`GPSLoggerKit` zusätzlich auf dem iOS-Simulator (im Paketordner):
-
-```sh
-xcodebuild test -scheme GPSLoggerKit -destination 'platform=iOS Simulator,OS=27.1,name=<iPhone>'
-```
+Die Formate und Geräteprotokolle testen ihre eigenen Repositories (siehe „Pakete“).
 
 Lokalisierung prüfen (nach einem Debug-Build, siehe oben):
 
@@ -115,6 +111,8 @@ Gerät aus dem Katalog auslesen, z. B. gegen ein simuliertes Gerät an einem Pse
 ## Release
 
 ```sh
+Scripts/release.sh --publish            # dazu Tag <Version> und GitHub-Release mit ZIP, Prüfsumme und docs/releases/<Version>.md
+Scripts/release.sh --publish --dry-run --skip-notarize --allow-unpublished   # Skript testen, ohne etwas zu veröffentlichen
 Scripts/release.sh                      # Archiv, Developer-ID-Export, Notarisierung, Stapling -> build/release/myTracks-Loader-<Version>.zip
 Scripts/release.sh --skip-notarize      # nur signiertes ZIP für eigene Tests, nicht für Anwender
 Scripts/release.sh --allow-unpublished  # notarisieren, ohne zu prüfen, dass der Commit sauber und gepusht ist
@@ -135,6 +133,31 @@ Keychain-Profil, das man einmalig anlegt:
 xcrun notarytool store-credentials gpsloader-notary --apple-id <Apple-ID> --team-id 4TNB35NY7G
 ```
 
+## Pakete
+
+Formate und Geräteprotokolle liegen seit 2026-11-19 in eigenen Repositories. Die App bindet sie in
+`Packages/GPSLoaderKit/Package.swift` per URL ein, mit den Ständen aus `Packages/GPSLoaderKit/Package.resolved`:
+
+| Paket | Lizenz | Repository |
+|---|---|---|
+| GPSLoggerKit | MIT, macOS 12+ und iOS/iPadOS 27+ | https://github.com/mytracks/GPSLoggerKit |
+| GPSLoggerKitGPL | GPL-3.0-or-later, nur macOS | https://github.com/mytracks/GPSLoggerKitGPL |
+
+Ablauf für ein Feature, das ein Paket und die App betrifft:
+1. Change und Release im Paket-Repository (`Scripts/release.sh <Version>` dort).
+2. Change hier: Version in `Package.swift` anheben, auflösen (`swift package update` in `Packages/GPSLoaderKit`) und
+   Katalog, Transport oder UI ergänzen.
+
+Gegen einen lokal ausgecheckten Paketstand entwickeln, die Repositories liegen nebeneinander:
+
+```sh
+cd Packages/GPSLoaderKit
+swift package edit GPSLoggerKit --path ../../../GPSLoggerKit       # lokaler Stand statt der URL
+swift package unedit GPSLoggerKit                                  # zurück zur Version aus Package.resolved
+```
+
+In Xcode reicht es, den Paketordner ins Projekt zu ziehen; Xcode nutzt ihn dann statt der URL.
+
 ## App-Icon
 
 Das Icon (`App/AppIcon.icon`, Icon Composer) entsteht aus einer festen Geometrie: der Verlauf von myTracks Neo und ein
@@ -150,10 +173,9 @@ swift Scripts/make-app-icon.swift preview /tmp/icons       # Vorschau aller Vari
 | Ort | Inhalt |
 |---|---|
 | `App/` | AppKit-App (UI, Lokalisierung `Localizable.xcstrings`) |
-| `Packages/GPSLoggerKit/` | Eigenständiges Paket (MIT, macOS 12+ und iOS 27+): Datenmodell, Dateiformate (NMEA, GPX, IGC, FIT, TCX, Suunto SML, KML/KMZ, V-900, iBlue-CSV), Geräteschnittstelle und GNS-2000-Treiber, GPX-Ausgabe. Wird später in ein eigenes Repository ausgelagert; siehe dessen `README.md` und `PROVENANCE.md` |
-| `Packages/GPSLoggerKitGPL/` | Paket für Formate und Treiber, die aus GPL-Quellen portiert sind (GPL-3.0-or-later, nur macOS). Ergänzt den Katalog von GPSLoggerKit; Regeln für Portierungen in `Packages/GPSLoggerKitGPL/README.md` |
 | `Packages/GPSLoaderKit/` | `LoggerCore` (Treibervertrag, Session), `SerialTransport`, `GPXExport` (Dateiname, Schreiben), `DiagnosticCapture`, `FileConversion` (Dateimodus: Erkennen, Zusammenführen), `DeviceDrivers` (Gerätekatalog, Anbindung der Treiber), `HIDTransport` (USB-HID), `BluetoothTransport` (Bluetooth-RFCOMM, GNS 2000), `SupportPackage` (App-Protokoll, Support-Paket), `TestSupport` |
 | `Vendor/Licenses/` | Lizenztexte für das App-Bundle: GPL-3.0 (Kopie von `LICENSE`) und die MIT-Lizenz von GPSLoggerKit |
+| `docs/releases/` | Release-Notes je Version (Text des GitHub-Releases) |
 | `Scripts/` | Release, Bundle-Prüfung, Lokalisierungsprüfung, App-Icon (`make-app-icon.swift`) |
 
 ## Ohne gpsbabel
@@ -172,5 +194,5 @@ anbot (z. B. OziExplorer, Garmin MapSource, CompeGPS); die Liste steht im Propos
 - myTracks Loader (App, `GPSLoaderKit`) und `GPSLoggerKitGPL` stehen unter der **GNU GPL Version 3
   oder später** (GPL-3.0-or-later, siehe `LICENSE`). Wer die App weitergibt, muss den vollständigen Quellcode
   anbieten.
-- `GPSLoggerKit` steht unter der **MIT-Lizenz** (`Packages/GPSLoggerKit/LICENSE`) und enthält keinen aus
+- `GPSLoggerKit` steht unter der **MIT-Lizenz** (Datei `LICENSE` in dessen Repository) und enthält keinen aus
   GPL-Quellen abgeleiteten Code.

@@ -154,4 +154,4 @@ Der Change ändert keinen Swift-Code mit eigener Isolation. Nur Abhängigkeiten 
 
 ## Open Questions
 
-- Kann XcodeGen `Package.resolved` direkt übernehmen (D3)? Das wird bei der Umsetzung geprüft; die Kopie ist der Rückfall.
+- **Geklärt am 2026-11-19 (D3):** XcodeGen 2.46 schreibt keine `Package.resolved`. Deshalb kopiert `release.sh` die Datei von GPSLoaderKit in das erzeugte Projekt. Xcode 27.1 übernimmt sie trotz eines anderen `originHash` unverändert. Mit `-onlyUsePackageVersionsFromResolvedFile` bricht es ab (Exit 74, „out-of-date resolved file“), sobald ein Pin fehlt.

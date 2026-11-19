@@ -41,19 +41,21 @@ Module und Bundle-ID heißen weiter `gpsloader`. Das Icon erzeugt `Scripts/make-
 - Kein gpsbabel in der App (entschieden am 2026-11-13, Change `remove-gpsbabel`); alle Treiber sind nativ.
   Das gpsbabel-1.7.0-Binary der Alt-App (Commit `e0d1f18`) dient nur der Black-Box-Gegenprüfung: in den
   Scratchpad kopieren, nie ins Repository; Aufruf als Prozess mit Argument-Array, nie über eine Shell.
-- Noch offene native Treiber: BG728 und WSG-2000 NAL. GNS2000 läuft über IOBluetooth/RFCOMM (Change `gns2000-driver`).
+- Noch offene native Treiber: BG728 (Paket noch nicht entschieden) und WSG-2000 NAL (GPSLoggerKit, Black-Box). GNS2000 läuft über IOBluetooth/RFCOMM (Change `gns2000-driver`).
 - Bluetooth-Logger nur über `/dev/cu.*`.
 - Keine Python- oder Perl-Abhängigkeit, kein `system()`/`popen()`.
 - Protokoll- und Parser-Logik in UI-unabhängigen Swift-Packages, ohne Hardware testbar.
-- `Packages/GPSLoggerKit`: eigenständiges Paket (macOS 12+, iOS/iPadOS 27+, **MIT-Lizenz**), wird später
-  in ein eigenes Repository ausgelagert. Keine Abhängigkeit auf andere Teile dieses Repositorys.
-  **Clean-Room:** GPL-Quelltext (gpsbabel, igotu2gpx, wsg2000.c u. a.) weder lesen noch übersetzen;
-  nur öffentliche Spezifikationen, eigener myTracks-Code und Black-Box-Beobachtung. Details in `openspec/config.yaml`.
-- `Packages/GPSLoggerKitGPL`: Paket für Portierungen aus GPL-Quellen (**GPL-3.0-or-later**, nur macOS 12+),
-  hängt nur von GPSLoggerKit ab. GPL-Quelltext nur in einem Change lesen, dessen Proposal die Familie diesem
-  Paket zuordnet, und nur für diese Familie; nie bei Arbeit an GPSLoggerKit. Ist eine Familie portiert, bleibt
-  sie dort. Nur Vorlagen mit GPL-3.0-vereinbarer Lizenz; jede portierte Datei trägt die Urheberhinweise der
-  Vorlage. Regeln und Zuordnung der Familien in `openspec/config.yaml` und `Packages/GPSLoggerKitGPL/README.md`.
+- **Pakete in eigenen Repositories** (seit 2026-11-19, Change `split-repositories`), eingebunden in
+  `Packages/GPSLoaderKit/Package.swift` per URL und `.upToNextMinor`, Stände in `Packages/GPSLoaderKit/Package.resolved`:
+  - [GPSLoggerKit](https://github.com/mytracks/GPSLoggerKit) (**MIT**, macOS 12+ und iOS/iPadOS 27+, Clean-Room;
+    auch von myTracks Neo genutzt). Lokal: `/Volumes/Dev/Projects/GPSLoggerKit`.
+  - [GPSLoggerKitGPL](https://github.com/mytracks/GPSLoggerKitGPL) (**GPL-3.0-or-later**, nur macOS, Portierungen).
+    Lokal: `/Volumes/Dev/Projects/GPSLoggerKitGPL`.
+  - Formate und Geräteprotokolle ändern sich nur mit einem Change im jeweiligen Paket-Repository, dort gelten dessen
+    `CLAUDE.md` und `openspec/config.yaml` (Clean-Room bzw. Regeln für Portierungen). **In diesem Repository wird kein
+    GPL-Quelltext gelesen.**
+  - Ein Change arbeitet in genau einem Repository: erst Paket-Change mit Release, dann ein Change hier, der die Version
+    anhebt und Katalog, Transport oder UI ergänzt. Zum Entwickeln gegen lokale Paketstände siehe README, „Pakete“.
 - Lizenz der App: GPL-3.0-or-later (`LICENSE`). Release-Builds brauchen die Adresse des Quellcodes
   (`GPSLOADER_SOURCE_CODE_URL` in `project.yml`).
 - Der Entwickler hat keine i-GotU- und Bluetooth-Logger; diese testen die Anwender.
