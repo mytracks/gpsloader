@@ -6,7 +6,7 @@ Erzeugt aus den ausgelesenen Daten (Tracks, Segmente, Wegpunkte) standardkonform
 ## Requirements
 
 ### Requirement: GPX-1.1-Konformität
-Erzeugte Dateien MUST gültiges GPX 1.1 nach dem Schema `http://www.topografix.com/GPX/1/1` in UTF-8 sein. Das `creator`-Attribut SHALL „gpsloader“ und die App-Version enthalten. Erweiterungen, insbesondere die von myTracks, SHALL die Datei nicht enthalten.
+Erzeugte Dateien MUST gültiges GPX 1.1 nach dem Schema `http://www.topografix.com/GPX/1/1` in UTF-8 sein. Das `creator`-Attribut SHALL „myTracks Loader“ und die App-Version enthalten, etwa „myTracks Loader 0.1.0“. Erweiterungen, insbesondere die von myTracks, SHALL die Datei nicht enthalten.
 
 #### Scenario: Validierung gegen das Schema
 - **WHEN** eine erzeugte Datei gegen das GPX-1.1-XSD geprüft wird
@@ -15,6 +15,10 @@ Erzeugte Dateien MUST gültiges GPX 1.1 nach dem Schema `http://www.topografix.c
 #### Scenario: Keine Erweiterungen
 - **WHEN** eine Datei erzeugt wird
 - **THEN** enthält sie kein `extensions`-Element
+
+#### Scenario: Creator
+- **WHEN** die App in Version 0.1.0 eine Datei erzeugt
+- **THEN** lautet ihr `creator`-Attribut „myTracks Loader 0.1.0“
 
 ### Requirement: Inhalt
 Jeder Track SHALL als `trk` mit Namen und einem oder mehreren `trkseg` ausgegeben werden. Jeder Punkt erscheint als `trkpt` mit Breite und Länge, sofern vorhanden mit Höhe (`ele`) und Zeit (`time`). Wegpunkte SHALL als `wpt` ausgegeben werden. Vorhandene Qualitätsangaben SHALL in der Reihenfolge des GPX-1.1-Schemas als `fix`, `sat`, `hdop`, `vdop` und `pdop` erscheinen. Geschwindigkeit und Kurs SHALL nicht ausgegeben werden.
