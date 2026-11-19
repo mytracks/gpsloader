@@ -1,7 +1,7 @@
 import Foundation
 
 /// App-wide registry that ensures only one operation uses a port or device at a time
-/// (spec `logger-session`, "Nur ein Vorgang gleichzeitig").
+/// (spec `logger-session`, "Only one operation at a time").
 public actor PortReservations {
     private var reserved: Set<String> = []
 

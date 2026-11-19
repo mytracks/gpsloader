@@ -10,7 +10,7 @@ struct RFCOMMStreamTests {
         RFCOMMStream(buffer: RFCOMMInputBuffer(), identifier: "bluetooth:test", interval: 1_000_000)
     }
 
-    /// Scenario "Zeilen in mehreren Paketen": a line arriving in two RFCOMM packets is read as a whole.
+    /// Scenario "Lines in several packets": a line arriving in two RFCOMM packets is read as a whole.
     @Test func lineInTwoPackets() async throws {
         let stream = stream()
         stream.buffer.append(Array("$PMTKLOX,1,0,0011".utf8))
@@ -23,7 +23,7 @@ struct RFCOMMStreamTests {
         #expect(try await stream.read(count: 3, timeout: 1) == Array("$GP".utf8))
     }
 
-    /// Scenario "Gerät trennt die Verbindung": a waiting read fails with an error, not with a timeout.
+    /// Scenario "Device disconnects": a waiting read fails with an error, not with a timeout.
     @Test func deviceClosesTheChannel() async {
         let stream = stream()
         Task {

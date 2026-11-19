@@ -2,7 +2,7 @@ import Foundation
 import SerialTransport
 
 /// Manufacturers of USB-serial chips whose missing driver gpsloader can point out
-/// (spec `device-mode`, "Fehlender Treiber"; design D2 of change device-ports-and-hints).
+/// (spec `device-mode`, "Missing driver"; design D2 of change device-ports-and-hints).
 public struct USBSerialChip: Sendable, Hashable {
     public var vendorID: Int
     /// Manufacturer and chip family, e.g. "Silicon Labs CP210x".
@@ -43,7 +43,7 @@ public struct PresentedPort: Sendable, Equatable {
     public var matchesDevice: Bool
 }
 
-/// Visible ports in the order of the selection (spec `device-mode`, "Anschluss wählen"; design D3):
+/// Visible ports in the order of the selection (spec `device-mode`, "Choose the port"; design D3):
 /// fitting the device, then USB, then Bluetooth, then the rest; system ports are left out.
 public enum PortPresentation {
     public static func list(ports: [SerialPortInfo], for entry: DeviceEntry?) -> [PresentedPort] {

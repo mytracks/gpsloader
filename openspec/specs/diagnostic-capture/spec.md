@@ -1,56 +1,56 @@
 # diagnostic-capture Specification
 
 ## Purpose
-Zeichnet die Kommunikation mit Geräten vollständig auf. Anwender können Fehler an Geräten melden, die dem Entwickler nicht zur Verfügung stehen. Aufzeichnungen dienen zugleich als wiederholbare Test-Fixtures.
+Records the complete communication with devices. Users can report problems with devices that the developer does not have. Captures also serve as repeatable test fixtures.
 
 ## Requirements
 
-### Requirement: Lesbares und maschinenlesbares Format
-Das Format MUST zeilenweise, textbasiert und versioniert sein. Bytes SHALL als Hexadezimalzeichen erscheinen, druckbare ASCII-Zeichen zusätzlich als Text, damit Menschen die Datei lesen und Programme sie verarbeiten können.
+### Requirement: Human- and machine-readable format
+The format MUST be line-based, text-based and versioned. Bytes SHALL appear as hexadecimal digits and printable ASCII characters additionally as text, so that people can read the file and programs can process it.
 
-#### Scenario: Datei im Texteditor
-- **WHEN** eine Aufzeichnung eines NMEA-artigen Dialogs im Texteditor geöffnet wird
-- **THEN** sind die gesendeten und empfangenen Zeilen als Text erkennbar
+#### Scenario: File in a text editor
+- **WHEN** a capture of an NMEA-like dialog is opened in a text editor
+- **THEN** the sent and received lines are recognizable as text
 
-### Requirement: Wiedergabe in Tests
-Eine Aufzeichnung eines seriellen Dialogs MUST sich als Mock-Transport wiedergeben lassen. Ein Treiber erhält dabei auf seine gesendeten Bytes die aufgezeichneten Antworten. Weicht der Treiber vom aufgezeichneten Dialog ab, MUST die Wiedergabe das mit Position und Inhalt melden.
+### Requirement: Replay in tests
+A capture of a serial dialog MUST be replayable as a mock transport. A driver then gets the recorded answers to the bytes it sends. If the driver deviates from the recorded dialog, the replay MUST report that with position and content.
 
-#### Scenario: Wiedergabe eines erfolgreichen Auslesens
-- **WHEN** ein Treiber gegen die Wiedergabe einer erfolgreichen Aufzeichnung läuft
-- **THEN** liefert er dasselbe Ergebnis wie beim aufgezeichneten Vorgang
+#### Scenario: Replay of a successful read
+- **WHEN** a driver runs against the replay of a successful capture
+- **THEN** it returns the same result as in the recorded operation
 
-#### Scenario: Abweichung
-- **WHEN** der Treiber an Position 5 andere Bytes sendet als aufgezeichnet
-- **THEN** schlägt die Wiedergabe mit erwarteten und tatsächlichen Bytes an Position 5 fehl
+#### Scenario: Deviation
+- **WHEN** the driver sends other bytes at position 5 than recorded
+- **THEN** the replay fails with the expected and actual bytes at position 5
 
-### Requirement: Begrenzter Speicherbedarf
-Aufzeichnungen MUST ausschließlich lokal gespeichert werden. Die App SHALL nur die Aufzeichnungen der letzten 10 Vorgänge aufbewahren und ältere automatisch löschen.
+### Requirement: Limited storage
+Captures MUST be stored only locally. The app SHALL keep only the captures of the last 10 operations and delete older ones automatically.
 
-#### Scenario: Elfter Vorgang
-- **WHEN** bei eingeschaltetem Mitschnitt der elfte Vorgang aufgezeichnet wird
-- **THEN** wird die älteste Aufzeichnung gelöscht
+#### Scenario: Eleventh operation
+- **WHEN** the eleventh operation is recorded
+- **THEN** the oldest capture is deleted
 
-### Requirement: Inhalt des Mitschnitts
-Eine Aufzeichnung MUST enthalten:
-- Kopfdaten: App-Version, macOS-Version, Architektur, ob unter Rosetta, Treiber, Port und Parameter
-- alle gesendeten und empfangenen Bytes in der tatsächlichen Reihenfolge, je mit Zeitstempel in Millisekunden
-- Ereignisse wie Öffnen, Schließen, Zeitüberschreitung, Abbruch und Fehler
+### Requirement: Content of the capture
+A capture MUST contain:
+- header data: app version, macOS version, architecture, whether under Rosetta, driver, port and parameters
+- all sent and received bytes in their actual order, each with a timestamp in milliseconds
+- events such as open, close, timeout, cancellation and error
 
-#### Scenario: Serieller Dialog
-- **WHEN** ein Treiber bei eingeschaltetem Mitschnitt 16 Bytes sendet und 3 Bytes empfängt
-- **THEN** enthält die Aufzeichnung einen Eintrag „gesendet“ mit den 16 Bytes und danach einen Eintrag „empfangen“ mit den 3 Bytes, jeweils mit Zeitstempel
+#### Scenario: Serial dialog
+- **WHEN** a driver sends 16 bytes and receives 3 bytes
+- **THEN** the capture contains an entry "sent" with the 16 bytes and after it an entry "received" with the 3 bytes, each with a timestamp
 
-#### Scenario: App unter Rosetta
-- **WHEN** der Anwender die App selbst unter Rosetta gestartet hat und einen Vorgang aufzeichnet
-- **THEN** vermerken die Kopfdaten, dass die App unter Rosetta läuft
+#### Scenario: App under Rosetta
+- **WHEN** the user started the app under Rosetta and records an operation
+- **THEN** the header data notes that the app runs under Rosetta
 
-### Requirement: Aufzeichnung immer aktiv
-Die App SHALL jeden Lese- und Löschvorgang aufzeichnen. Einen Schalter zum Abschalten SHALL es nicht geben. Aufzeichnungen MUST lokal bleiben, bis der Anwender sie in ein Support-Paket übernimmt.
+### Requirement: Capture always on
+The app SHALL record every read and erase operation. There SHALL be no switch to turn it off. Captures MUST stay local until the user includes them in a support package.
 
-#### Scenario: Erster Start
-- **WHEN** die App zum ersten Mal gestartet wird und der Anwender ein Gerät ausliest
-- **THEN** liegt danach ein Mitschnitt dieses Vorgangs vor
+#### Scenario: First start
+- **WHEN** the app is started for the first time and the user reads a device
+- **THEN** a capture of this operation exists afterwards
 
-#### Scenario: Fehlgeschlagener Vorgang
-- **WHEN** ein Vorgang mit einem Fehler endet
-- **THEN** wird sein Mitschnitt ebenso gespeichert wie der eines erfolgreichen Vorgangs
+#### Scenario: Failed operation
+- **WHEN** an operation ends with an error
+- **THEN** its capture is stored just like that of a successful operation

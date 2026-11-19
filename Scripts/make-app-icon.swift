@@ -119,11 +119,11 @@ struct Satellite {
 
 /// The variants shown to the developer (task 3.1).
 let variants: [Int: (title: String, satellite: Satellite)] = [
-    1: ("Satellit diagonal, zwei Funkwellen",
+    1: ("Satellite diagonal, two radio waves",
         Satellite(rotation: 45, scale: 0.92, center: CGPoint(x: 512, y: 540), wingCells: 3, waves: 2, orbit: false)),
-    2: ("Satellit mit Umlaufbahn, eine Funkwelle",
+    2: ("Satellite with orbit, one radio wave",
         Satellite(rotation: 45, scale: 0.78, center: CGPoint(x: 512, y: 530), wingCells: 3, waves: 1, orbit: true)),
-    3: ("Satellit waagerecht, drei Funkwellen",
+    3: ("Satellite horizontal, three radio waves",
         Satellite(rotation: 0, scale: 0.98, center: CGPoint(x: 512, y: 620), wingCells: 3, waves: 3, orbit: false)),
 ]
 

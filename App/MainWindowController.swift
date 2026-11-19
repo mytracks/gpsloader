@@ -3,7 +3,7 @@ import BluetoothTransport
 import HIDTransport
 import LoggerCore
 
-/// The two sections of the main window (spec `app-shell`, "Bereiche des Hauptfensters").
+/// The two sections of the main window (spec `app-shell`, "Sections of the main window").
 enum MainWindowSection: String, CaseIterable {
     case files, device
 
@@ -97,7 +97,7 @@ final class MainWindowController: NSWindowController, NSMenuItemValidation, NSTo
         select(MainWindowSection.allCases[sender.selectedIndex])
     }
 
-    /// Shows a section and remembers it (scenarios "Bereich merken", "Tastenkürzel").
+    /// Shows a section and remembers it (scenarios "Remember the section", "Keyboard shortcut").
     func select(_ section: MainWindowSection) {
         self.section = section
         tabView.selectTabViewItem(withIdentifier: section.rawValue)
@@ -134,7 +134,7 @@ final class MainWindowController: NSWindowController, NSMenuItemValidation, NSTo
         }
         tabView.setContentHuggingPriority(.defaultLow, for: .vertical)
 
-        // Drops are accepted in both sections and switch to "Convert Files" (spec `file-conversion`, "Dateien auswählen").
+        // Drops are accepted in both sections and switch to "Convert Files" (spec `file-conversion`, "Choose files").
         let dropView = FileDropView()
         dropView.acceptsDrops = { [weak self] in self?.conversionPresenter.isConverting == false }
         dropView.onDragHighlight = { [weak self] highlighted in self?.dropZone.isHighlighted = highlighted }

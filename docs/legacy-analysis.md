@@ -1,151 +1,153 @@
-# Analyse: GPS-Logger-Funktionalität in myTracks (Alt-App)
+# Analysis: GPS logger functionality in myTracks (old app)
 
-Dieses Dokument fasst zusammen, wie myTracks heute GPS-Logger ausliest. Es dient als
-fachliche Referenz für die Neuimplementierung in gpsloader. Der Originalcode liegt unter
-`input/mytracks4mac/`. Der Ordner ist per `.gitignore` nicht versioniert, deshalb sind hier
-alle relevanten Details festgehalten. Pfade in diesem Dokument beziehen sich auf
+This document summarizes how myTracks reads GPS loggers today. It serves as the functional reference for the
+reimplementation in myTracks Loader (repository gpsloader). The original code is in `input/mytracks4mac/`. The folder
+is not versioned (`.gitignore`), so all relevant details are recorded here. Paths in this document are relative to
 `input/mytracks4mac/`.
 
-Ergänzend: [legacy-device-catalog.md](legacy-device-catalog.md) enthält alle 143 Geräte-Einträge des
-aktuellen Stands. Geräte, die in früheren Versionen entfernt wurden (i-GotU, Wintec WPL 1000), sind
-hier in den Abschnitten 3.2 und 4 beschrieben.
+In addition: [legacy-device-catalog.md](legacy-device-catalog.md) contains all 143 device entries of the current
+version. Devices that were removed in earlier versions (i-GotU, Wintec WPL 1000) are described here in sections 3.2
+and 4.
 
-Welche Teile gpsloader übernimmt, ist nicht hier festgelegt, sondern in `openspec/config.yaml`.
-Dieses Dokument beschreibt nur das Verhalten der Alt-App.
+Which parts myTracks Loader takes over is not decided here but in `openspec/config.yaml`.
+This document only describes the behavior of the old app.
 
-Die Alt-App ist ein Git-Repository. Gelöschter Code lässt sich mit `git show <commit>^:<pfad>` abrufen.
-Wichtige Commits:
+The old app is a Git repository. Deleted code can be retrieved with `git show <commit>^:<path>`.
+Important commits:
 
-| Commit | Datum | Inhalt |
+| Commit | Date | Content |
 |---|---|---|
-| `b1ac5a3` | 2016-06-11 | initial checkin (die Historie beginnt hier) |
+| `b1ac5a3` | 2016-06-11 | initial checkin (the history starts here) |
 | `fdb8054` | 2025-02-04 | myTracks 4.4.0, gpsbabel 1.9.0 (universal) |
-| `e0d1f18` | 2025-04-19 | „rollback of gpsbabel“: Rückkehr zu gpsbabel 1.7.0 (myTracks 4.4.3) |
-| `3cbc727` | 2026-10-19 | myTracks 4.5.0: Intel-Support, i-GotU und WPL 1000 entfernt, gpsbabel 1.10.0 |
+| `e0d1f18` | 2025-04-19 | "rollback of gpsbabel": back to gpsbabel 1.7.0 (myTracks 4.4.3) |
+| `3cbc727` | 2026-10-19 | myTracks 4.5.0: Intel support, i-GotU and WPL 1000 removed, gpsbabel 1.10.0 |
 
 ---
 
-## 1. Überblick und Begriffe
+## 1. Overview and terms
 
-myTracks kennt drei **GPS-Modi** (`GpsMode` in `DsUtilities/.../DsPreferences`):
+myTracks knows three **GPS modes** (`GpsMode` in `DsUtilities/.../DsPreferences`):
 
-| Modus | Bedeutung | Relevanz für gpsloader |
+| Mode | Meaning | Relevance for myTracks Loader |
 |---|---|---|
-| `GpsModeDirect` | Gerät hängt seriell an (USB-Seriell-Adapter oder Bluetooth-SPP), wird aktiv ausgelesen | **Kern** |
-| `GpsModeUsbStorage` | Gerät ist Massenspeicher oder SD-Karte; Dateien werden ausgewählt und konvertiert | **Kern** (Dateimodus) |
-| `GpsModeLoadMyTracks` | Auslesen über die Fremd-App *LoadMyTracks* (ScriptingBridge, `com.ClueTrust.LoadMyTracks`) | **nicht übernehmen** |
+| `GpsModeDirect` | The device is attached serially (USB serial adapter or Bluetooth SPP) and is read actively | **core** |
+| `GpsModeUsbStorage` | The device is mass storage or an SD card; files are chosen and converted | **core** (file mode) |
+| `GpsModeLoadMyTracks` | Reading through the third-party app *LoadMyTracks* (ScriptingBridge, `com.ClueTrust.LoadMyTracks`) | **not taken over** |
 
-Eine **Logger-Konfiguration** besteht aus:
+A **logger configuration** consists of:
 
-- `device`: Name des seriellen Geräts **ohne** `/dev/cu.`-Präfix (z. B. `SLAB_USBtoUART`, `usbmodem1421`).
-  Sonderwert `auto` bei Geräten, die keine Gerätewahl brauchen.
-- `deviceType`: Treiber-String. Er codiert den Treibertyp (siehe Abschnitt 3).
-- `additionalArguments`: Zusatzargumente für gpsbabel (siehe 3.1).
-- `gpsFileFormat` und `gpsFileAdditionalArguments`: nur für den Dateimodus.
+- `device`: name of the serial device **without** the `/dev/cu.` prefix (for example `SLAB_USBtoUART`, `usbmodem1421`).
+  Special value `auto` for devices that need no device choice.
+- `deviceType`: driver string. It encodes the driver type (see section 3).
+- `additionalArguments`: additional arguments for gpsbabel (see 3.1).
+- `gpsFileFormat` and `gpsFileAdditionalArguments`: only for the file mode.
 
-Mehrere benannte Konfigurationen werden in den UserDefaults gespeichert
+Several named configurations are stored in the user defaults
 (`myTracks/Source/Classes/NewControllers/LoggerConfiguration/LoggerConfigurations.swift`).
-Schlüssel: `LoggerConfigurationsCount`, `LoggerConfigurationName<i>`,
+Keys: `LoggerConfigurationsCount`, `LoggerConfigurationName<i>`,
 `LoggerConfigurationDeviceType<i>`, `LoggerConfigurationDevice<i>`,
 `LoggerConfigurationAdditionalArguments<i>`, `LoggerConfigurationGpsFileFormat<i>`,
-`LoggerConfigurationGpsFileAdditionalArguments<i>` und `LoggerConfigurationGpsMode<i>`.
-myTracks läuft in der Sandbox (`info.stichling.myTracks`), die Werte liegen also in dessen Container.
-Für gpsloader ist **keine Übernahme** dieser Konfigurationen vorgesehen.
+`LoggerConfigurationGpsFileAdditionalArguments<i>` and `LoggerConfigurationGpsMode<i>`.
+myTracks runs in the sandbox (`info.stichling.myTracks`), so the values are in its container.
+myTracks Loader does **not take over** these configurations.
 
-## 2. Ablauf „Daten vom Logger importieren“ (Direktmodus)
+## 2. Flow "Import data from logger" (direct mode)
 
-Quelle: `myTracks/Source/Classes/Controller/MyTracksMainController.m`
+Source: `myTracks/Source/Classes/Controller/MyTracksMainController.m`
 (`importFromGPSDevice:`, `importFromGPSDeviceThread`, `deleteDataFromGPSDevice:`).
 
-1. Ein Hintergrund-Thread startet. Die UI zeigt ein nicht-modales Fortschrittspanel ohne echten Fortschritt.
-2. `GPSBabel importTracksAndWaypointToFile:` schreibt eine temporäre GPX-Datei (`device.gpxx` in Application Support).
-3. Die Gerätenamen werden korrigiert (`correctDeviceNameWithDynamicPrefix:`). Für die Präfixe
-   `usbmodem` und `PL2303` gilt: Existiert `/dev/cu.<device>` nicht mehr, wird das erste
-   `/dev/cu.<prefix>*` genommen. Diese Gerätenamen ändern sich je nach USB-Port.
-4. Der Treiber wird anhand von `deviceType` gewählt (Abschnitt 3).
-5. Die GPX-Datei wird in die Track-Bibliothek importiert. Danach folgt die Nachbearbeitung (Abschnitt 5).
-6. Ergebnisse oder Fehler werden als Alert gemeldet. Texte:
-   - „Error communicating with the GPS device. Please check connection and configuration.“
-   - „The import finished successfully. However no tracks have been created because your logger does not contain any GPS data.“
-   - „%d tracks have been imported.“ oder „… already existing track(s) have been found.“
+1. A background thread starts. The UI shows a non-modal progress panel without real progress.
+2. `GPSBabel importTracksAndWaypointToFile:` writes a temporary GPX file (`device.gpxx` in Application Support).
+3. The device names are corrected (`correctDeviceNameWithDynamicPrefix:`). For the prefixes
+   `usbmodem` and `PL2303`: if `/dev/cu.<device>` no longer exists, the first `/dev/cu.<prefix>*` is taken.
+   These device names change with the USB port.
+4. The driver is chosen by `deviceType` (section 3).
+5. The GPX file is imported into the track library. Post-processing follows (section 5).
+6. Results or errors are reported as alerts. Texts:
+   - "Error communicating with the GPS device. Please check connection and configuration."
+   - "The import finished successfully. However no tracks have been created because your logger does not contain any GPS data."
+   - "%d tracks have been imported." or "… already existing track(s) have been found."
 
-**Löschen** (`deleteDataFromGPSDevice:`) ist nur erlaubt, wenn eine der folgenden Bedingungen gilt:
+**Erasing** (`deleteDataFromGPSDevice:`) is only allowed if one of the following conditions holds:
 
-- Der Treiber ist `wbt*`, `m241*`, `mtk*` oder `skytraq*`.
-- Der Treiber-String enthält `!DEL!`.
-- Es ist ein interner Treiber (`*…`).
+- The driver is `wbt*`, `m241*`, `mtk*` or `skytraq*`.
+- The driver string contains `!DEL!`.
+- It is an internal driver (`*…`).
 
-Sonst erscheint „Deleting is currently only supported for the wbt, mtk and skytraq driver.“
+Otherwise "Deleting is currently only supported for the wbt, mtk and skytraq driver." appears.
 
-Außerdem gibt es `killAllRunningProcesses` (`killall gpsbabel`) als Abbruch beim Beenden der App.
+In addition there is `killAllRunningProcesses` (`killall gpsbabel`) as cancellation when the app quits.
 
-## 3. Treibertypen (Codierung im `deviceType`-String)
+## 3. Driver types (encoding in the `deviceType` string)
 
-Quelle: `DsTrackFramework/Source/Classes/GPSBabel/GPSBabel.m`.
+Source: `DsTrackFramework/Source/Classes/GPSBabel/GPSBabel.m`.
 
-### 3.1 gpsbabel-Treiber (kein Präfix)
+### 3.1 gpsbabel drivers (no prefix)
 
-Der Treibername ist ein gpsbabel-Eingabeformat. Aufruf (Shell über `system()`, Arbeitsverzeichnis `$TMPDIR`):
+The driver name is a gpsbabel input format. Call (shell through `system()`, working directory `$TMPDIR`):
 
 ```
 gpsbabel -t -w -i <type>[<additionalArgs>] -f "/dev/cu.<device>" <filter> -o gpx -F <out.gpx>
 ```
 
-- Beginnt `additionalArguments` mit `,`, wird der Teil direkt an `-i <type>` angehängt.
-  Das sind Format-Optionen, z. B. `,baud=38400,initbaud=38400`. Sonst wird er ans Ende der Kommandozeile angehängt.
-- `!FILTER!` in `additionalArguments`: Alles danach wird als gpsbabel-Filter eingefügt (`-x …`).
-- `#<suffix>` im deviceType: Statt `gpsbabel` wird `gpsbabel<suffix>` aufgerufen. Das ist ein Überbleibsel für mehrere gpsbabel-Versionen.
-- Löschen: `-i <type>,erase<additionalArgs>`; bei `skytraq` `-i skytraq,erase,no-output`.
-  Erlaubt nur für `wbt`, `mtk`, `skytraq` und `m241`. Sonst liefert die Funktion den Code 254.
+- If `additionalArguments` starts with `,`, the part is appended directly to `-i <type>`.
+  These are format options, for example `,baud=38400,initbaud=38400`. Otherwise it is appended to the end of the
+  command line.
+- `!FILTER!` in `additionalArguments`: everything after it is inserted as a gpsbabel filter (`-x …`).
+- `#<suffix>` in the deviceType: `gpsbabel<suffix>` is called instead of `gpsbabel`. This is a leftover for several
+  gpsbabel versions.
+- Erasing: `-i <type>,erase<additionalArgs>`; for `skytraq` `-i skytraq,erase,no-output`.
+  Allowed only for `wbt`, `mtk`, `skytraq` and `m241`. Otherwise the function returns the code 254.
 
-Im Direktmodus verwendete gpsbabel-Treiber (siehe Katalog):
+gpsbabel drivers used in direct mode (see catalog):
 
-| gpsbabel-Format | Geräte (Auswahl) | Löschen | Bemerkung |
+| gpsbabel format | Devices (selection) | Erase | Note |
 |---|---|---|---|
-| `mtk` | Qstarz BT-Q1000/1300/BT-100, iBlue 747, Blumax GPS-4044, iTrek Z1, Photomate 887, Transystem 860E, Networx iGeo | ja | MediaTek-Chipsatz, sehr verbreitet |
-| `m241` | Holux M-241, GPSport 245 | ja | MTK-Variante von Holux |
-| `wbt` | Wintec WBT-100/200/201, G-Rays 2, WSG-1000 | ja | |
-| `skytraq` | SkyTraq Venus, Canmore GT-730FL/740FL/750F, Conrad GT-730/750, Navin MiniHomer, Travel Honey, Gisteq DPL900, Dörr | ja | Baudraten-Optionen `baud`, `initbaud` |
-| `navilink` | Locosys GT-11/GT-31/BGT-31, NaviGPS | nein | |
-| `magellan` | Magellan SporTrak/Meridian | nein | |
-| `itracku` | XAiOX iTrackU | nein | |
+| `mtk` | Qstarz BT-Q1000/1300/BT-100, iBlue 747, Blumax GPS-4044, iTrek Z1, Photomate 887, Transystem 860E, Networx iGeo | yes | MediaTek chipset, very common |
+| `m241` | Holux M-241, GPSport 245 | yes | MTK variant by Holux |
+| `wbt` | Wintec WBT-100/200/201, G-Rays 2, WSG-1000 | yes | |
+| `skytraq` | SkyTraq Venus, Canmore GT-730FL/740FL/750F, Conrad GT-730/750, Navin MiniHomer, Travel Honey, Gisteq DPL900, Dörr | yes | baud rate options `baud`, `initbaud` |
+| `navilink` | Locosys GT-11/GT-31/BGT-31, NaviGPS | no | |
+| `magellan` | Magellan SporTrak/Meridian | no | |
+| `itracku` | XAiOX iTrackU | no | |
 
-#### gpsbabel-Versionen und Formatumfang
+#### gpsbabel versions and format scope
 
-Ab Version 1.8 hat gpsbabel viele alte Formate entfernt. Dazu gehören gerade die Logger-Treiber `wbt`,
-`navilink`, `magellan` und `itracku` sowie die Dateiformate `wintec_tes`, `sbp`, `sbn`, `gopal`,
-`alantrl`, `wbt-bin` und `wbt-tk1`. Das betrifft rund 35 Einträge im Katalog.
+From version 1.8 gpsbabel removed many old formats. Among them are exactly the logger drivers `wbt`,
+`navilink`, `magellan` and `itracku` and the file formats `wintec_tes`, `sbp`, `sbn`, `gopal`,
+`alantrl`, `wbt-bin` and `wbt-tk1`. This affects about 35 entries in the catalog.
 
-| myTracks | gpsbabel | Architektur | entfernte Formate vorhanden? |
+| myTracks | gpsbabel | Architecture | removed formats present? |
 |---|---|---|---|
-| 4.4.0 | 1.9.0 | universal | nein |
-| 4.4.3 | **1.7.0** | nur x86_64 | **ja**: „Rückkehr zu 1.7.0, da einige Dateiformate … nicht mehr unterstützt werden“ |
-| 4.5.0 (aktuell) | 1.10.0 | universal, ab macOS 11 (Qt 6.5.3) | nein |
+| 4.4.0 | 1.9.0 | universal | no |
+| 4.4.3 | **1.7.0** | x86_64 only | **yes**: "back to 1.7.0, because some file formats … are no longer supported" |
+| 4.5.0 (current) | 1.10.0 | universal, from macOS 11 (Qt 6.5.3) | no |
 
-⚠️ Folge: Im aktuellen myTracks 4.5.0 bietet die plist die wbt-, navilink-, magellan- und itracku-Geräte
-weiterhin an, gpsbabel 1.10.0 kennt diese Formate aber nicht mehr. Diese Geräte funktionieren dort also nicht.
+⚠️ Consequence: in the current myTracks 4.5.0 the plist still offers the wbt, navilink, magellan and itracku devices,
+but gpsbabel 1.10.0 no longer knows these formats. So these devices do not work there.
 
-Geprüft wurde das so: Die 1.10.0 aus dem aktuellen Bundle wurde ausgeführt (`gpsbabel -^1` listet 60 Formate).
-Die Binaries aus der Historie wurden mit `strings` auf die Formatnamen untersucht.
-In 1.7.0 vorhanden sind alle im Katalog genutzten Formate **außer** `cetus` und `coto` (Palm OS).
+This was checked like this: the 1.10.0 from the current bundle was run (`gpsbabel -^1` lists 60 formats).
+The binaries from the history were examined with `strings` for the format names.
+1.7.0 contains all formats used in the catalog **except** `cetus` and `coto` (Palm OS).
 
-**gpsbabel 1.7.0** (für gpsloader vorgesehen) ist an zwei Stellen verfügbar:
+**gpsbabel 1.7.0** (planned for myTracks Loader at that time, today only used for black-box cross-checks) is
+available in two places:
 
-- Git-Historie, Commit `e0d1f18`: `myTracks/Source/Resources/X86Only/gpsbabel1_7_0`
-  (identisch mit `X86Only/gpsbabel` in diesem Commit) und
+- Git history, commit `e0d1f18`: `myTracks/Source/Resources/X86Only/gpsbabel1_7_0`
+  (identical to `X86Only/gpsbabel` in this commit) and
   `myTracks/Source/Resources/X86Only/QtCoreGpsBabel.framework` (Qt 5.12.9).
-- Arbeitskopie: `Import/Apps/GPSBabelFE170.app` (gpsbabel 1.7.0 samt Qt-5-Frameworks).
-  `Import/install-gpsbabel170.sh` stellt daraus `gpsbabel` und `QtCoreGpsBabel.framework` zusammen
-  (install_name_tool + codesign mit Developer ID).
+- Working copy: `Import/Apps/GPSBabelFE170.app` (gpsbabel 1.7.0 with Qt 5 frameworks).
+  `Import/install-gpsbabel170.sh` assembles `gpsbabel` and `QtCoreGpsBabel.framework` from it
+  (install_name_tool + codesign with Developer ID).
 
-Eigenschaften: Mach-O **x86_64**, Minimum macOS 10.12. Gelinkt gegen
+Properties: Mach-O **x86_64**, minimum macOS 10.12. Linked against
 `@executable_path/../Frameworks/QtCoreGpsBabel.framework/Versions/A/QtCoreGpsBabel`, CoreFoundation,
-IOKit und DiskArbitration. Auf Apple Silicon braucht es **Rosetta 2**. Fehlt Rosetta, schlägt der Start
-eines Hilfsprozesses mit „Bad CPU type in executable“ fehl. Einen Installationsdialog gibt es dabei nicht.
+IOKit and DiskArbitration. On Apple silicon it needs **Rosetta 2**. Without Rosetta the start of a helper process
+fails with "Bad CPU type in executable". There is no installation dialog.
 
-### 3.2 Interne Treiber (Präfix `*`)
+### 3.2 Internal drivers (prefix `*`)
 
-Sie sind in Objective-C implementiert und implementieren das Protokoll `GpsDriver`
+They are written in Objective-C and implement the protocol `GpsDriver`
 (`DsTrackFramework/Source/Classes/GpsDriver/GpsDriver.h`):
 
 ```objc
@@ -154,259 +156,265 @@ Sie sind in Objective-C implementiert und implementieren das Protokoll `GpsDrive
 - (BOOL)      deleteTracksFromDevice:(NSString*)device options:(NSDictionary*)options;
 ```
 
-Die Track-Liste wird anschließend als GPX exportiert, und zwar ohne myTracks-Extensions.
+The track list is then exported as GPX, without myTracks extensions.
 
 #### `*BG728` – Maptaq Trip IQ (`GpsDriver/BG728.m`)
 
-- Seriell über `AMSerialPort` (`GpsDriver/AMSerialPort/`, Fremdbibliothek): **115200 Baud, 8N1**, Lese-Timeout 30 s.
-- ASCII-Zeilenprotokoll im NMEA-Stil, Zeilenende `\r\n`. Die Prüfsumme ist das XOR aller Zeichen zwischen `$` und `*`, als zweistellige Hex-Zahl.
-- Ablauf:
-  1. `$BG728,0,3*3B` fragt die Zeitzone ab. Antwort: commandId 3, Argument 0 = Zeitzone in **Stunden**.
-  2. `$BG728,0,16*0F` fragt die Anzahl der Punkte ab. Antwort: commandId 16, Argument 0 = Anzahl.
-  3. `$BG728,0,17,<n>*00` fragt Punkt *n* ab (0-basiert). Die Prüfsumme wird hier immer als `00` gesendet; das Gerät ignoriert sie offenbar.
-     Antwort: commandId 17. Argumente: `n, hh:mm:ss, MMDDYY, lat, lon, ele`
-     (Beispiel: `11:54:02`, `051712`, `51.741158`, `8.680967`, `94`).
-     Das Jahr ist `20YY`.
-  4. Löschen: `$BG728,1,18*00`. Antwort: commandId 18.
-- Antwortformat: `$BG728,<commandCode>,<commandId>,<args…>*<cs>`.
-- Fehlerbehandlung: Bei falscher Prüfsumme, fremder Kennung oder unpassender Antwort wird die aktuelle Anfrage erneut gesendet.
-  Nach mehr als 128 Leseversuchen ohne passende Antwort bricht der Treiber ab. Lesefehler-Code 100 (Timeout) wird toleriert.
-- Ergebnis: **ein** Track. Name = Zeitpunkt des ersten Punkts. Der Zeitzonen-Offset (`timezone * 60` Minuten) wird am Track gespeichert.
-  ⚠️ Offen: Es ist nicht geklärt, ob die Gerätezeit UTC oder Lokalzeit ist. Die Alt-App interpretiert den ISO-String ohne Zonenangabe.
-  Das muss mit echter Hardware verifiziert werden.
+- Serial through `AMSerialPort` (`GpsDriver/AMSerialPort/`, third-party library): **115200 baud, 8N1**, read timeout 30 s.
+- ASCII line protocol in NMEA style, line end `\r\n`. The checksum is the XOR of all characters between `$` and `*`,
+  as a two-digit hex number.
+- Flow:
+  1. `$BG728,0,3*3B` queries the time zone. Answer: commandId 3, argument 0 = time zone in **hours**.
+  2. `$BG728,0,16*0F` queries the number of points. Answer: commandId 16, argument 0 = number.
+  3. `$BG728,0,17,<n>*00` queries point *n* (0-based). The checksum is always sent as `00` here; the device
+     apparently ignores it.
+     Answer: commandId 17. Arguments: `n, hh:mm:ss, MMDDYY, lat, lon, ele`
+     (example: `11:54:02`, `051712`, `51.741158`, `8.680967`, `94`).
+     The year is `20YY`.
+  4. Erasing: `$BG728,1,18*00`. Answer: commandId 18.
+- Answer format: `$BG728,<commandCode>,<commandId>,<args…>*<cs>`.
+- Error handling: on a wrong checksum, a foreign identifier or a non-matching answer the current request is sent again.
+  After more than 128 read attempts without a matching answer the driver gives up. Read error code 100 (timeout) is
+  tolerated.
+- Result: **one** track. Name = time of the first point. The time zone offset (`timezone * 60` minutes) is stored on
+  the track.
+  ⚠️ Open: it is not clear whether the device time is UTC or local time. The old app interprets the ISO string without
+  a zone. This has to be verified with real hardware.
 
 #### `*GNS2000` – GNS 2000 / GNS 2000 plus (`GpsDriver/GNS2000.m`)
 
-- **Bluetooth Classic über IOBluetooth**, nicht über `/dev/cu.*`. Der Gerätepfad wird ignoriert.
-  1. Unter `IOBluetoothDevice.pairedDevices` wird das Gerät mit dem Namen `GNS 2000` oder `GNS 2000 plus` gesucht.
-  2. Bestehende Verbindung schließen, `openConnection` aufrufen, jeweils 2 s warten.
-  3. SDP-Query. Den Service mit dem Namen `GNS GPS` suchen und dessen RFCOMM-Kanal öffnen (`openRFCOMMChannelSync`).
-- Das Protokoll ist MTK-basiert mit NMEA-artigen Zeilen und XOR-Prüfsumme. Das Gerät sendet laufend NMEA-Sätze.
-  Die erste Zeile, die mit `$` beginnt, gilt als Signal „bereit“. Erst dann wird die Anfrage gesendet.
-  - Lesen: `$PGNS,R*<cs>`. Antworten:
-    - `$PMTKLOX,0,<anzahlPakete>`: Start.
-    - `$PMTKLOX,1,<paketIndex>,<w1>,<w2>,…`: Daten. Je 4 Hex-Wörter (8 Hex-Zeichen) ergeben einen 16-Byte-Datensatz.
-    - `$PMTKLOX,2`: Ende.
-  - Löschen: `$PGNS,C*<cs>`. Bestätigung: `$PMTK001,…`. Nach mehr als 10 Nicht-`$P`-Zeilen wird die Anfrage wiederholt.
-  - Version (ungenutzt): `$PGNS,V,3`.
-- **16-Byte-Datensatz** (Little Endian):
+- **Bluetooth Classic through IOBluetooth**, not through `/dev/cu.*`. The device path is ignored.
+  1. The device named `GNS 2000` or `GNS 2000 plus` is looked for in `IOBluetoothDevice.pairedDevices`.
+  2. Close an existing connection, call `openConnection`, wait 2 s each.
+  3. SDP query. Look for the service named `GNS GPS` and open its RFCOMM channel (`openRFCOMMChannelSync`).
+- The protocol is MTK-based with NMEA-like lines and an XOR checksum. The device sends NMEA sentences continuously.
+  The first line that starts with `$` counts as the signal "ready". Only then is the request sent.
+  - Read: `$PGNS,R*<cs>`. Answers:
+    - `$PMTKLOX,0,<packetCount>`: start.
+    - `$PMTKLOX,1,<packetIndex>,<w1>,<w2>,…`: data. Every 4 hex words (8 hex characters) form a 16-byte record.
+    - `$PMTKLOX,2`: end.
+  - Erase: `$PGNS,C*<cs>`. Confirmation: `$PMTK001,…`. After more than 10 non-`$P` lines the request is repeated.
+  - Version (unused): `$PGNS,V,3`.
+- **16-byte record** (little endian):
 
-  | Offset | Typ | Inhalt |
+  | Offset | Type | Content |
   |---|---|---|
-  | 0 | UInt32 | Unix-Zeitstempel (UTC) |
-  | 4 | UInt8 | Fix-Typ; nur 1…4 sind gültig |
-  | 5 | Float32 | Breite |
-  | 9 | Float32 | Länge |
-  | 13 | Int16 | Höhe (m) |
-  | 15 | UInt8 | (ungenutzt, vermutlich Prüfsumme) |
+  | 0 | UInt32 | Unix timestamp (UTC) |
+  | 4 | UInt8 | fix type; only 1…4 are valid |
+  | 5 | Float32 | latitude |
+  | 9 | Float32 | longitude |
+  | 13 | Int16 | altitude (m) |
+  | 15 | UInt8 | (unused, probably a checksum) |
 
-  Datensätze aus lauter `FF` gelten als leer und werden übersprungen.
-- **Track-Aufteilung**: Ist ein Zeitstempel kleiner als der vorherige, beginnt ein neuer Track.
-- Track-Namen: Zeitpunkt des ersten Punkts. Die Zeitzone kommt aus den App-Einstellungen.
-- Synchronisation: Die Delegates laufen auf dem Main Thread, der Aufrufer wartet über `NSCondition`.
-  Einen Timeout gibt es nicht; die Alt-App kann hängen bleiben.
+  Records of only `FF` count as empty and are skipped.
+- **Track splitting**: if a timestamp is smaller than the previous one, a new track starts.
+- Track names: time of the first point. The time zone comes from the app settings.
+- Synchronization: the delegates run on the main thread, the caller waits through `NSCondition`.
+  There is no timeout; the old app can hang.
 
-#### i-GotU (Mobile Action), entfernt in myTracks 4.5.0
+#### i-GotU (Mobile Action), removed in myTracks 4.5.0
 
-Quelle: `git show 3cbc727^:DsTrackFramework/Source/Classes/GpsDriver/IGotUGT800.m` (bzw. `IGotU.m`)
-und `git show 3cbc727^:myTracks/Source/Resources/gpslogger.plist`.
+Source: `git show 3cbc727^:DsTrackFramework/Source/Classes/GpsDriver/IGotUGT800.m` (or `IGotU.m`)
+and `git show 3cbc727^:myTracks/Source/Resources/gpslogger.plist`.
 
-Katalog-Einträge vor der Entfernung (alle Typ `usb`):
+Catalog entries before the removal (all of type `usb`):
 
-| Gerät | Treiber | Löschen |
+| Device | Driver | Erase |
 |---|---|---|
-| i-GotU GT-100, GT-120, GT-600 | externes `igotu2gpx0.3.0 dump` bzw. `clear` (Shell-Kommando, `driverurl = skip`) | ja |
-| i-GotU GT-200e | `igotu2gpx0.3.0 dump` | nein |
-| i-gotU GT-800 (und Pro) | interner Treiber `*i-gotUGT800` (`IGotUGT800.m`) | ja |
+| i-GotU GT-100, GT-120, GT-600 | external `igotu2gpx0.3.0 dump` or `clear` (shell command, `driverurl = skip`) | yes |
+| i-GotU GT-200e | `igotu2gpx0.3.0 dump` | no |
+| i-gotU GT-800 (and Pro) | internal driver `*i-gotUGT800` (`IGotUGT800.m`) | yes |
 
-`igotu2gpx` ist ein externes Open-Source-Programm (GPL). Es lag in den Versionen 0.3.0 und 0.4.0 bei
-(Qt 4, boost, libusb 0.1/1.0, **nur x86**). Der Versionshinweis zu 4.5.0 nennt als Grund für die
-Entfernung „fehlende Treiber für Apple Silicon“. Tatsächlich fehlten arm64-Builds dieser Programme;
-einen Kernel-Treiber gab es nicht.
+`igotu2gpx` is an external open source program (GPL). It was bundled in the versions 0.3.0 and 0.4.0
+(Qt 4, boost, libusb 0.1/1.0, **x86 only**). The release note of 4.5.0 names "missing drivers for Apple silicon" as
+the reason for the removal. In fact arm64 builds of these programs were missing; there was no kernel driver.
 
-**Gemeinsames Protokoll** (identisch in `IGotU.m` und `IGotUGT800.m`):
+**Shared protocol** (identical in `IGotU.m` and `IGotUGT800.m`):
 
-- Befehle beginnen mit `0x93`. Das letzte Byte ist die Prüfsumme: `(0 − Summe aller vorherigen Bytes) mod 256`.
-- Eine Antwort beginnt mit `0x93`. Bytes davor werden verworfen.
-- Befehle (Bytes nach `0x93`, Rest mit `00` aufgefüllt):
+- Commands start with `0x93`. The last byte is the checksum: `(0 − sum of all previous bytes) mod 256`.
+- An answer starts with `0x93`. Bytes before it are discarded.
+- Commands (bytes after `0x93`, the rest padded with `00`):
 
-  | Zweck | Befehl | Antwort |
+  | Purpose | Command | Answer |
   |---|---|---|
-  | NMEA-Ausgabe umschalten | `93 01 01 <mode>`; mode 3 vor dem Auslesen, 0 danach | 3 Byte |
-  | Identifikation (USB-Variante) | `93 0A` | 3 Byte, danach 10 Byte: Seriennummer LE32 in Byte 0–3, Modell in Byte 7 (1 = GT-120, 2 = GT-200, 8 = GT-800) |
-  | Modell (GT-800) | `93 05 04 00 03 01 9F` | 6 Byte; Byte 5 == `0x17` bedeutet GT-800 Pro |
-  | Anzahl Punkte | `93 0B 03 00 1D` | GT-800: 6 Byte, Anzahl = `((b[3] & 3) << 16) + BE16(b[4..5])`; USB: 3 Byte, Anzahl = `BE16(b[1..2])` |
-  | Speicher lesen | `93 05 07 <sizeHi> <sizeLo> 04 03 <pos 24 Bit BE>` | 3 Byte, danach `size` Datenbytes |
+  | Switch NMEA output | `93 01 01 <mode>`; mode 3 before reading, 0 afterwards | 3 bytes |
+  | Identification (USB variant) | `93 0A` | 3 bytes, then 10 bytes: serial number LE32 in bytes 0–3, model in byte 7 (1 = GT-120, 2 = GT-200, 8 = GT-800) |
+  | Model (GT-800) | `93 05 04 00 03 01 9F` | 6 bytes; byte 5 == `0x17` means GT-800 Pro |
+  | Number of points | `93 0B 03 00 1D` | GT-800: 6 bytes, number = `((b[3] & 3) << 16) + BE16(b[4..5])`; USB: 3 bytes, number = `BE16(b[1..2])` |
+  | Read memory | `93 05 07 <sizeHi> <sizeLo> 04 03 <pos 24 bit BE>` | 3 bytes, then `size` data bytes |
 
-- Die Daten beginnen bei Adresse `0x1000` und werden in Blöcken von `0x1000` Byte gelesen, bis
-  `Anzahl × 32` Byte erreicht sind.
-- **Datensatz, 32 Byte, Big Endian:**
+- The data starts at address `0x1000` and is read in blocks of `0x1000` bytes until `number × 32` bytes are reached.
+- **Record, 32 bytes, big endian:**
 
-  | Offset | Inhalt |
+  | Offset | Content |
   |---|---|
-  | 0 | Flags: `0x04` Wegpunkt, `0x10` Navigationsdaten ungültig, `0x40` Track-Start. Der Wert `0xF1` markiert einen Debug-Datensatz mit ASCII-Text ab Byte 6. |
-  | 1 | High-Nibble: **Jahr mod 16**; Low-Nibble: Monat |
-  | 2–3 | Tag = `b2 >> 3`; Stunde = `(b2 & 7) * 4 + (b3 >> 6)`; Minute = `b3 & 0x3F` |
-  | 4–5 | Millisekunden (BE16); Sekunde = Wert / 1000 |
-  | 8–11 | Höhe aus Luftdruck, Int32 / 100 |
-  | 12–15 | Breite, Int32 / 1e7 |
-  | 16–19 | Länge, Int32 / 1e7 |
-  | 20–23 | Höhe GPS, Int32 / 100 (wird verwendet; die Luftdruckhöhe ist deaktiviert) |
-  | 29 | Low-Nibble: genutzte Satelliten; High-Nibble: maximal gefundene Satelliten |
-  | 30 | „weight criteria“ (ungenutzt) |
+  | 0 | Flags: `0x04` waypoint, `0x10` navigation data invalid, `0x40` track start. The value `0xF1` marks a debug record with ASCII text from byte 6. |
+  | 1 | high nibble: **year mod 16**; low nibble: month |
+  | 2–3 | day = `b2 >> 3`; hour = `(b2 & 7) * 4 + (b3 >> 6)`; minute = `b3 & 0x3F` |
+  | 4–5 | milliseconds (BE16); second = value / 1000 |
+  | 8–11 | altitude from air pressure, Int32 / 100 |
+  | 12–15 | latitude, Int32 / 1e7 |
+  | 16–19 | longitude, Int32 / 1e7 |
+  | 20–23 | GPS altitude, Int32 / 100 (used; the pressure altitude is disabled) |
+  | 29 | low nibble: used satellites; high nibble: maximum satellites found |
+  | 30 | "weight criteria" (unused) |
 
-- Gültigkeit: nicht ungültig, genutzte Satelliten > 4 und maximal gefundene > 0 (GT-800).
-  Der USB-Code verlangt nur genutzte Satelliten > 0.
-- Das Flag „Track-Start“ beginnt einen neuen Track. Wegpunkte werden zu Trackpunkten mit dem Namen „WPT“.
-- ⚠️ Das Jahr wird relativ zum aktuellen Jahr rekonstruiert (letzte 16 Jahre). Bei sehr alten Daten ist es mehrdeutig.
-- ⚠️ Die Zeit wird ohne Zonenangabe interpretiert. Vermutlich ist es UTC; mangels Testgerät ist das nicht verifiziert.
+- Validity: not invalid, used satellites > 4 and maximum found > 0 (GT-800).
+  The USB code only requires used satellites > 0.
+- The flag "track start" starts a new track. Waypoints become track points with the name "WPT".
+- ⚠️ The year is reconstructed relative to the current year (last 16 years). For very old data it is ambiguous.
+- ⚠️ The time is interpreted without a zone. It is probably UTC; without a test device this is not verified.
 
-**GT-800** (`IGotUGT800.m`): seriell (`/dev/cu.*`) mit **9600 Baud, 8N1**, ohne Flusskontrolle,
-nicht-kanonischer Modus, Lese-Timeout 5 s. Ein Befehl ist **16 Byte** lang.
-Löschen (`purgeMemory`):
+**GT-800** (`IGotUGT800.m`): serial (`/dev/cu.*`) with **9600 baud, 8N1**, no flow control,
+non-canonical mode, read timeout 5 s. A command is **16 bytes** long.
+Erasing (`purgeMemory`):
 
-1. Von Block `0x6FF` abwärts bis 1 wird je mit `Speicher lesen` (16 Byte bei `i × 0x1000`) gesucht,
-   bis der erste Block gefunden ist, der nicht nur aus `FF` besteht.
-2. Ab diesem Block wird für jeden Block die folgende Sequenz gesendet:
-   - `93 06 04 00 00 01 06`, erwartete Antwort `93 00 00`
-   - `93 06 07 00 00 04 20 <pos 24 Bit>`, erwartete Antwort 3 Byte
-   - `93 05 04 00 01 01 05` so lange wiederholen, bis die Antwort `93 00 01 00` lautet
-3. Danach muss der Anwender den Logger abziehen, damit er neu startet. Die Alt-App zeigt dafür einen Hinweis.
+1. From block `0x6FF` downwards to 1, each block is checked with `read memory` (16 bytes at `i × 0x1000`)
+   until the first block is found that does not consist only of `FF`.
+2. From this block on the following sequence is sent for every block:
+   - `93 06 04 00 00 01 06`, expected answer `93 00 00`
+   - `93 06 07 00 00 04 20 <pos 24 bit>`, expected answer 3 bytes
+   - repeat `93 05 04 00 01 01 05` until the answer is `93 00 01 00`
+3. Afterwards the user has to unplug the logger so that it restarts. The old app shows a hint for this.
 
-Die Bedeutung der Schreibbefehle ist nicht dokumentiert; im Code heißen sie `sendUnknownWriteCommand`.
+The meaning of the write commands is not documented; in the code they are called `sendUnknownWriteCommand`.
 
-**GT-100/120/200e/600** (Vorlage `IGotU.m`): USB-Vendor `0x0DF7`, Product `0x0900`. Der GT-800 hat
-über USB die Product-ID `0x0B80`.
+**GT-100/120/200e/600** (template `IGotU.m`): USB vendor `0x0DF7`, product `0x0900`. Over USB the GT-800 has the
+product ID `0x0B80`.
 
-- Ein Befehl wird in **zwei 8-Byte-Hälften** als Control-Transfer gesendet:
-  `bmRequestType 0x21, bRequest 0x09, wValue 0x0200, wIndex 0`. Das entspricht einem HID-`SET_REPORT`.
-- Die Prüfsumme steht im letzten Byte der zweiten Hälfte und umfasst beide Hälften.
-- Antworten kommen über die Interrupt-/Bulk-Pipe.
-- `IGotU.m` war **unfertig** und wurde in keinem plist-Eintrag verwendet: Die Product-ID ist fest auf
-  `0x0B80` gesetzt, gelesen werden höchstens 12 Blöcke, und Löschen ist nicht implementiert.
-- Hypothese, nicht verifiziert: Weil es ein HID-Gerät ist, lässt es sich über IOHIDDevice ohne Kext ansprechen.
+- A command is sent in **two 8-byte halves** as a control transfer:
+  `bmRequestType 0x21, bRequest 0x09, wValue 0x0200, wIndex 0`. This corresponds to an HID `SET_REPORT`.
+- The checksum is in the last byte of the second half and covers both halves.
+- Answers come through the interrupt/bulk pipe.
+- `IGotU.m` was **unfinished** and not used in any plist entry: the product ID is fixed to
+  `0x0B80`, at most 12 blocks are read, and erasing is not implemented.
+- Hypothesis, not verified: because it is an HID device, it can be used through IOHIDDevice without a kext.
 
-### 3.3 Shell-Kommando-Treiber (Präfix `!`)
+### 3.3 Shell command drivers (prefix `!`)
 
-Der deviceType ist eine Shell-Kommandozeile. Ein optionales `!DEL!` trennt das Lösch-Kommando ab:
-`!<importCmd>!DEL!<deleteCmd>`. Platzhalter (`replaceTemplates:` in `GPSBabel.m`):
+The deviceType is a shell command line. An optional `!DEL!` separates the erase command:
+`!<importCmd>!DEL!<deleteCmd>`. Placeholders (`replaceTemplates:` in `GPSBabel.m`):
 
-| Platzhalter | Ersetzung |
+| Placeholder | Replacement |
 |---|---|
-| `$BUNDLE` | Pfad des App-Bundles |
-| `$APP_BUNDLE` | veraltet, wird zu `$BUNDLE/Contents/Resources` (siehe `correctSetting:`) |
-| `$TMPDIR` | Temp-Verzeichnis |
-| `$DEVICE` | `/dev/cu.<device>` (für die Shell gequotet) |
-| `$GPX` und `$GPX_NO_EXT` | Ziel-GPX-Datei mit bzw. ohne Endung |
-| `$INPUTFILE` | Eingabedatei (Dateimodus) |
+| `$BUNDLE` | path of the app bundle |
+| `$APP_BUNDLE` | obsolete, becomes `$BUNDLE/Contents/Resources` (see `correctSetting:`) |
+| `$TMPDIR` | temporary directory |
+| `$DEVICE` | `/dev/cu.<device>` (quoted for the shell) |
+| `$GPX` and `$GPX_NO_EXT` | target GPX file with or without extension |
+| `$INPUTFILE` | input file (file mode) |
 
-Erfolgskriterium beim Import: Die Zieldatei existiert und ist mindestens 10 Byte groß.
+Success criterion of the import: the target file exists and is at least 10 bytes large.
 
-Verwendete Hilfsprogramme (alle unter `myTracks/Source/Resources/`):
+Helper programs used (all below `myTracks/Source/Resources/`):
 
-| Geräte | Hilfsprogramm | Sprache / Lizenz | Bemerkung |
+| Devices | Helper program | Language / license | Note |
 |---|---|---|---|
-| Royaltek RGM-3800, GOSGET S1, RBT-2300 | `rgm3800-rev25.py`, `rbt2300.py` (`-d $DEVICE trackx 0-` bzw. `erase all`) | Python 2, GPLv3 (Karsten Petersen) | RBT-2300 hat ein zusätzliches Feld in `GetInfo` |
-| Gisteq PhotoTrackr DPL700/CD111, XAiOX iTrackU (Nemerix/SiRF III) | `iTU4l/iTU4l.pl` + `iTU4l/sr2x.pl` (vorher `stty 115200 cs8 raw`) | Perl, GPLv2 (Hartmut Schimmel) | Variante über `-i p`, `-i n` oder `-i s` |
-| MainNav | `mainnav-reader-0.5/mainnavdist/…` | Python 2, BSD-2 (Dennis Keitzel) | Löschen mit `-p` |
-| Holux GPSport 245 (Alternative) | zweistufig: `gpsbabel -i m241` und danach `-i m241-bin` | gpsbabel | |
+| Royaltek RGM-3800, GOSGET S1, RBT-2300 | `rgm3800-rev25.py`, `rbt2300.py` (`-d $DEVICE trackx 0-` or `erase all`) | Python 2, GPLv3 (Karsten Petersen) | RBT-2300 has an additional field in `GetInfo` |
+| Gisteq PhotoTrackr DPL700/CD111, XAiOX iTrackU (Nemerix/SiRF III) | `iTU4l/iTU4l.pl` + `iTU4l/sr2x.pl` (before that `stty 115200 cs8 raw`) | Perl, GPLv2 (Hartmut Schimmel) | variant through `-i p`, `-i n` or `-i s` |
+| MainNav | `mainnav-reader-0.5/mainnavdist/…` | Python 2, BSD-2 (Dennis Keitzel) | erase with `-p` |
+| Holux GPSport 245 (alternative) | two-stage: `gpsbabel -i m241` and then `-i m241-bin` | gpsbabel | |
 
-⚠️ **Python 2 ist seit macOS 12.3 nicht mehr vorhanden, und Perl ist von Apple als veraltet markiert.**
-Diese Treiber funktionieren auf aktuellen Systemen in der Alt-App faktisch nicht mehr.
+⚠️ **Python 2 is no longer present since macOS 12.3, and Apple marked Perl as deprecated.**
+These drivers effectively no longer work in the old app on current systems.
 
-Die Variante „Holux GPSport 245 – alternative“ ist ebenfalls ein Shell-Kommando, braucht aber keine Skriptsprache:
+The variant "Holux GPSport 245 – alternative" is also a shell command but needs no script language:
 
-1. `gpsbabel -i m241 -f $DEVICE -o csv -F $TMPDIRm241.csv`; dabei entsteht als Nebenprodukt `data.bin` im Arbeitsverzeichnis.
+1. `gpsbabel -i m241 -f $DEVICE -o csv -F $TMPDIRm241.csv`; as a by-product `data.bin` is created in the working directory.
 2. `gpsbabel -t -w -i m241-bin -f $TMPDIRdata.bin -o gpx -F $GPX`
 
-## 4. Dateimodus (USB-Speicher / SD-Karte)
+## 4. File mode (USB storage / SD card)
 
-- Der Anwender wählt eine oder mehrere Dateien aus. Konvertiert wird mit
-  `gpsbabel -t -w -i <gpsFileFormat> -f <in> -o gpx -F <out> <args> 2>&1`, stderr wird als Fehlertext angezeigt.
-- Beginnt `gpsFileAdditionalArguments` mit `!`, ist es ein Shell-Kommando mit Platzhaltern (wie in 3.3).
-- **NMEA**: Mehrere Dateien werden vor der Konvertierung aneinandergehängt (`cat`), außer wenn das UserDefault
-  `DoNotMergeNMEAFiles` gesetzt ist. Zeilen, die mit `@` beginnen, werden entfernt (Sony GPS CS-1/CS-3).
-- Enthält das Ergebnis keine Tracks, folgt ein zweiter Versuch mit `gpsbabel -i gpx … -x transform,trk=wpt`:
-  Wegpunkte werden zu einem Track.
-- Hilfsprogramme: `suuntoconvert/ambit2gpx.py` (Suunto Ambit XML/SML, Python 2), `wsg2000/wsg2000.c`
+- The user chooses one or more files. They are converted with
+  `gpsbabel -t -w -i <gpsFileFormat> -f <in> -o gpx -F <out> <args> 2>&1`, stderr is shown as the error text.
+- If `gpsFileAdditionalArguments` starts with `!`, it is a shell command with placeholders (as in 3.3).
+- **NMEA**: several files are concatenated before the conversion (`cat`), unless the user default
+  `DoNotMergeNMEAFiles` is set. Lines that start with `@` are removed (Sony GPS CS-1/CS-3).
+- If the result contains no tracks, a second attempt follows with `gpsbabel -i gpx … -x transform,trk=wpt`:
+  waypoints become a track.
+- Helper programs: `suuntoconvert/ambit2gpx.py` (Suunto Ambit XML/SML, Python 2), `wsg2000/wsg2000.c`
   (Wintec WSG-2000 `.NAL`, C, GPL/CC-BY-SA, Greg A. Woods), `fit2tcx` (Garmin).
-  Für TCX gibt es `-i gtrnctr -x transform,rte=trk`, für IGC `-i igc`.
-  ⚠️ Der IGC-Eintrag in der plist enthält einen Tippfehler (`i-o gpx` statt `-o gpx`).
-- Die Liste der angebotenen gpsbabel-Dateiformate (70 Einträge) steht in `GPSBabel.m` (`gpsBabelFileFormats[]`).
-- `cetus` und `coto` (Palm OS) sind schon in gpsbabel 1.7.0 nicht mehr enthalten. Diese Katalog-Einträge sind tot.
+  For TCX there is `-i gtrnctr -x transform,rte=trk`, for IGC `-i igc`.
+  ⚠️ The IGC entry in the plist contains a typo (`i-o gpx` instead of `-o gpx`).
+- The list of offered gpsbabel file formats (70 entries) is in `GPSBabel.m` (`gpsBabelFileFormats[]`).
+- `cetus` and `coto` (Palm OS) are already missing in gpsbabel 1.7.0. These catalog entries are dead.
 
 **WSG-2000 `.NAL`** (`myTracks/Source/Resources/wsg2000/wsg2000.c`, Greg A. Woods, CC-BY-SA/GPLv2):
-eigenes C-Programm (Bundle-ID `info.stichling.wsg2000`). Das Format besteht aus festen Datensätzen
-von **32 Byte**, Little Endian:
+a C program of its own (bundle ID `info.stichling.wsg2000`). The format consists of fixed records of **32 bytes**,
+little endian:
 
-| Feld | Inhalt |
+| Field | Content |
 |---|---|
-| Flags (16 Bit) | Bit 0 Track-Start, Bit 1 Wegpunkt |
-| Zeit (32 Bit, bitgepackt) | Sekunde 6 Bit, Minute 6 Bit, Stunde 5 Bit (vermutlich UTC) |
-| Datum (32 Bit, bitgepackt) | Tag 5 Bit, Monat 4 Bit, Jahr 6 Bit (+2000) |
-| Breite, Länge | Int32 / 1e7 |
-| Höhe | UInt16, Meter |
-| Temperatur | Int8, °C |
-| Luftdruck | UInt16, mbar |
-| Trittfrequenz, Puls | UInt8 |
-| Steigung | Int8, Grad |
-| Kompass, Roll, Yaw | Int16 |
-| Geschwindigkeit | UInt8, km/h |
-| Benutzer | UInt8, 0–3 |
-| Auffüllung | 16 Bit |
+| Flags (16 bit) | bit 0 track start, bit 1 waypoint |
+| Time (32 bit, bit-packed) | second 6 bits, minute 6 bits, hour 5 bits (probably UTC) |
+| Date (32 bit, bit-packed) | day 5 bits, month 4 bits, year 6 bits (+2000) |
+| Latitude, longitude | Int32 / 1e7 |
+| Altitude | UInt16, meters |
+| Temperature | Int8, °C |
+| Air pressure | UInt16, mbar |
+| Cadence, heart rate | UInt8 |
+| Incline | Int8, degrees |
+| Compass, roll, yaw | Int16 |
+| Speed | UInt8, km/h |
+| User | UInt8, 0–3 |
+| Padding | 16 bit |
 
-Die genaue Bit-Anordnung steht in der Struktur `nal_data32_le` in `wsg2000.c`.
+The exact bit layout is in the structure `nal_data32_le` in `wsg2000.c`.
+(This description comes from `wsg2000.c` and is therefore not a permitted source for the clean-room GPSLoggerKit.)
 
-**Wintec WPL 1000 / Navilock NL-456DL Easy Logger**, entfernt in myTracks 4.5.0: Datei `nvpipe.dat` vom
-Gerät. Gelesen wurde sie mit `wpl1000reader`, einem externen Programm (C++, nur x86_64, Oliver Lau 2008/09,
-„Alle Rechte vorbehalten“, **ohne Quellcode**). Das Binary steht noch unter
-`git show 3cbc727^:myTracks/Source/Resources/X86Only/wpl1000reader`; Option `-m` erzeugt eine Datei pro Track.
+**Wintec WPL 1000 / Navilock NL-456DL Easy Logger**, removed in myTracks 4.5.0: file `nvpipe.dat` from the device.
+It was read with `wpl1000reader`, an external program (C++, x86_64 only, Oliver Lau 2008/09, "all rights reserved",
+**without source code**). The binary is still available at
+`git show 3cbc727^:myTracks/Source/Resources/X86Only/wpl1000reader`; option `-m` creates one file per track.
 
-## 5. Nachbearbeitung beim Import
+## 5. Post-processing during the import
 
-Quelle: `DsTrackFramework/Source/Classes/ImportExport/TrackLibraryGPX.m`, `GpxImportConfiguration`.
+Source: `DsTrackFramework/Source/Classes/ImportExport/TrackLibraryGPX.m`, `GpxImportConfiguration`.
 
-- **GPS-Week-Rollover-Korrektur**: Liegt ein Punkt mehr als 512 Wochen in der Vergangenheit, werden
-  1024 Wochen addiert. Das wird so lange wiederholt, bis die Bedingung nicht mehr zutrifft.
-  Abschaltbar per UserDefault `DontCorrectWeekRollover`. Für ältere MTK-Logger ist das relevant.
-- **Zeitzone**: Ist am Track keine Zeitzone gesetzt, nimmt die Alt-App die Zeitzone aus den Einstellungen.
-  In GPX sind Zeiten immer UTC; für gpsloader ist das nur relevant, wenn Geräte Lokalzeit liefern (BG728?).
-- **Dublettenerkennung**: Track-ID `logger:<start>-<ende>`. Das ist myTracks-spezifisch und wird in gpsloader eventuell nicht benötigt.
-- GPX-Export ohne myTracks-Extensions (`GpxExportConfiguration.exportMytracksExtensions = NO`).
+- **GPS week rollover correction**: if a point lies more than 512 weeks in the past, 1024 weeks are added. This is
+  repeated until the condition no longer holds. Can be switched off with the user default `DontCorrectWeekRollover`.
+  Relevant for older MTK loggers.
+- **Time zone**: if no time zone is set on the track, the old app takes the time zone from the settings.
+  In GPX times are always UTC; for myTracks Loader this is only relevant if devices return local time (BG728?).
+- **Duplicate detection**: track ID `logger:<start>-<end>`. This is specific to myTracks and possibly not needed in
+  myTracks Loader.
+- GPX export without myTracks extensions (`GpxExportConfiguration.exportMytracksExtensions = NO`).
 
-## 6. Gerätewahl und Einrichtungsassistent
+## 6. Device choice and setup assistant
 
-Quelle: `myTracks/Source/Classes/Controller/GpsLoggerWizard.m`,
+Source: `myTracks/Source/Classes/Controller/GpsLoggerWizard.m`,
 `NewControllers/Preferences/PrefGpsDevicesViewController.swift`.
 
-- Geräteliste: alle Einträge `/dev/cu.*`.
-- Assistent mit Suche über die Gerätenamen aus `gpslogger.plist`. Die Schritte hängen vom Typ ab:
-  - **USB**: Der Anwender zieht das Gerät ab, und die vorhandenen `cu.*` werden gemerkt. Dann schließt er es an,
-    wartet 5 s und sieht ein neues `cu.*`. Bevorzugt wird `SLAB_USBtoUART`. Wird nichts gefunden,
-    verlinkt der Assistent die Treiber-Downloadseite (`driverurl`, allgemein `http://www.mytracks4mac.info/drivers`).
-  - **Bluetooth**: Der Anwender wählt aus der `cu.*`-Liste (das Gerät muss vorher gekoppelt sein).
-  - `driverurl == "skip"`: keine Gerätewahl, Gerät `auto`.
-- Die USB-Seriell-Chips der Logger sind typischerweise Silicon Labs CP210x (`SLAB_USBtoUART`), Prolific PL2303
-  (`PL2303-*`, `usbserial-*`) oder CDC-ACM (`usbmodem*`). Bisher waren dafür teils Hersteller-Kexts nötig,
-  die nur auf Intel-Macs laufen. Das ist der Anlass für die Auslagerung.
-  (Aktuelle macOS-Versionen bringen für CP210x, PL2303, FTDI und CDC-ACM eigene DriverKit-Treiber mit.
-  Welche Geräte damit ohne Zusatztreiber laufen, ist noch zu prüfen.)
-- Bluetooth-Logger, außer GNS2000, laufen ausschließlich über den seriellen Port `/dev/cu.<Name>`,
-  den macOS nach dem Koppeln anlegt. Mehr konnte die Alt-App nicht.
+- Device list: all entries `/dev/cu.*`.
+- Assistant with a search over the device names from `gpslogger.plist`. The steps depend on the type:
+  - **USB**: the user unplugs the device, and the existing `cu.*` are remembered. Then the user plugs it in,
+    waits 5 s and sees a new `cu.*`. `SLAB_USBtoUART` is preferred. If nothing is found, the assistant links the
+    driver download page (`driverurl`, generally `http://www.mytracks4mac.info/drivers`).
+  - **Bluetooth**: the user chooses from the `cu.*` list (the device must be paired before).
+  - `driverurl == "skip"`: no device choice, device `auto`.
+- The USB serial chips of the loggers are typically Silicon Labs CP210x (`SLAB_USBtoUART`), Prolific PL2303
+  (`PL2303-*`, `usbserial-*`) or CDC-ACM (`usbmodem*`). Until now vendor kexts were partly needed for them, which only
+  run on Intel Macs. This is the reason for moving the logger functions out of myTracks.
+  (Current macOS versions bring DriverKit drivers of their own for CP210x, PL2303, FTDI and CDC-ACM.
+  Which devices work with them without additional drivers is still to be checked.)
+- Bluetooth loggers, except the GNS2000, run exclusively through the serial port `/dev/cu.<name>` that macOS creates
+  after pairing. The old app could not do more.
 
-## 7. Nicht zu übernehmende Funktionen
+## 7. Functions not to be taken over
 
-- Track-Bibliothek, Karten, Geotagging, Dublettenerkennung, Lizenzprüfung (`stripIfNoLicense`).
-- LoadMyTracks-Anbindung (Typ `loadmytracks`, 37 Geräte, hauptsächlich Garmin).
-- Echtzeit-Tracking (`RealtimeTracking.m`: `gpsbabel -T -i NMEA -f /dev/cu.<device> -o csv -F -`), außer es wird ausdrücklich gewünscht.
-- Allgemeine GPX/KML/LOC/GPI-Konvertierungen und `simplifyFile` aus `GPSBabel.m`. Sie dienen der Track-Verwaltung, nicht dem Logger-Auslesen.
-- Logger-Konfigurationen aus myTracks (Abschnitt 1).
-- Alle Treiber, die auf Skriptsprachen basieren (Abschnitt 3.3), sowie `ambit2gpx.py` und `fit2tcx` (Perl).
+- Track library, maps, geotagging, duplicate detection, license check (`stripIfNoLicense`).
+- LoadMyTracks connection (type `loadmytracks`, 37 devices, mainly Garmin).
+- Real-time tracking (`RealtimeTracking.m`: `gpsbabel -T -i NMEA -f /dev/cu.<device> -o csv -F -`), unless explicitly
+  requested.
+- General GPX/KML/LOC/GPI conversions and `simplifyFile` from `GPSBabel.m`. They serve the track management, not
+  reading loggers.
+- Logger configurations from myTracks (section 1).
+- All drivers based on script languages (section 3.3), and `ambit2gpx.py` and `fit2tcx` (Perl).
 
-## 8. Bekannte Schwächen der Alt-Implementierung (nicht nachbauen)
+## 8. Known weaknesses of the old implementation (do not rebuild)
 
-- Shell-Aufrufe über `system()` und `popen()` mit String-Konkatenation (Quoting- und Injection-Risiko).
-- Keine echte Fortschrittsanzeige und kein sauberer Abbruch (nur `killall gpsbabel`).
-- GNS2000 kann ohne Timeout endlos warten. BG728 blockiert synchron im Lesethread.
-- Manuelle Speicherverwaltung (MRC) und Objective-C-Singletons.
-- Abhängigkeit von Python 2 und Perl.
+- Shell calls through `system()` and `popen()` with string concatenation (quoting and injection risk).
+- No real progress display and no clean cancellation (only `killall gpsbabel`).
+- GNS2000 can wait forever without a timeout. BG728 blocks synchronously in the read thread.
+- Manual memory management (MRC) and Objective-C singletons.
+- Dependency on Python 2 and Perl.

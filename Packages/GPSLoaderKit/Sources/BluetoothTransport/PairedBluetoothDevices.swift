@@ -2,7 +2,7 @@ import CoreBluetooth
 import Foundation
 import IOBluetooth
 
-/// The paired Bluetooth devices for the support package (spec `support-package`, "Datenschutz im Support-Paket").
+/// The paired Bluetooth devices for the support package (spec `support-package`, "Privacy in the support package").
 @MainActor
 public enum PairedBluetoothDevices {
     /// Whether gpsloader already has the Bluetooth permission. Reading `CBManager.authorization` never shows a dialog.

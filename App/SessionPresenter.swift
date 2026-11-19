@@ -27,7 +27,7 @@ final class SessionPresenter {
     // MARK: - Reading
 
     /// `failureHints` are added to the message when reading fails (spec `device-mode`,
-    /// "Hinweise zum Gerät"), e.g. "use USB instead of Bluetooth".
+    /// "Device hints"), e.g. "use USB instead of Bluetooth".
     func read(with driver: any LoggerDriver, failureHints: [String] = []) {
         let (session, capture) = makeSession(driver)
         Task {
@@ -61,7 +61,7 @@ final class SessionPresenter {
         }
     }
 
-    /// Spec "Bestätigung vor dem Löschen" (with the warning for experimental drivers).
+    /// Spec "Confirmation before erasing" (with the warning for experimental drivers).
     private func confirmErase(_ descriptor: DriverDescriptor, completion: @escaping (EraseConfirmation?) -> Void) {
         let alert = NSAlert()
         alert.alertStyle = .critical
@@ -157,7 +157,7 @@ final class SessionPresenter {
         }
     }
 
-    /// Spec "Ergebnis speichern".
+    /// Spec "Save the result".
     private func save(_ recording: Recording, device: String) {
         let suggestedName = GPXFileName.suggested(device: device, date: Date())
         #if DEBUG
@@ -191,7 +191,7 @@ final class SessionPresenter {
     }
 
     /// Spec "Einheitliche Fehlermeldungen": message, hint and technical detail. Failed operations also offer
-    /// "Create Support Package…" (spec `support-package`, "Support-Paket erstellen").
+    /// "Create Support Package…" (spec `support-package`, "Create a support package").
     func showError(_ error: LoggerError, offerSupportPackage: Bool = false, hints: [String] = []) {
         let alert = NSAlert()
         alert.alertStyle = .warning
@@ -221,7 +221,7 @@ final class SessionPresenter {
     }
 }
 
-/// Progress window (child of the main window) with a progress indicator, the current step and a Cancel button (spec "Fortschritt", "Abbruch").
+/// Progress window (child of the main window) with a progress indicator, the current step and a Cancel button (spec "Progress", "Cancellation").
 @MainActor
 final class ProgressSheetController: NSWindowController {
     /// Two indicators instead of switching one between modes: after an animated indeterminate phase,

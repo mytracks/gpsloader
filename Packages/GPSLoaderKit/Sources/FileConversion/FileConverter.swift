@@ -2,7 +2,7 @@ import Foundation
 import GPSLoggerKit
 import GPSLoggerKitGPL
 
-/// The formats of the app: GPSLoggerKit followed by GPSLoggerKitGPL (spec `file-conversion`, "Unterstützte Formate").
+/// The formats of the app: GPSLoggerKit followed by GPSLoggerKitGPL (spec `file-conversion`, "Supported formats").
 public enum AppFormats {
     /// The catalog used by the file conversion.
     public static let catalog = FormatCatalog.standard.adding(GPLFileFormats.all)

@@ -1,85 +1,85 @@
 # logger-session Specification
 
 ## Purpose
-Der einheitliche Ablauf eines Auslese- oder Löschvorgangs an einem GPS-Logger, unabhängig vom konkreten Treiber: Fortschritt, Abbruch, Zeitlimits, Fehlermeldungen, Bestätigung vor dem Löschen und Speichern des Ergebnisses als GPX.
+The uniform flow of a read or erase operation on a GPS logger, independent of the specific driver: progress, cancellation, time limits, error messages, confirmation before erasing and saving the result as GPX.
 
 ## Requirements
 
-### Requirement: Einheitlicher Treibervertrag
-Jeder Treiber MUST über denselben Vertrag angesprochen werden. Er umfasst Auslesen, optional Löschen, die Angabe, ob Löschen unterstützt und ob es als experimentell eingestuft ist, sowie Fortschrittsmeldungen. Die Sitzung SHALL nur über diesen Vertrag mit Treibern arbeiten.
+### Requirement: Uniform driver contract
+Every driver MUST be used through the same contract. It covers reading, optionally erasing, whether erasing is supported and whether it is considered experimental, and progress reports. The session SHALL work with drivers only through this contract.
 
-#### Scenario: Treiber ohne Löschfunktion
-- **WHEN** ein Treiber angibt, dass er Löschen nicht unterstützt
-- **THEN** bietet die Sitzung für dieses Gerät keine Löschaktion an
+#### Scenario: Driver without erasing
+- **WHEN** a driver states that it does not support erasing
+- **THEN** the session offers no erase action for this device
 
-#### Scenario: Experimentelles Löschen
-- **WHEN** ein Treiber Löschen als experimentell einstuft
-- **THEN** weist die Sitzung vor der Bestätigung ausdrücklich darauf hin, dass das Löschen nicht mit einem echten Gerät getestet wurde
+#### Scenario: Experimental erasing
+- **WHEN** a driver considers erasing experimental
+- **THEN** the session points out explicitly before the confirmation that erasing was not tested with a real device
 
-### Requirement: Fortschritt
-Während eines Vorgangs SHALL die Sitzung den Fortschritt melden: bestimmt mit gelesenen und erwarteten Einheiten, sobald der Treiber die Gesamtmenge kennt, sonst unbestimmt.
+### Requirement: Progress
+During an operation the session SHALL report the progress: determinate with read and expected units as soon as the driver knows the total, otherwise indeterminate.
 
-#### Scenario: Bestimmter Fortschritt
-- **WHEN** ein Treiber meldet, dass 250 von 1000 Punkten gelesen sind
-- **THEN** zeigt die Sitzung einen Fortschritt von 25 %
+#### Scenario: Determinate progress
+- **WHEN** a driver reports that 250 of 1000 points have been read
+- **THEN** the session shows a progress of 25 %
 
-#### Scenario: Unbestimmter Fortschritt
-- **WHEN** ein Treiber keine Gesamtmenge kennt
-- **THEN** zeigt die Sitzung einen unbestimmten Fortschritt mit der Beschreibung des aktuellen Schritts
+#### Scenario: Indeterminate progress
+- **WHEN** a driver does not know the total
+- **THEN** the session shows an indeterminate progress with the description of the current step
 
-### Requirement: Zeitlimit ohne Antwort
-Erhält ein Vorgang über die vom Treiber festgelegte Zeit keine Daten vom Gerät, MUST die Sitzung ihn mit dem Fehler „Zeitüberschreitung“ beenden, statt unbegrenzt zu warten.
+### Requirement: Time limit without an answer
+If an operation receives no data from the device for longer than the time set by the driver, the session MUST end it with the error "timeout" instead of waiting without limit.
 
-#### Scenario: Gerät antwortet nicht
-- **WHEN** ein Gerät nach dem Öffnen der Verbindung keine Daten sendet
-- **THEN** endet der Vorgang nach dem Zeitlimit mit dem Fehler „Zeitüberschreitung“ und einem Hinweis, Verbindung und Gerätewahl zu prüfen
+#### Scenario: Device does not answer
+- **WHEN** a device sends no data after the connection was opened
+- **THEN** the operation ends after the time limit with the error "timeout" and a hint to check the connection and the device choice
 
-### Requirement: Ergebnis speichern
-Nach erfolgreichem Auslesen SHALL die Sitzung das Ergebnis als GPX-Datei an einem vom Anwender gewählten Ort speichern. Der vorgeschlagene Dateiname MUST Gerätenamen sowie Datum und Uhrzeit des Auslesens enthalten.
+### Requirement: Save the result
+After a successful read the session SHALL save the result as a GPX file at a place chosen by the user. The suggested file name MUST contain the device name and the date and time of reading.
 
-#### Scenario: Erfolgreiches Auslesen
-- **WHEN** ein Treiber einen Track mit 120 Punkten liefert
-- **THEN** schlägt die Sitzung einen Dateinamen wie „Gerätename 2026-11-02 14-30.gpx“ vor
-- **AND** schreibt nach Bestätigung eine GPX-Datei mit diesen 120 Punkten
+#### Scenario: Successful read
+- **WHEN** a driver returns a track with 120 points
+- **THEN** the session suggests a file name like "Device name 2026-11-02 14-30.gpx"
+- **AND** after confirmation writes a GPX file with these 120 points
 
-#### Scenario: Keine Daten auf dem Gerät
-- **WHEN** ein Treiber erfolgreich ausliest, aber keine Punkte und keine Wegpunkte liefert
-- **THEN** meldet die Sitzung, dass der Logger keine Daten enthält, und schreibt keine Datei
+#### Scenario: No data on the device
+- **WHEN** a driver reads successfully but returns no points and no waypoints
+- **THEN** the session reports that the logger contains no data and writes no file
 
-### Requirement: Bestätigung vor dem Löschen
-Die Sitzung MUST einen Löschvorgang nur nach einer ausdrücklichen Bestätigung des Anwenders starten. Der Bestätigungsdialog MUST darauf hinweisen, dass gelöschte Daten nicht wiederhergestellt werden können.
+### Requirement: Confirmation before erasing
+The session MUST start an erase operation only after an explicit confirmation by the user. The confirmation dialog MUST point out that erased data cannot be restored.
 
-#### Scenario: Löschen abgelehnt
-- **WHEN** der Anwender den Bestätigungsdialog für das Löschen abbricht
-- **THEN** wird kein Befehl an das Gerät gesendet
+#### Scenario: Erasing declined
+- **WHEN** the user cancels the confirmation dialog for erasing
+- **THEN** no command is sent to the device
 
-#### Scenario: Löschen bestätigt
-- **WHEN** der Anwender das Löschen bestätigt und der Treiber erfolgreich löscht
-- **THEN** meldet die Sitzung, dass die Daten gelöscht wurden
+#### Scenario: Erasing confirmed
+- **WHEN** the user confirms erasing and the driver erases successfully
+- **THEN** the session reports that the data has been erased
 
-### Requirement: Nur ein Vorgang gleichzeitig
-Die App MUST verhindern, dass zwei Vorgänge gleichzeitig dasselbe Gerät oder denselben Port verwenden.
+### Requirement: Only one operation at a time
+The app MUST prevent two operations from using the same device or the same port at the same time.
 
-#### Scenario: Zweiter Start während laufendem Vorgang
-- **WHEN** ein Vorgang läuft und der Anwender einen weiteren Vorgang für denselben Port starten will
-- **THEN** wird der zweite Vorgang nicht gestartet und der Anwender erhält einen Hinweis
+#### Scenario: Second start during a running operation
+- **WHEN** an operation runs and the user wants to start another operation for the same port
+- **THEN** the second operation is not started and the user gets a hint
 
-### Requirement: Abbruch eines Vorgangs
-Der Anwender MUST jeden laufenden Vorgang abbrechen können. Nach einem Abbruch SHALL die Sitzung alle Geräteverbindungen innerhalb von 5 Sekunden freigeben. Teilergebnisse SHALL sie verwerfen.
+### Requirement: Cancelling an operation
+The user MUST be able to cancel every running operation. After a cancellation the session SHALL release all device connections within 5 seconds. It SHALL discard partial results.
 
-#### Scenario: Abbruch beim Auslesen
-- **WHEN** der Anwender während des Auslesens „Abbrechen“ wählt
-- **THEN** endet der Vorgang mit dem Status „abgebrochen“
-- **AND** es wird keine GPX-Datei geschrieben
-- **AND** der serielle Port ist anschließend wieder frei
+#### Scenario: Cancel while reading
+- **WHEN** the user chooses "Cancel" while reading
+- **THEN** the operation ends with the status "cancelled"
+- **AND** no GPX file is written
+- **AND** the serial port is free again afterwards
 
-### Requirement: Fehlermeldungen der Sitzung
-Die Sitzung SHALL Fehler als verständliche, lokalisierte Meldung mit Fehlerart und technischem Detail ausgeben. Fehlerarten sind: Gerät nicht gefunden, Port belegt, Zeitüberschreitung, Protokollfehler, Schreibfehler, abgebrochen.
+### Requirement: Error messages of the session
+The session SHALL report errors as understandable, localized messages with the kind of error and the technical detail. The kinds of error are: device not found, port busy, timeout, protocol error, write error, cancelled.
 
-#### Scenario: Port belegt
-- **WHEN** der gewählte serielle Port bereits von einem anderen Programm geöffnet ist
-- **THEN** meldet die Sitzung „Port belegt“ mit dem Portnamen
+#### Scenario: Port busy
+- **WHEN** the chosen serial port is already open in another program
+- **THEN** the session reports "port busy" with the port name
 
-#### Scenario: Protokollfehler
-- **WHEN** ein Treiber eine unerwartete Antwort des Geräts meldet
-- **THEN** meldet die Sitzung „Protokollfehler“ und zeigt die Meldung des Treibers als Detail
+#### Scenario: Protocol error
+- **WHEN** a driver reports an unexpected answer of the device
+- **THEN** the session reports "protocol error" and shows the driver's message as detail

@@ -1,7 +1,7 @@
 import Foundation
 import GPSLoggerKit
 
-/// Progress of a running operation (spec `logger-session`, "Fortschritt").
+/// Progress of a running operation (spec `logger-session`, "Progress").
 public enum ProgressUpdate: Sendable, Equatable {
     /// `completed` of `total` units (points, bytes, blocks, ...) are done.
     case determinate(completed: Int, total: Int, step: String?)
@@ -71,7 +71,7 @@ public struct DriverContext: Sendable {
     }
 }
 
-/// The contract every driver implements (spec `logger-session`, "Einheitlicher Treibervertrag").
+/// The contract every driver implements (spec `logger-session`, "Uniform driver contract").
 ///
 /// Drivers receive their transport (or gpsbabel runner) when they are created and must
 /// react to task cancellation by throwing `LoggerError(.cancelled)` or `CancellationError`.

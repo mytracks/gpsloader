@@ -1,108 +1,108 @@
 # serial-transport Specification
 
 ## Purpose
-Byteweise Kommunikation mit GPS-Loggern über serielle Ports (`/dev/cu.*`), wie sie USB-Seriell-Adapter und gekoppelte Bluetooth-Geräte bereitstellen. Die Kommunikation hat feste Zeitlimits und lässt sich jederzeit abbrechen.
+Byte-level communication with GPS loggers over serial ports (`/dev/cu.*`) as provided by USB serial adapters and paired Bluetooth devices. The communication has fixed time limits and can be cancelled at any time.
 
 ## Requirements
 
-### Requirement: Ports ermitteln
-Das System SHALL alle aktuell vorhandenen seriellen Ports `/dev/cu.*` auflisten. Für USB-Geräte SHALL es, soweit verfügbar, Hersteller-ID, Produkt-ID und Produktnamen mitliefern.
+### Requirement: List ports
+The system SHALL list all serial ports `/dev/cu.*` that currently exist. For USB devices it SHALL also provide vendor ID, product ID and product name where available.
 
-#### Scenario: USB-Seriell-Adapter angeschlossen
-- **WHEN** ein Logger mit einem CP210x-Adapter angeschlossen ist
-- **THEN** enthält die Liste den Port (z. B. `/dev/cu.SLAB_USBtoUART`) mit Hersteller- und Produkt-ID
+#### Scenario: USB serial adapter connected
+- **WHEN** a logger with a CP210x adapter is connected
+- **THEN** the list contains the port (for example `/dev/cu.SLAB_USBtoUART`) with vendor and product ID
 
-#### Scenario: Gekoppeltes Bluetooth-Gerät
-- **WHEN** ein gekoppelter Bluetooth-Logger einen Port `/dev/cu.<Name>` bereitstellt
-- **THEN** enthält die Liste diesen Port ohne USB-Angaben
+#### Scenario: Paired Bluetooth device
+- **WHEN** a paired Bluetooth logger provides a port `/dev/cu.<name>`
+- **THEN** the list contains this port without USB data
 
-### Requirement: Port-Änderungen erkennen
-Das System SHALL melden, wenn serielle Ports hinzukommen oder verschwinden, damit die UI die Liste ohne Neustart aktualisieren kann.
+### Requirement: Detect port changes
+The system SHALL report when serial ports appear or disappear, so that the UI can update the list without a restart.
 
-#### Scenario: Gerät wird eingesteckt
-- **WHEN** während die App läuft ein USB-Seriell-Gerät eingesteckt wird
-- **THEN** wird ein neuer Port gemeldet
+#### Scenario: Device is plugged in
+- **WHEN** a USB serial device is plugged in while the app runs
+- **THEN** a new port is reported
 
-### Requirement: Port öffnen und konfigurieren
-Das System SHALL einen Port exklusiv öffnen können, mit einer angegebenen Baudrate (mindestens 4800, 9600, 19200, 38400, 57600, 115200), 8 Datenbits, ohne Parität, 1 Stoppbit, ohne Flusskontrolle und im Rohmodus.
+### Requirement: Open and configure a port
+The system SHALL be able to open a port exclusively with a given baud rate (at least 4800, 9600, 19200, 38400, 57600, 115200), 8 data bits, no parity, 1 stop bit, no flow control and in raw mode.
 
-#### Scenario: Öffnen mit 115200 Baud
-- **WHEN** ein Treiber einen vorhandenen Port mit 115200 Baud anfordert
-- **THEN** ist der Port mit 115200 8N1 im Rohmodus geöffnet
+#### Scenario: Open with 115200 baud
+- **WHEN** a driver requests an existing port with 115200 baud
+- **THEN** the port is open with 115200 8N1 in raw mode
 
-#### Scenario: Port existiert nicht
-- **WHEN** ein Treiber einen nicht vorhandenen Port öffnen will
-- **THEN** schlägt das Öffnen mit dem Fehler „Gerät nicht gefunden“ fehl
+#### Scenario: Port does not exist
+- **WHEN** a driver wants to open a port that does not exist
+- **THEN** opening fails with the error "device not found"
 
-#### Scenario: Port bereits geöffnet
-- **WHEN** ein Port exklusiv von einem anderen Prozess geöffnet ist
-- **THEN** schlägt das Öffnen mit dem Fehler „Port belegt“ fehl
+#### Scenario: Port already open
+- **WHEN** a port is open exclusively in another process
+- **THEN** opening fails with the error "port busy"
 
-### Requirement: Lesen mit Zeitlimit
-Das System SHALL Lesevorgänge mit Zeitlimit anbieten: eine bestimmte Anzahl Bytes oder alles bis zu einer Endmarkierung (z. B. `\r\n`). Läuft das Zeitlimit ohne vollständige Daten ab, MUST der Lesevorgang mit „Zeitüberschreitung“ enden.
+### Requirement: Read with a time limit
+The system SHALL offer reads with a time limit: a certain number of bytes or everything up to a terminator (for example `\r\n`). If the time limit expires without complete data, the read MUST end with "timeout".
 
-#### Scenario: Zeile lesen
-- **WHEN** das Gerät `$TEST,1,2\r\n` sendet und eine Zeile bis `\r\n` angefordert ist
-- **THEN** liefert der Lesevorgang die Zeile ohne die Endmarkierung
+#### Scenario: Read a line
+- **WHEN** the device sends `$TEST,1,2\r\n` and a line up to `\r\n` is requested
+- **THEN** the read returns the line without the terminator
 
-#### Scenario: Daten in Teilstücken
-- **WHEN** 4096 Bytes angefordert sind und das Gerät sie in mehreren Teilstücken sendet
-- **THEN** liefert der Lesevorgang erst nach allen 4096 Bytes
+#### Scenario: Data in pieces
+- **WHEN** 4096 bytes are requested and the device sends them in several pieces
+- **THEN** the read returns only after all 4096 bytes
 
-#### Scenario: Gerät schweigt
-- **WHEN** innerhalb des Zeitlimits keine Daten eintreffen
-- **THEN** endet der Lesevorgang mit „Zeitüberschreitung“
+#### Scenario: Device is silent
+- **WHEN** no data arrives within the time limit
+- **THEN** the read ends with "timeout"
 
-### Requirement: Schreiben
-Das System SHALL Bytefolgen vollständig an das Gerät senden. Ein Schreibfehler MUST als Fehler gemeldet werden.
+### Requirement: Write
+The system SHALL send byte sequences completely to the device. A write error MUST be reported as an error.
 
-#### Scenario: Befehl senden
-- **WHEN** ein Treiber 16 Bytes sendet
-- **THEN** werden alle 16 Bytes an den Port übergeben
+#### Scenario: Send a command
+- **WHEN** a driver sends 16 bytes
+- **THEN** all 16 bytes are passed to the port
 
-### Requirement: Abbruch und Freigabe
-Das System MUST einen laufenden Lese- oder Schreibvorgang bei einem Abbruch sofort beenden. Den Port SHALL es in jedem Fall freigeben: bei Erfolg, bei Fehler und bei Abbruch.
+### Requirement: Cancellation and release
+The system MUST end a running read or write at once on cancellation. It SHALL release the port in every case: on success, on error and on cancellation.
 
-#### Scenario: Abbruch während des Lesens
-- **WHEN** ein Lesevorgang auf Daten wartet und abgebrochen wird
-- **THEN** endet der Lesevorgang mit „abgebrochen“ und der Port ist geschlossen
+#### Scenario: Cancel while reading
+- **WHEN** a read waits for data and is cancelled
+- **THEN** the read ends with "cancelled" and the port is closed
 
-#### Scenario: Gerät wird abgezogen
-- **WHEN** das Gerät während der Kommunikation entfernt wird
-- **THEN** endet der laufende Vorgang mit einem Fehler und der Port ist freigegeben
+#### Scenario: Device is unplugged
+- **WHEN** the device is removed during the communication
+- **THEN** the running operation ends with an error and the port is released
 
-### Requirement: Austauschbarer Transport
-Treiber MUST über eine Transport-Abstraktion kommunizieren. So lässt sich derselbe Treiber ohne Hardware gegen einen vorgegebenen oder aufgezeichneten Gerätedialog testen.
+### Requirement: Exchangeable transport
+Drivers MUST communicate through a transport abstraction. So the same driver can be tested without hardware against a given or recorded device dialog.
 
-#### Scenario: Treiber gegen Mock-Transport
-- **WHEN** ein Treiber mit einem Mock-Transport ausgeführt wird, der auf einen erwarteten Befehl eine vorgegebene Antwort liefert
-- **THEN** verhält sich der Treiber so, als wäre ein echtes Gerät angeschlossen
+#### Scenario: Driver against a mock transport
+- **WHEN** a driver runs with a mock transport that returns a given answer to an expected command
+- **THEN** the driver behaves as if a real device were connected
 
-#### Scenario: Unerwarteter Befehl im Mock
-- **WHEN** ein Treiber einen Befehl sendet, den der Mock-Transport nicht erwartet
-- **THEN** schlägt der Test mit einer Meldung fehl, die erwarteten und tatsächlichen Befehl nennt
+#### Scenario: Unexpected command in the mock
+- **WHEN** a driver sends a command that the mock transport does not expect
+- **THEN** the test fails with a message that names the expected and the actual command
 
-### Requirement: Baudrate wechseln
-Ein geöffneter Port SHALL seine Baudrate auf jede unterstützte Rate umstellen können, ohne geschlossen zu werden. Eine nicht unterstützte Rate MUST mit einem Protokollfehler abgelehnt werden.
+### Requirement: Change the baud rate
+An open port SHALL be able to switch its baud rate to any supported rate without being closed. An unsupported rate MUST be rejected with a protocol error.
 
-#### Scenario: Wechsel nach der Verhandlung
-- **WHEN** ein Treiber den Port mit 9600 Baud öffnet und danach auf 115200 Baud umstellt
-- **THEN** laufen alle weiteren Lese- und Schreibvorgänge mit 115200 Baud
+#### Scenario: Switch after the negotiation
+- **WHEN** a driver opens the port with 9600 baud and then switches to 115200 baud
+- **THEN** all further reads and writes run with 115200 baud
 
-### Requirement: Art des Anschlusses
-Das System SHALL zu jedem seriellen Anschluss angeben, ob er zu einem USB-Gerät, zu einem gekoppelten Bluetooth-Gerät oder zum System gehört. Systemanschlüsse sind `Bluetooth-Incoming-Port` und Anschlüsse ohne USB- und Bluetooth-Gerät, deren Name `debug` enthält.
+### Requirement: Kind of port
+For every serial port the system SHALL state whether it belongs to a USB device, to a paired Bluetooth device or to the system. System ports are `Bluetooth-Incoming-Port` and ports without a USB or Bluetooth device whose name contains `debug`.
 
-#### Scenario: Gekoppeltes Bluetooth-Gerät
-- **WHEN** ein gekoppelter Bluetooth-Logger den Anschluss `/dev/cu.HOLUX_M-241-SPPSlave` bereitstellt
-- **THEN** ist der Anschluss als Bluetooth-Anschluss gekennzeichnet
+#### Scenario: Paired Bluetooth device
+- **WHEN** a paired Bluetooth logger provides the port `/dev/cu.HOLUX_M-241-SPPSlave`
+- **THEN** the port is marked as a Bluetooth port
 
-#### Scenario: Systemanschluss
-- **WHEN** die Anschlüsse `/dev/cu.Bluetooth-Incoming-Port` und `/dev/cu.debug-console` vorhanden sind
-- **THEN** sind beide als Systemanschlüsse gekennzeichnet
+#### Scenario: System port
+- **WHEN** the ports `/dev/cu.Bluetooth-Incoming-Port` and `/dev/cu.debug-console` exist
+- **THEN** both are marked as system ports
 
-### Requirement: USB-Geräte ermitteln
-Das System SHALL alle angeschlossenen USB-Geräte mit Hersteller-ID, Produkt-ID und, soweit verfügbar, Hersteller- und Produktnamen auflisten. Seriennummern MUST NOT gelesen werden.
+### Requirement: List USB devices
+The system SHALL list all connected USB devices with vendor ID, product ID and, where available, vendor and product name. Serial numbers MUST NOT be read.
 
-#### Scenario: Adapter ohne Treiber
-- **WHEN** ein USB-Seriell-Adapter steckt, für den kein Treiber geladen ist
-- **THEN** erscheint er in der Liste der USB-Geräte, obwohl es keinen Anschluss dazu gibt
+#### Scenario: Adapter without driver
+- **WHEN** a USB serial adapter is plugged in for which no driver is loaded
+- **THEN** it appears in the list of USB devices, although it has no port

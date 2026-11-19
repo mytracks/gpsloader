@@ -2,7 +2,7 @@ import AppKit
 import FileConversion
 
 /// About window with version, copyright, the app's license (GPL-3.0-or-later) and the notices for
-/// GPSLoggerKit and the sources of ported formats and drivers (spec `app-shell`, "Lizenzhinweise").
+/// GPSLoggerKit and the sources of ported formats and drivers (spec `app-shell`, "License notices").
 @MainActor
 final class AboutWindowController: NSWindowController {
     static let shared = AboutWindowController()

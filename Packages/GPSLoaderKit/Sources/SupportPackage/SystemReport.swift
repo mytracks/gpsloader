@@ -4,7 +4,7 @@ import Foundation
 import LoggerCore
 import SerialTransport
 
-/// System and app facts for the support package (spec `support-package`, "Inhalt des Support-Pakets").
+/// System and app facts for the support package (spec `support-package`, "Content of the support package").
 public struct SystemReport: Sendable, Equatable {
     public var appVersion: String
     public var build: String

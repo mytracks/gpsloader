@@ -2,7 +2,7 @@ import Foundation
 import LoggerCore
 import os
 
-/// The app's own log (spec `support-package`, "App-Protokoll"): one line per entry in
+/// The app's own log (spec `support-package`, "App log"): one line per entry in
 /// `~/Library/Logs/myTracks Loader/myTracks Loader.log`, also sent to the unified log for Console.app.
 ///
 /// When the file would grow beyond `maximumFileSize`, it is renamed to `myTracks Loader.1.log` (older ones move up

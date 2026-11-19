@@ -19,7 +19,7 @@ struct AppLogTests {
         #expect(text.hasPrefix("2026-11-"))
     }
 
-    /// Scenario "Ordner mit altem Namen": files of earlier builds become the oldest files under the new name.
+    /// Scenario "Folder with the old name": files of earlier builds become the oldest files under the new name.
     @Test func adoptsLegacyFiles() throws {
         let directory = temporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }

@@ -14,7 +14,7 @@ struct SystemReportTests {
         #expect(!SystemReport.current(appVersion: "1", build: "1").model.isEmpty)
     }
 
-    /// Scenario "Keine Seriennummern".
+    /// Scenario "No serial numbers".
     @Test func usbDevicesWithoutSerialNumbers() {
         let properties: [String: Any] = [
             "idVendor": NSNumber(value: 0x10C4), "idProduct": NSNumber(value: 0xEA60),

@@ -22,14 +22,14 @@ public struct DeviceSelection: Sendable, Equatable {
     }
 
     /// Restores a stored selection: the device if it still exists (else the first one), the port if it is
-    /// still visible (else the first port of the presentation order). Scenario "Auswahl merken".
+    /// still visible (else the first port of the presentation order). Scenario "Remember the choice".
     public static func restore(_ stored: DeviceSelection, entries: [DeviceEntry], ports: [SerialPortInfo]) -> DeviceSelection {
         let entry = entries.first { $0.id == stored.entryID } ?? entries.first
         return DeviceSelection(entryID: entry?.id, portPath: port(preferring: stored.portPath, in: ports, for: entry))
     }
 
     /// Keeps the selected port when the port list changes, otherwise picks the first port in the order of
-    /// `PortPresentation` (scenarios "Logger angesteckt", "Passender Bluetooth-Anschluss"). System ports are never chosen.
+    /// `PortPresentation` (scenarios "Logger plugged in", "Fitting Bluetooth port"). System ports are never chosen.
     public static func port(preferring path: String?, in ports: [SerialPortInfo], for entry: DeviceEntry? = nil) -> String? {
         let visible = PortPresentation.list(ports: ports, for: entry)
         if let path, visible.contains(where: { $0.port.path == path }) { return path }
@@ -51,7 +51,7 @@ public struct DeviceSelection: Sendable, Equatable {
         entries.first { $0.id == entryID }
     }
 
-    /// The hints for the current selection (spec `device-mode`, "Hinweise zum Gerät", "Fehlender Treiber").
+    /// The hints for the current selection (spec `device-mode`, "Device hints", "Missing driver").
     public func hints(entries: [DeviceEntry], ports: [SerialPortInfo], usbDevices: [USBDeviceInfo]) -> [Hint] {
         guard let entry = entry(in: entries) else { return [] }
         var hints: [Hint] = []
@@ -78,13 +78,13 @@ public struct DeviceSelection: Sendable, Equatable {
         return entry.hints.filter { $0.condition == .always || onBluetooth }
     }
 
-    /// Scenario "Kein Anschluss".
+    /// Scenario "No port".
     public func canRead(entries: [DeviceEntry], isRunning: Bool) -> Bool {
         guard !isRunning, let entry = entry(in: entries) else { return false }
         return !entry.needsPort || portPath != nil
     }
 
-    /// Scenario "Gerät ohne Löschfunktion".
+    /// Scenario "Device without erasing".
     public func canErase(entries: [DeviceEntry], isRunning: Bool) -> Bool {
         canRead(entries: entries, isRunning: isRunning) && entry(in: entries)?.eraseSupport != .unsupported
     }

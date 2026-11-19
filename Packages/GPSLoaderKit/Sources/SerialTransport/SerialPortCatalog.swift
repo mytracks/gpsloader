@@ -3,7 +3,7 @@ import IOKit
 import IOKit.serial
 import LoggerCore
 
-/// What a serial port belongs to (spec `serial-transport`, "Art des Anschlusses").
+/// What a serial port belongs to (spec `serial-transport`, "Kind of port").
 public enum SerialPortKind: String, Sendable, Hashable {
     /// A USB device, e.g. a USB-serial adapter or a logger with a built-in chip.
     case usb
@@ -15,7 +15,7 @@ public enum SerialPortKind: String, Sendable, Hashable {
     case other
 }
 
-/// A serial port present on the system (spec `serial-transport`, "Ports ermitteln").
+/// A serial port present on the system (spec `serial-transport`, "List ports").
 public struct SerialPortInfo: Sendable, Hashable, Identifiable {
     /// Callout device path, e.g. `/dev/cu.SLAB_USBtoUART`.
     public var path: String
@@ -62,7 +62,7 @@ public struct SerialPortInfo: Sendable, Hashable, Identifiable {
     }
 }
 
-/// A port appeared or disappeared (spec `serial-transport`, "Port-Änderungen erkennen").
+/// A port appeared or disappeared (spec `serial-transport`, "Detect port changes").
 public enum SerialPortChange: Sendable, Equatable {
     case added(SerialPortInfo)
     case removed(path: String)

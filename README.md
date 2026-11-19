@@ -1,18 +1,19 @@
 # myTracks Loader
 
-Eigenständige macOS-App zum Auslesen von GPS-Loggern und zum Konvertieren von Logger-Dateien nach GPX.
-myTracks Loader löst die Logger-Funktionen von myTracks ab. Das Repository, das Xcode-Target und die Bundle-ID
-(`info.stichling.gpsloader`) heißen weiter `gpsloader`. Der Vertrieb läuft per Download, nicht über den App Store.
+Standalone macOS app that reads GPS loggers and converts logger files to GPX.
+myTracks Loader replaces the logger functions of myTracks. The repository, the Xcode target and the bundle ID
+(`info.stichling.gpsloader`) keep the name `gpsloader`. The app is distributed by download
+([GitHub releases](https://github.com/mytracks/gpsloader/releases)), not through the App Store.
 
-Planung und Anforderungen: `openspec/` (spec-getrieben mit OpenSpec), Hintergrund: `docs/legacy-analysis.md`.
+Planning and requirements: `openspec/` (spec-driven with OpenSpec), background: `docs/legacy-analysis.md`.
 
-## Voraussetzungen
+## Requirements
 
-- macOS mit **Xcode 27** (Swift 6.4, macOS-27-SDK); Deployment Target der App ist macOS 12.
-- **XcodeGen** (`brew install xcodegen`). Das Xcode-Projekt wird aus `project.yml` erzeugt und nicht eingecheckt.
-- Zum Signieren: Zertifikate „Apple Development“ und „Developer ID Application“ des Teams `4TNB35NY7G`.
+- macOS with **Xcode 27** (Swift 6.4, macOS 27 SDK); the deployment target of the app is macOS 12.
+- **XcodeGen** (`brew install xcodegen`). The Xcode project is generated from `project.yml` and not checked in.
+- For signing: the certificates "Apple Development" and "Developer ID Application" of the team `4TNB35NY7G`.
 
-## Bauen und starten
+## Build and run
 
 ```sh
 xcodegen generate
@@ -20,79 +21,79 @@ xcodebuild -project gpsloader.xcodeproj -scheme gpsloader -configuration Debug -
 open "build/DerivedData/Build/Products/Debug/myTracks Loader.app"
 ```
 
-Alternativ nach `xcodegen generate` das Projekt `gpsloader.xcodeproj` in Xcode öffnen.
+Alternatively open the project `gpsloader.xcodeproj` in Xcode after `xcodegen generate`.
 
-## Bedienung
+## Usage
 
-Das Hauptfenster hat zwei Bereiche, umschaltbar in der Werkzeugleiste oder über „Darstellung“ (⌘1 „Dateien
-konvertieren“, ⌘2 „Gerät auslesen“). Die App merkt sich den zuletzt gewählten Bereich; beim ersten Start ist
-„Gerät auslesen“ gewählt.
+The main window has two sections, switched in the toolbar or through "View" (⌘1 "Convert Files", ⌘2 "Read Device").
+The app remembers the last chosen section; at the first start "Read Device" is chosen.
 
-- **Dateimodus:** „Ablage > Dateien konvertieren …“ (⌘O), „Dateien auswählen …“ bzw. ein Klick auf die Ablagefläche
-  im Bereich „Dateien konvertieren“ oder Dateien per Drag & Drop auf das Hauptfenster (in beiden Bereichen; das
-  Fenster schaltet dann auf „Dateien konvertieren“). Das Format wird am Inhalt erkannt. Mehrere Dateien ergeben eine GPX-Datei.
-  - `GPSLoggerKit`: NMEA 0183, GPX, IGC, Garmin FIT, TCX, Suunto SML, KML/KMZ, Columbus V-900 und iBlue 747/757 (CSV).
-  - `GPSLoggerKitGPL`: Speicherabbilder von SkyTraq-, MTK- und Holux-Loggern, Wintec TES/BIN/TK1, Locosys SBP/SBN
-    und Medion-GoPal-Tracks.
-- **Direktmodus:** Im Bereich „Gerät auslesen“ Gerät und Anschluss wählen, dann „Auslesen“ bzw. „Speicher löschen …“.
-  Anschlüsse erscheinen mit sprechenden Namen („USB: … (Prolific PL2303)“, „Bluetooth: …“); ein Anschluss, dessen
-  Name zum Gerät passt, steht oben und ist vorausgewählt, Systemanschlüsse sind ausgeblendet. Unter der Auswahl
-  stehen Hinweise zum Gerät (z. B. M-241 nicht über Bluetooth, GNS 2000 vorher koppeln) und, wenn ein
-  USB-Seriell-Chip ohne Anschluss steckt, ein Hinweis auf den fehlenden Treiber mit Link zum Hersteller.
-  Native Treiber (`GPSLoggerKitGPL`) für SkyTraq, MTK/Holux, Wintec, Navilink und i-GotU (GT-800 seriell,
-  übrige Modelle über USB-HID; Löschen experimentell).
-- **Support:** „Hilfe > Support-Paket erstellen …“ oder der Knopf in der Fehlermeldung eines Vorgangs sichert ein ZIP
-  mit System- und App-Informationen, App-Protokoll, Einstellungen, Anschlüssen und USB-Geräten, gekoppelten
-  Bluetooth-Geräten (nur mit vorhandener Bluetooth-Berechtigung), den Diagnose-Mitschnitten der letzten
-  10 Vorgänge und Absturzberichten. Jeder Teil lässt sich abwählen; Mitschnitte enthalten Positionsdaten.
-  Der Mitschnitt läuft immer mit; das App-Protokoll liegt unter `~/Library/Logs/myTracks Loader/` (höchstens 5 MB).
+- **File mode:** "File > Convert Files…" (⌘O), "Choose Files…" or a click on the drop zone in the section
+  "Convert Files", or drag files onto the main window (in both sections; the window then switches to "Convert
+  Files"). The format is detected from the content. Several files result in one GPX file.
+  - `GPSLoggerKit`: NMEA 0183, GPX, IGC, Garmin FIT, TCX, Suunto SML, KML/KMZ, Columbus V-900 and iBlue 747/757 (CSV).
+  - `GPSLoggerKitGPL`: memory images of SkyTraq, MTK and Holux loggers, Wintec TES/BIN/TK1, Locosys SBP/SBN,
+    Medion GoPal tracks, Magellan SD files and Alan Map500 track logs.
+- **Direct mode:** choose device and port in the section "Read Device", then "Read" or "Erase Memory…".
+  Ports appear with readable names ("USB: … (Prolific PL2303)", "Bluetooth: …"); a port whose name fits the device is
+  at the top and preselected, system ports are hidden. Below the choice there are hints for the device (for example
+  M-241 not over Bluetooth, pair the GNS 2000 first) and, when a USB serial chip without a port is plugged in, a hint
+  on the missing driver with a link to the vendor.
+  Native drivers: `GPSLoggerKitGPL` for SkyTraq, MTK/Holux, Wintec, Navilink, Magellan, XAiOX iTrackU and i-GotU
+  (GT-800 serial, other models over USB HID; erasing experimental), `GPSLoggerKit` for the GNS 2000 over Bluetooth.
+- **Support:** "Help > Create Support Package…" or the button in the error message of an operation saves a ZIP with
+  system and app information, app log, settings, ports and USB devices, paired Bluetooth devices (only with an
+  existing Bluetooth permission), the diagnostic captures of the last 10 operations and crash reports. Every part can
+  be deselected; captures contain position data. The capture is always on; the app log is in
+  `~/Library/Logs/myTracks Loader/` (at most 5 MB).
 
 ## Tests
 
-Anbindung der Treiber, Transporte, Sitzung und Support-Paket liegen im lokalen Swift-Package `Packages/GPSLoaderKit`
-und sind ohne Hardware testbar:
+The connection of the drivers, transports, session and support package live in the local Swift package
+`Packages/GPSLoaderKit` and are testable without hardware:
 
 ```sh
 swift test --package-path Packages/GPSLoaderKit
 ```
 
-Die Formate und Geräteprotokolle testen ihre eigenen Repositories (siehe „Pakete“).
+The formats and device protocols are tested in their own repositories (see "Packages").
 
-Lokalisierung prüfen (nach einem Debug-Build, siehe oben):
+Check the localization (after a debug build, see above):
 
 ```sh
 swift Scripts/check-localizations.swift
 ```
 
-### Debug-Hilfen
+### Debug helpers
 
-Debug-Builds enthalten einen Demo-Treiber und Startargumente, um UI-Zustände ohne Hardware zu prüfen
-(siehe `App/DebugAutomation.swift`), zum Beispiel:
+Debug builds contain a demo driver and launch arguments to check UI states without hardware
+(see `App/DebugAutomation.swift`), for example:
 
 ```sh
 "build/DerivedData/Build/Products/Debug/myTracks Loader.app/Contents/MacOS/myTracks Loader" \
     -DebugDemo success -AppleLanguages '(de)'
 ```
 
-Dateikonvertierung ohne Dialoge (schreibt nach `-DebugSaveDirectory`, Bildschirmfotos nach `-DebugSnapshotDirectory`):
+File conversion without dialogs (writes to `-DebugSaveDirectory`, screenshots to `-DebugSnapshotDirectory`):
 
 ```sh
 "build/DerivedData/Build/Products/Debug/myTracks Loader.app/Contents/MacOS/myTracks Loader" \
-    -DebugConvert /pfad/a.nmea,/pfad/b.igc -DebugSaveDirectory /tmp/out -DebugQuitAfter 5
+    -DebugConvert /path/a.nmea,/path/b.igc -DebugSaveDirectory /tmp/out -DebugQuitAfter 5
 ```
 
-Bereich vorgeben (`-DebugSection files|device`), Tastenkürzel über das Menü senden (`-DebugKeyEquivalent 2`) und
-Zeitpunkte der Bildschirmfotos wählen (`-DebugSnapshotTimes 1.5,3`).
+Preset the section (`-DebugSection files|device`), send a keyboard shortcut through the menu (`-DebugKeyEquivalent 2`)
+and choose the times of the screenshots (`-DebugSnapshotTimes 1.5,3`). Screenshots of a directly started binary show
+the generic app icon; start with `open -n "…/myTracks Loader.app" --args …` to see the real one.
 
-Support-Paket ohne Dialoge schreiben (`-DebugShowSupportPackage <s>` öffnet stattdessen den Dialog,
-`-DebugNoBluetoothPermission YES` zeigt ihn wie ohne Bluetooth-Berechtigung):
+Write a support package without dialogs (`-DebugShowSupportPackage <s>` opens the dialog instead,
+`-DebugNoBluetoothPermission YES` shows it as without Bluetooth permission):
 
 ```sh
 "build/DerivedData/Build/Products/Debug/myTracks Loader.app/Contents/MacOS/myTracks Loader" \
     -DebugSupportPackagePath /tmp/support.zip -DebugQuitAfter 4
 ```
 
-Anschlussnamen und Hinweise ohne Hardware prüfen (erfundene Anschlüsse und USB-Geräte, siehe `DebugPorts` in
+Check port names and hints without hardware (invented ports and USB devices, see `DebugPorts` in
 `App/DevicePanel.swift`):
 
 ```sh
@@ -101,7 +102,7 @@ Anschlussnamen und Hinweise ohne Hardware prüfen (erfundene Anschlüsse und USB
     -DebugUSBDevices "067B:2303" -DebugSelectDevice m241.holux-m-241 -DebugSnapshotDirectory /tmp/snap -DebugQuitAfter 3
 ```
 
-Gerät aus dem Katalog auslesen, z. B. gegen ein simuliertes Gerät an einem Pseudo-Terminal:
+Read a device from the catalog, for example against a simulated device on a pseudo terminal:
 
 ```sh
 "build/DerivedData/Build/Products/Debug/myTracks Loader.app/Contents/MacOS/myTracks Loader" \
@@ -111,88 +112,86 @@ Gerät aus dem Katalog auslesen, z. B. gegen ein simuliertes Gerät an einem Pse
 ## Release
 
 ```sh
-Scripts/release.sh --publish            # dazu Tag <Version> und GitHub-Release mit ZIP, Prüfsumme und docs/releases/<Version>.md
-Scripts/release.sh --publish --dry-run --skip-notarize --allow-unpublished   # Skript testen, ohne etwas zu veröffentlichen
-Scripts/release.sh                      # Archiv, Developer-ID-Export, Notarisierung, Stapling -> build/release/myTracks-Loader-<Version>.zip
-Scripts/release.sh --skip-notarize      # nur signiertes ZIP für eigene Tests, nicht für Anwender
-Scripts/release.sh --allow-unpublished  # notarisieren, ohne zu prüfen, dass der Commit sauber und gepusht ist
-Scripts/verify-bundle.sh <App>          # Signaturen, Hardened Runtime, Architekturen, Lizenzen prüfen
+Scripts/release.sh --publish            # also tag <version> and GitHub release with ZIP, checksum and docs/releases/<version>.md
+Scripts/release.sh --publish --dry-run --skip-notarize --allow-unpublished   # test the script without publishing anything
+Scripts/release.sh                      # archive, Developer ID export, notarization, stapling -> build/release/myTracks-Loader-<version>.zip
+Scripts/release.sh --skip-notarize      # only a signed ZIP for own tests, not for users
+Scripts/release.sh --allow-unpublished  # notarize without checking that the commit is clean and pushed
+Scripts/verify-bundle.sh <app>          # check signatures, hardened runtime, architectures, licenses and icon
 ```
 
-Vor dem langen Build prüft `release.sh`, dass der Commit sauber und auf `origin` gepusht ist (GPL: Quelle jeder Version
-öffentlich), dass die Anmeldung für die Notarisierung funktioniert und dass das Developer-ID-Zertifikat da ist. Das ZIP für die
-Anwender enthält die App mit angeheftetem Notarisierungs-Ticket (Stapling); daneben liegt `myTracks-Loader-<Version>.zip.sha256`. Lehnt Apple ab, liegt das Protokoll in
-`build/release/notarization-log.json`.
+Before the long build `release.sh` checks that the commit is clean and pushed to `origin` (GPL: the source of every
+version is public), that signing in for notarization works and that the Developer ID certificate exists. The ZIP for
+users contains the app with the stapled notarization ticket; next to it is `myTracks-Loader-<version>.zip.sha256`.
+If Apple rejects the submission, its log is in `build/release/notarization-log.json`.
 
-Die Notarisierung meldet sich wie in myTracksNeo mit dem App-Store-Connect-API-Schlüssel
-`~/.appstoreconnect/private_keys/app-manager_<Key-ID>.p8` an. Die Issuer-ID kommt aus `NOTARY_ISSUER_ID`,
-sonst aus `~/.appstoreconnect/issuer_id`, sonst ist es die des Teams. Ohne Schlüssel nutzt das Skript ein
-Keychain-Profil, das man einmalig anlegt:
+Like myTracks Neo, notarization signs in with the App Store Connect API key
+`~/.appstoreconnect/private_keys/app-manager_<key ID>.p8`. The issuer ID comes from `NOTARY_ISSUER_ID`, else from
+`~/.appstoreconnect/issuer_id`, else it is the team's. Without a key the script uses a keychain profile that is
+created once:
 
 ```sh
-xcrun notarytool store-credentials gpsloader-notary --apple-id <Apple-ID> --team-id 4TNB35NY7G
+xcrun notarytool store-credentials gpsloader-notary --apple-id <Apple ID> --team-id 4TNB35NY7G
 ```
 
-## Pakete
+## Packages
 
-Formate und Geräteprotokolle liegen seit 2026-11-19 in eigenen Repositories. Die App bindet sie in
-`Packages/GPSLoaderKit/Package.swift` per URL ein, mit den Ständen aus `Packages/GPSLoaderKit/Package.resolved`:
+Since 2026-11-19 formats and device protocols live in repositories of their own. The app uses them in
+`Packages/GPSLoaderKit/Package.swift` by URL, with the versions from `Packages/GPSLoaderKit/Package.resolved`:
 
-| Paket | Lizenz | Repository |
+| Package | License | Repository |
 |---|---|---|
-| GPSLoggerKit | MIT, macOS 12+ und iOS/iPadOS 27+ | https://github.com/mytracks/GPSLoggerKit |
-| GPSLoggerKitGPL | GPL-3.0-or-later, nur macOS | https://github.com/mytracks/GPSLoggerKitGPL |
+| GPSLoggerKit | MIT, macOS 12+ and iOS/iPadOS 27+ | https://github.com/mytracks/GPSLoggerKit |
+| GPSLoggerKitGPL | GPL-3.0-or-later, macOS only | https://github.com/mytracks/GPSLoggerKitGPL |
 
-Ablauf für ein Feature, das ein Paket und die App betrifft:
-1. Change und Release im Paket-Repository (`Scripts/release.sh <Version>` dort).
-2. Change hier: Version in `Package.swift` anheben, auflösen (`swift package update` in `Packages/GPSLoaderKit`) und
-   Katalog, Transport oder UI ergänzen.
+Flow for a feature that concerns a package and the app:
+1. Change and release in the package repository (`Scripts/release.sh <version>` there).
+2. Change here: raise the version in `Package.swift`, resolve (`swift package update` in `Packages/GPSLoaderKit`) and
+   add catalog, transport or UI.
 
-Gegen einen lokal ausgecheckten Paketstand entwickeln, die Repositories liegen nebeneinander:
+Develop against a local package checkout; the repositories lie next to each other:
 
 ```sh
 cd Packages/GPSLoaderKit
-swift package edit GPSLoggerKit --path ../../../GPSLoggerKit       # lokaler Stand statt der URL
-swift package unedit GPSLoggerKit                                  # zurück zur Version aus Package.resolved
+swift package edit GPSLoggerKit --path ../../../GPSLoggerKit       # local checkout instead of the URL
+swift package unedit GPSLoggerKit                                  # back to the version from Package.resolved
 ```
 
-In Xcode reicht es, den Paketordner ins Projekt zu ziehen; Xcode nutzt ihn dann statt der URL.
+In Xcode it is enough to drag the package folder into the project; Xcode then uses it instead of the URL.
 
-## App-Icon
+## App icon
 
-Das Icon (`App/AppIcon.icon`, Icon Composer) entsteht aus einer festen Geometrie: der Verlauf von myTracks Neo und ein
-Satellit. Xcode rendert daraus auch die Bilder für macOS 12–15.
+The icon (`App/AppIcon.icon`, Icon Composer) is generated from a fixed geometry: the gradient of myTracks Neo and a
+satellite. Xcode also renders the images for macOS 12–15 from it.
 
 ```sh
-swift Scripts/make-app-icon.swift generate --variant 3     # App/AppIcon.icon neu erzeugen (gewählte Variante)
-swift Scripts/make-app-icon.swift preview /tmp/icons       # Vorschau aller Varianten (randlos und in macOS-Form)
+swift Scripts/make-app-icon.swift generate --variant 3     # generate App/AppIcon.icon again (chosen variant)
+swift Scripts/make-app-icon.swift preview /tmp/icons       # preview of all variants (full-bleed and macOS shape)
 ```
 
-## Aufbau
+## Structure
 
-| Ort | Inhalt |
+| Place | Content |
 |---|---|
-| `App/` | AppKit-App (UI, Lokalisierung `Localizable.xcstrings`) |
-| `Packages/GPSLoaderKit/` | `LoggerCore` (Treibervertrag, Session), `SerialTransport`, `GPXExport` (Dateiname, Schreiben), `DiagnosticCapture`, `FileConversion` (Dateimodus: Erkennen, Zusammenführen), `DeviceDrivers` (Gerätekatalog, Anbindung der Treiber), `HIDTransport` (USB-HID), `BluetoothTransport` (Bluetooth-RFCOMM, GNS 2000), `SupportPackage` (App-Protokoll, Support-Paket), `TestSupport` |
-| `Vendor/Licenses/` | Lizenztexte für das App-Bundle: GPL-3.0 (Kopie von `LICENSE`) und die MIT-Lizenz von GPSLoggerKit |
-| `docs/releases/` | Release-Notes je Version (Text des GitHub-Releases) |
-| `Scripts/` | Release, Bundle-Prüfung, Lokalisierungsprüfung, App-Icon (`make-app-icon.swift`) |
+| `App/` | AppKit app (UI, localization `Localizable.xcstrings`) |
+| `Packages/GPSLoaderKit/` | `LoggerCore` (driver contract, session), `SerialTransport`, `GPXExport` (file name, writing), `DiagnosticCapture`, `FileConversion` (file mode: detection, merging), `DeviceDrivers` (device catalog, connection of the drivers), `HIDTransport` (USB HID), `BluetoothTransport` (Bluetooth RFCOMM, GNS 2000), `SupportPackage` (app log, support package), `TestSupport` |
+| `Vendor/Licenses/` | License texts for the app bundle: GPL-3.0 (copy of `LICENSE`) and the MIT License of GPSLoggerKit |
+| `docs/releases/` | Release notes per version (text of the GitHub release) |
+| `Scripts/` | Release, bundle check, localization check, app icon (`make-app-icon.swift`) |
 
-## Ohne gpsbabel
+## Without gpsbabel
 
-myTracks Loader liest alle Formate und Geräte mit eigenen Swift-Treibern (GPSLoggerKit und GPSLoggerKitGPL). Bis
-2026-11-13 lag gpsbabel 1.7.0 samt Qt bei; seit dem Change `remove-gpsbabel` enthält die App keine
-Hilfsprogramme mehr und braucht auch auf Apple Silicon kein Rosetta. Für Black-Box-Gegenprüfungen von
-Portierungen wird das gpsbabel-1.7.0-Binary aus der myTracks-Historie (Commit `e0d1f18`) in einen
-temporären Ordner kopiert, nie ins Repository.
+myTracks Loader reads all formats and devices with native Swift drivers (GPSLoggerKit and GPSLoggerKitGPL). Until
+2026-11-13 gpsbabel 1.7.0 with Qt was bundled; since the change `remove-gpsbabel` the app contains no helper programs
+and does not need Rosetta on Apple silicon either. For black-box cross-checks of ports the gpsbabel 1.7.0 binary from
+the myTracks history (commit `e0d1f18`) is copied to a temporary folder, never into the repository.
 
-Nicht mehr unterstützt werden die 45 Formate von Karten- und Navigationsprogrammen, die myTracks über gpsbabel
-anbot (z. B. OziExplorer, Garmin MapSource, CompeGPS); die Liste steht im Proposal von `remove-gpsbabel`.
+The 45 formats of map and navigation programs that myTracks offered through gpsbabel (for example OziExplorer,
+Garmin MapSource, CompeGPS) are no longer supported; the list is in the proposal of `remove-gpsbabel`.
 
-## Lizenz
+## License
 
-- myTracks Loader (App, `GPSLoaderKit`) und `GPSLoggerKitGPL` stehen unter der **GNU GPL Version 3
-  oder später** (GPL-3.0-or-later, siehe `LICENSE`). Wer die App weitergibt, muss den vollständigen Quellcode
-  anbieten.
-- `GPSLoggerKit` steht unter der **MIT-Lizenz** (Datei `LICENSE` in dessen Repository) und enthält keinen aus
-  GPL-Quellen abgeleiteten Code.
+- myTracks Loader (app, `GPSLoaderKit`) and `GPSLoggerKitGPL` are licensed under the **GNU GPL version 3 or later**
+  (GPL-3.0-or-later, see `LICENSE`). Whoever distributes the app must offer the complete source code.
+- `GPSLoggerKit` is licensed under the **MIT License** (file `LICENSE` in its repository) and contains no code derived
+  from GPL sources.

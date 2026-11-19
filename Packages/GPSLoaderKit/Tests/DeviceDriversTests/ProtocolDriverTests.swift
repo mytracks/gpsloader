@@ -56,7 +56,7 @@ private func driver(_ mock: MockTransport) -> ProtocolDriver {
 
 @Suite("Protocol driver adapter")
 struct ProtocolDriverTests {
-    /// Scenario "Mitschnitt" plus progress and closing.
+    /// Scenario "Capture" plus progress and closing.
     @Test func readsAndCaptures() async throws {
         let mock = MockTransport(script: [.expect("HELLO\r\n"), .reply("50.0,8.0\r\nEND\r\n")])
         let log = EventLog()
@@ -71,7 +71,7 @@ struct ProtocolDriverTests {
         #expect(progress.values.contains(.determinate(completed: 1, total: 1, step: nil)))
     }
 
-    /// Scenario "Protokollfehler"; the transport is closed as well.
+    /// Scenario "Protocol error"; the transport is closed as well.
     @Test func protocolErrorIsMapped() async {
         let mock = MockTransport(script: [.expect("HELLO\r\n"), .reply("?\r\n")])
         await #expect(throws: LoggerError(.protocolError, detail: "Unexpected answer: ?")) {
@@ -97,7 +97,7 @@ struct ProtocolDriverTests {
         #expect(await mock.isScriptFinished)
     }
 
-    /// Scenarios "Logger mit Wochenüberlauf" and "Aktuelle Zeiten bleiben" (spec `device-mode`).
+    /// Scenarios "Logger with week rollover" and "Current times stay" (spec `device-mode`).
     @Test func weekRolloverIsCorrected() async throws {
         let utc = ISO8601DateFormatter()
         let reading = try #require(utc.date(from: "2026-11-13T10:00:00Z"))
@@ -128,7 +128,7 @@ struct ProtocolDriverTests {
         #expect(entry().needsPort)
     }
 
-    /// Scenario "Treiber fehlt": the catalog lists only devices with a driver, sorted by name.
+    /// Scenario "Driver missing": the catalog lists only devices with a driver, sorted by name.
     @Test func catalogIsSorted() {
         let names = DeviceCatalog.entries.map(\.name)
         #expect(names == names.sorted { $0.localizedStandardCompare($1) == .orderedAscending })
@@ -157,7 +157,7 @@ struct DeviceSelectionTests {
     private let ports = [SerialPortInfo(path: "/dev/cu.Bluetooth-Incoming-Port", isBluetooth: true),
                          SerialPortInfo(path: "/dev/cu.usbserial-1410", usbVendorID: 0x067B, usbProductID: 0x2303)]
 
-    /// Scenario "Auswahl merken".
+    /// Scenario "Remember the choice".
     @Test func restoresTheStoredSelection() {
         let stored = DeviceSelection(stored: ["device": "b.readonly", "port": "/dev/cu.usbserial-1410"])
         let restored = DeviceSelection.restore(stored, entries: [serial, readOnly], ports: ports)
@@ -167,16 +167,16 @@ struct DeviceSelectionTests {
         #expect(gone == DeviceSelection(entryID: "a.serial", portPath: "/dev/cu.usbserial-1410"))
     }
 
-    /// Scenario "Logger angesteckt".
+    /// Scenario "Logger plugged in".
     @Test func newPortIsPickedUp() {
         #expect(DeviceSelection.port(preferring: nil, in: []) == nil)
         #expect(DeviceSelection.port(preferring: nil, in: ports) == "/dev/cu.usbserial-1410")
-        // A system port is never kept or chosen (scenario "Systemanschlüsse").
+        // A system port is never kept or chosen (scenario "System ports").
         #expect(DeviceSelection.port(preferring: "/dev/cu.Bluetooth-Incoming-Port", in: ports) == "/dev/cu.usbserial-1410")
         #expect(DeviceSelection.port(preferring: nil, in: [ports[0], SerialPortInfo(path: "/dev/cu.debug-console")]) == nil)
     }
 
-    /// Scenarios "Kein Anschluss" and "Gerät ohne Löschfunktion".
+    /// Scenarios "No port" and "Device without erasing".
     @Test func availability() {
         let entries = [serial, readOnly, hid]
         let noPort = DeviceSelection(entryID: "a.serial", portPath: nil)
@@ -199,7 +199,7 @@ private struct ReadOnlyProtocol: DeviceProtocol {
 
 @Suite("Device catalog")
 struct DeviceCatalogTests {
-    /// Spec `skytraq-device`, "Geräte im Katalog".
+    /// Spec `skytraq-device`, "Devices in the catalog".
     @Test func skyTraqDevices() throws {
         let skytraq = DeviceCatalog.entries.filter { $0.driverID == "skytraq" }
         #expect(skytraq.count == 11)
@@ -215,7 +215,7 @@ struct DeviceCatalogTests {
 
 @Suite("Device catalog – MTK")
 struct MTKCatalogTests {
-    /// Spec `mtk-device`, "MTK-Geräte im Katalog".
+    /// Spec `mtk-device`, "MTK devices in the catalog".
     @Test func mtkDevices() throws {
         #expect(DeviceCatalog.entries.filter { $0.driverID == "mtk" }.count == 9)
         let holux = try #require(DeviceCatalog.entry(withID: "m241.holux-m-241"))
@@ -227,7 +227,7 @@ struct MTKCatalogTests {
 
 @Suite("Device catalog – Wintec")
 struct WintecCatalogTests {
-    /// Spec `wintec-device`, "Wintec-Geräte im Katalog".
+    /// Spec `wintec-device`, "Wintec devices in the catalog".
     @Test func wintecDevices() {
         let wintec = DeviceCatalog.entries.filter { $0.driverID == "wbt" }
         #expect(wintec.count == 5)
@@ -237,7 +237,7 @@ struct WintecCatalogTests {
 
 @Suite("Device catalog – Navilink")
 struct NavilinkCatalogTests {
-    /// Spec `navilink-device`, "Navilink-Geräte im Katalog".
+    /// Spec `navilink-device`, "Navilink devices in the catalog".
     @Test func navilinkDevices() {
         let navilink = DeviceCatalog.entries.filter { $0.driverID == "navilink" }
         #expect(navilink.count == 6)
@@ -247,7 +247,7 @@ struct NavilinkCatalogTests {
 
 @Suite("Device catalog – Magellan")
 struct MagellanCatalogTests {
-    /// Spec `magellan-device`, "Magellan-Gerät wählen".
+    /// Spec `magellan-device`, "Choose a Magellan device".
     @Test func magellanDevices() throws {
         let magellan = DeviceCatalog.entries.filter { $0.driverID == "magellan" }
         #expect(magellan.count == 7)
@@ -262,7 +262,7 @@ struct MagellanCatalogTests {
 
 @Suite("Device catalog – iTrackU")
 struct ITrackUCatalogTests {
-    /// Spec `itracku-device`, "iTrackU wählen".
+    /// Spec `itracku-device`, "Choose iTrackU".
     @Test func itrackuDevice() throws {
         let entry = try #require(DeviceCatalog.entry(withID: "itracku.xaiox-itracku"))
         #expect(entry.name == "XAiOX iTrackU" && entry.driverID == "itracku")
@@ -286,7 +286,7 @@ struct GNS2000CatalogTests {
         "$\(body)*\(String(format: "%02X", body.utf8.reduce(0, ^)))\r\n"
     }
 
-    /// Spec `gns2000-device`, "GNS 2000 wählen", and spec `device-mode`, "Bluetooth-Gerät".
+    /// Spec `gns2000-device`, "Choose GNS 2000", and spec `device-mode`, "Bluetooth device".
     @Test func gns2000Entry() throws {
         let entry = try #require(DeviceCatalog.entry(withID: "gns2000.gns-2000"))
         #expect(entry.name == "GNS 2000" && entry.driverID == "gns2000")
@@ -299,7 +299,7 @@ struct GNS2000CatalogTests {
         #expect(selection.canErase(entries: DeviceCatalog.entries, isRunning: false))
     }
 
-    /// Spec `device-mode`, "Mitschnitt über Bluetooth": the bytes of the RFCOMM channel are captured.
+    /// Spec `device-mode`, "Capture over Bluetooth": the bytes of the RFCOMM channel are captured.
     @Test func capturesBluetoothBytes() async throws {
         let entry = try #require(DeviceCatalog.entry(withID: "gns2000.gns-2000"))
         let record = "407BE86A" + ",0300004A" + ",42000004" + ",417B0000"  // 2026-11-02T12:00Z, 50.5/8.25, 123 m
@@ -329,7 +329,7 @@ struct GNS2000CatalogTests {
 
 @Suite("Device catalog – i-GotU")
 struct IGotUCatalogTests {
-    /// Spec `igotu-device`, "i-GotU-Geräte im Katalog".
+    /// Spec `igotu-device`, "i-GotU devices in the catalog".
     @Test func igotuDevices() {
         let igotu = DeviceCatalog.entries.filter { $0.driverID == "igotu" }
         #expect(igotu.count == 7)

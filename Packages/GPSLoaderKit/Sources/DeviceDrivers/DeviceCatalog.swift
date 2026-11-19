@@ -14,7 +14,7 @@ public enum DeviceConnectionKind: Sendable, Equatable {
     case bluetooth(deviceNames: [String], serviceName: String)
 }
 
-/// A note shown for a device (spec `device-mode`, "Hinweise zum Gerät"); the app supplies the text.
+/// A note shown for a device (spec `device-mode`, "Device hints"); the app supplies the text.
 public struct DeviceHint: Sendable, Equatable {
     public enum Condition: Sendable, Equatable {
         case always
@@ -40,7 +40,7 @@ public struct DeviceHint: Sendable, Equatable {
     }
 }
 
-/// One selectable device (spec `device-mode`, "Gerätekatalog").
+/// One selectable device (spec `device-mode`, "Device catalog").
 public struct DeviceEntry: Sendable, Identifiable {
     /// Stable identifier, e.g. "mtk.qstarz-bt-q1000"; stored as the user's selection.
     public var id: String
@@ -48,7 +48,7 @@ public struct DeviceEntry: Sendable, Identifiable {
     /// Driver family, e.g. "mtk"; used for diagnostics.
     public var driverID: String
     public var connection: DeviceConnectionKind
-    /// Notes for the user (spec `device-mode`, "Hinweise zum Gerät").
+    /// Notes for the user (spec `device-mode`, "Device hints").
     public var hints: [DeviceHint]
     /// Creates the protocol for this device.
     public var makeProtocol: @Sendable () -> any DeviceProtocol

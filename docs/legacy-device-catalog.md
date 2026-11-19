@@ -1,12 +1,12 @@
-# Gerätekatalog der Alt-App (myTracks)
+# Device catalog of the old app (myTracks)
 
-Automatisch erzeugt aus `input/mytracks4mac/myTracks/Source/Resources/gpslogger.plist` (143 Einträge).
-Spalten: Gerätename, Verbindungsart (`type`), Treiber (`driver`), zusätzliche Argumente (`additionalarguments`).
-Der `driver`-Wert ist bei Shell-Kommandos gekürzt; die Originale stehen in der plist.
+Generated automatically from `input/mytracks4mac/myTracks/Source/Resources/gpslogger.plist` (143 entries).
+Columns: device name, connection type (`type`), driver (`driver`), additional arguments (`additionalarguments`).
+The `driver` value is shortened for shell commands; the originals are in the plist.
 
-## USB (seriell) — 50 Geräte
+## USB (serial) — 50 devices
 
-| Gerät | Treiber | Zusatzargumente | Treiber-URL |
+| Device | Driver | Additional arguments | Driver URL |
 |---|---|---|---|
 | Maptaq Trip IQ | `*BG728` |  |  |
 | Gisteq PhotoTrackr (CD111) | `!bash -c 'cd $TMPDIR; stty 115200 cs8 raw < $DEVICE; sleep 1; "$BUNDLE/Contents/Resources/…` |  |  |
@@ -59,9 +59,9 @@ Der `driver`-Wert ist bei Shell-Kommandos gekürzt; die Originale stehen in der 
 | Wintec WBT-201 | `wbt` |  |  |
 | Wintec WSG-1000 (G-Tender) | `wbt` |  |  |
 
-## Bluetooth (seriell/RFCOMM) — 16 Geräte
+## Bluetooth (serial/RFCOMM) — 16 devices
 
-| Gerät | Treiber | Zusatzargumente | Treiber-URL |
+| Device | Driver | Additional arguments | Driver URL |
 |---|---|---|---|
 | GNS 2000 | `*GNS2000` |  | skip |
 | MainNav | `!cd $TMPDIR; python "$BUNDLE/Contents/Resources/mainnavdist/mainnav-reader-helper" $DEVICE…` |  |  |
@@ -80,9 +80,9 @@ Der `driver`-Wert ist bei Shell-Kommandos gekürzt; die Originale stehen in der 
 | Wintec WBT-201 | `wbt` |  |  |
 | Wintec WSG-1000 (G-Tender) | `wbt` |  |  |
 
-## Datei (USB-Speicher/SD-Karte) — 40 Geräte
+## File (USB storage/SD card) — 40 devices
 
-| Gerät | Treiber | Zusatzargumente | Treiber-URL |
+| Device | Driver | Additional arguments | Driver URL |
 |---|---|---|---|
 | Alan Map500 | `alantrl` |  |  |
 | Cetus for Palm/OS | `cetus` |  |  |
@@ -125,9 +125,9 @@ Der `driver`-Wert ist bei Shell-Kommandos gekürzt; die Originale stehen in der 
 | Visiontac VGPS-900 | `v900` |  |  |
 | Wintec WBT-202 (using SD card) | `wintec_tes` |  |  |
 
-## LoadMyTracks (externe App) — 37 Geräte
+## LoadMyTracks (external app) — 37 devices
 
-| Gerät | Treiber | Zusatzargumente | Treiber-URL |
+| Device | Driver | Additional arguments | Driver URL |
 |---|---|---|---|
 | Garmin - USB generic | `loadmytracks` |  |  |
 | Garmin 12XL | `loadmytracks` |  |  |
@@ -167,13 +167,13 @@ Der `driver`-Wert ist bei Shell-Kommandos gekürzt; die Originale stehen in der 
 | TomTom - generic | `loadmytracks` |  |  |
 | TomTom Go 910 | `loadmytracks` |  |  |
 
-## Übersicht nach Treiber (ohne LoadMyTracks)
+## Overview by driver (without LoadMyTracks)
 
-| Treiber | Anzahl Einträge |
+| Driver | Number of entries |
 |---|---|
 | gpsbabel: gpx | 16 |
 | gpsbabel: mtk | 15 |
-| Shell-Kommando / Hilfsskript | 11 |
+| Shell command / helper script | 11 |
 | gpsbabel: navilink | 11 |
 | gpsbabel: skytraq | 11 |
 | gpsbabel: wbt | 10 |
@@ -190,5 +190,5 @@ Der `driver`-Wert ist bei Shell-Kommandos gekürzt; die Originale stehen in der 
 | gpsbabel: sbn | 1 |
 | gpsbabel: itracku | 1 |
 | gpsbabel: wintec_tes | 1 |
-| Interner Treiber (BG728) | 1 |
-| Interner Treiber (GNS2000) | 1 |
+| Internal driver (BG728) | 1 |
+| Internal driver (GNS2000) | 1 |

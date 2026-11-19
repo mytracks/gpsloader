@@ -14,7 +14,7 @@ private let console = SerialPortInfo(path: "/dev/cu.debug-console")
 
 @Suite("Port presentation")
 struct PortPresentationTests {
-    /// Scenario "Passender Bluetooth-Anschluss".
+    /// Scenario "Fitting Bluetooth port".
     @Test func fittingBluetoothPortComesFirst() {
         #expect(m241.id == "m241.holux-m-241")
         let list = PortPresentation.list(ports: [incoming, otherBluetooth, usbPort, holuxBluetooth, console], for: m241)
@@ -30,7 +30,7 @@ struct PortPresentationTests {
         #expect(selection.portPath == holuxBluetooth.path)  // nothing fits: the port is kept
     }
 
-    /// Scenario "Systemanschlüsse": the list is empty and the "no port" hint appears.
+    /// Scenario "System ports": the list is empty and the "no port" hint appears.
     @Test func systemPortsAreHidden() {
         #expect(PortPresentation.list(ports: [incoming, console], for: m241).isEmpty)
         let restored = DeviceSelection.restore(DeviceSelection(entryID: m241.id, portPath: incoming.path),
@@ -51,7 +51,7 @@ struct PortPresentationTests {
 
 @Suite("Device hints")
 struct DeviceHintTests {
-    /// Scenario "M-241 über Bluetooth" (also for the timeout message, scenario "Fehlschlag über Bluetooth").
+    /// Scenario "M-241 over Bluetooth" (also for the timeout message, scenario "Failure over Bluetooth").
     @Test func m241OverBluetooth() {
         let ports = [usbPort, holuxBluetooth]
         let overBluetooth = DeviceSelection(entryID: m241.id, portPath: holuxBluetooth.path)
@@ -62,7 +62,7 @@ struct DeviceHintTests {
         #expect(overUSB.failureHints(entries: DeviceCatalog.entries, ports: ports).isEmpty)
     }
 
-    /// Scenarios "Treiber fehlt" and "Treiber vorhanden".
+    /// Scenarios "Driver missing" and "Driver present".
     @Test func missingDriver() throws {
         let prolific = USBDeviceInfo(vendorID: 0x067B, productID: 0x2303, locationID: 0x0114_0000)
         let hub = USBDeviceInfo(vendorID: 0x047D, productID: 0x8080, locationID: 0x0110_0000)

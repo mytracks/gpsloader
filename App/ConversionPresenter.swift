@@ -22,7 +22,7 @@ final class ConversionPresenter {
         self.sessionPresenter = sessionPresenter
     }
 
-    /// `true` while a conversion runs; a second one is not started (spec "Fortschritt und Abbruch").
+    /// `true` while a conversion runs; a second one is not started (spec "Progress and cancellation").
     private(set) var isConverting = false
 
     /// Names of the supported formats for the main window, e.g. "NMEA 0183, GPX, IGC (flight recorder)".
@@ -32,7 +32,7 @@ final class ConversionPresenter {
 
     // MARK: - Choosing files
 
-    /// Spec "Dateien auswählen": an open panel for one or more files of any type.
+    /// Spec "Choose files": an open panel for one or more files of any type.
     func chooseFiles() {
         guard !isConverting else { return }
         let panel = NSOpenPanel()
@@ -114,7 +114,7 @@ final class ConversionPresenter {
         }
     }
 
-    /// Spec "Nicht erkannte Dateien".
+    /// Spec "Unrecognized files".
     private func confirmSkipping(_ names: [String]) async -> Bool {
         let alert = NSAlert()
         alert.messageText = names.count == 1
@@ -134,7 +134,7 @@ final class ConversionPresenter {
         }
     }
 
-    /// Spec "Speichern"; afterwards the warnings (spec "Fehler und Warnungen").
+    /// Spec "Save"; afterwards the warnings (spec "Errors and warnings").
     private func save(_ result: ImportResult, suggestedName: String, directory: URL?) {
         let write: (URL) -> Void = { url in
             do {
@@ -223,7 +223,7 @@ final class ConversionPresenter {
     }
 }
 
-/// Main window content view that accepts files dropped from the Finder (spec "Dateien auswählen").
+/// Main window content view that accepts files dropped from the Finder (spec "Choose files").
 @MainActor
 final class FileDropView: NSView {
     /// Called with the dropped regular files.

@@ -4,7 +4,7 @@ import LoggerCore
 import SerialTransport
 import SupportPackage
 
-/// The "Device" section of the main window (spec `device-mode`): device and port selection with readable
+/// The "Read Device" section of the main window (spec `device-mode`): device and port selection with readable
 /// names, hints for the device, read and erase.
 @MainActor
 final class DevicePanel: NSObject {
@@ -119,7 +119,7 @@ final class DevicePanel: NSObject {
         UserDefaults.standard.set(selection.stored, forKey: Self.defaultsKey)
     }
 
-    // MARK: - Hints (spec "Hinweise zum Gerät", "Fehlender Treiber")
+    // MARK: - Hints (spec "Device hints", "Missing driver")
 
     private func showHints(_ hints: [DeviceSelection.Hint], device: String) {
         hintStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
@@ -173,7 +173,7 @@ final class DevicePanel: NSObject {
         NSWorkspace.shared.open(hintLinks[sender.tag])
     }
 
-    // MARK: - Ports (spec "Anschluss wählen")
+    // MARK: - Ports (spec "Choose the port")
 
     private func reloadPorts() {
         visiblePorts = PortPresentation.list(ports: ports, for: selection.entry(in: entries))
@@ -220,7 +220,7 @@ final class DevicePanel: NSObject {
                               bluetoothFactory: bluetoothFactory)
     }
 
-    /// Hints that are added to the message of a failed read (spec "Hinweise zum Gerät", design D6).
+    /// Hints that are added to the message of a failed read (spec "Device hints", design D6).
     private var failureHints: [String] {
         let device = selection.entry(in: entries)?.name ?? ""
         return selection.failureHints(entries: entries, ports: ports).map { Self.text(for: $0, device: device) }

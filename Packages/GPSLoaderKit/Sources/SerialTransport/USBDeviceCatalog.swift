@@ -3,7 +3,7 @@ import IOKit
 import IOKit.usb
 import LoggerCore
 
-/// A connected USB device (spec `serial-transport`, "USB-Geräte ermitteln"). Serial numbers are never read.
+/// A connected USB device (spec `serial-transport`, "List USB devices"). Serial numbers are never read.
 public struct USBDeviceInfo: Sendable, Hashable {
     public var vendorID: Int
     public var productID: Int

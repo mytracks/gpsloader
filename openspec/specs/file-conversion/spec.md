@@ -1,110 +1,110 @@
 # file-conversion Specification
 
 ## Purpose
-Der Dateimodus von gpsloader: Dateien von Speicherkarte oder USB-Speicher, deren Format GPSLoggerKit nativ liest, auswählen und als GPX-Datei speichern, ohne gpsbabel und ohne Rosetta.
+The file mode of myTracks Loader: choosing files from a memory card or USB storage whose format GPSLoggerKit or GPSLoggerKitGPL reads natively and saving them as a GPX file, without gpsbabel and without Rosetta.
 
 ## Requirements
 
-### Requirement: Dateien auswählen
-Die App SHALL den Befehl „Dateien konvertieren…“ im Menü „Ablage“ (⌘O) und als Schaltfläche im Bereich „Dateien konvertieren“ anbieten, dazu dort eine Ablagefläche. Der Befehl SHALL auf diesen Bereich schalten und einen Dateidialog für eine oder mehrere Dateien öffnen. Auf das Hauptfenster gezogene Dateien SHALL die App in jedem Bereich annehmen, auf „Dateien konvertieren“ schalten und konvertieren.
+### Requirement: Choose files
+The app SHALL offer the command "Convert Files…" in the "File" menu (⌘O) and as a button in the section "Convert Files", together with a drop zone there. The command SHALL switch to this section and open a file dialog for one or more files. The app SHALL accept files dragged onto the main window in every section, switch to "Convert Files" and convert them.
 
-#### Scenario: Auswahl über das Menü
-- **WHEN** der Anwender „Ablage > Dateien konvertieren…“ wählt und zwei NMEA-Dateien auswählt
-- **THEN** startet die Konvertierung dieser beiden Dateien
+#### Scenario: Choice through the menu
+- **WHEN** the user chooses "File > Convert Files…" and selects two NMEA files
+- **THEN** the conversion of these two files starts
 
-#### Scenario: Drag & Drop
-- **WHEN** der Anwender eine IGC-Datei aus dem Finder auf das Hauptfenster zieht
-- **THEN** startet die Konvertierung dieser Datei
+#### Scenario: Drag and drop
+- **WHEN** the user drags an IGC file from the Finder onto the main window
+- **THEN** the conversion of this file starts
 
-#### Scenario: Ordner gezogen
-- **WHEN** der Anwender einen Ordner auf das Hauptfenster zieht
-- **THEN** nimmt die App ihn nicht an
+#### Scenario: Folder dragged
+- **WHEN** the user drags a folder onto the main window
+- **THEN** the app does not accept it
 
-#### Scenario: Drag & Drop im Gerätebereich
-- **WHEN** der Bereich „Gerät auslesen“ gezeigt wird und der Anwender eine NMEA-Datei auf das Fenster zieht
-- **THEN** zeigt das Fenster den Bereich „Dateien konvertieren“, und die Konvertierung startet
+#### Scenario: Drag and drop in the device section
+- **WHEN** the section "Read Device" is shown and the user drags an NMEA file onto the window
+- **THEN** the window shows the section "Convert Files", and the conversion starts
 
-### Requirement: Unterstützte Formate
-Die App SHALL alle Formate ihres Katalogs konvertieren. Der Katalog SHALL aus den Formaten von GPSLoggerKit und von GPSLoggerKitGPL bestehen. Das Format jeder Datei SHALL über die Formaterkennung auf diesem Katalog bestimmt werden. Kommt ein Format zu einem der beiden Pakete hinzu, SHALL es ohne Änderung an der App verfügbar sein. Der Dateidialog SHALL alle Dateien zur Auswahl zulassen, weil die Endung nur ein Hinweis ist.
+### Requirement: Supported formats
+The app SHALL convert all formats of its catalog. The catalog SHALL consist of the formats of GPSLoggerKit and of GPSLoggerKitGPL. The format of each file SHALL be determined by format detection on this catalog. If a format is added to one of the two packages, it SHALL be available without a change to the app. The file dialog SHALL allow all files to be chosen, because the extension is only a hint.
 
-#### Scenario: NMEA mit Endung .LOG
-- **WHEN** der Anwender die Datei `GPS_20261102.LOG` einer Canon EOS wählt
-- **THEN** wird sie als NMEA 0183 erkannt und konvertiert
+#### Scenario: NMEA with extension .LOG
+- **WHEN** the user chooses the file `GPS_20261102.LOG` of a Canon EOS
+- **THEN** it is detected as NMEA 0183 and converted
 
-#### Scenario: Neues Format im Katalog
-- **WHEN** GPSLoggerKit oder GPSLoggerKitGPL ein weiteres Format in seinen Katalog aufnimmt
-- **THEN** konvertiert die App Dateien dieses Formats, ohne dass ihr Code geändert wird
+#### Scenario: New format in the catalog
+- **WHEN** GPSLoggerKit or GPSLoggerKitGPL adds another format to its catalog
+- **THEN** the app converts files of this format without a change to its code
 
-#### Scenario: Format aus dem GPL-Paket
-- **WHEN** die Konvertierung mit einem Katalog geprüft wird, der zusätzlich ein Testformat enthält, und eine Datei dieses Formats gewählt wird
-- **THEN** wird sie mit dem Testformat gelesen und in die GPX-Datei übernommen
+#### Scenario: Format from the GPL package
+- **WHEN** the conversion is checked with a catalog that additionally contains a test format, and a file of this format is chosen
+- **THEN** it is read with the test format and included in the GPX file
 
-### Requirement: Nicht erkannte Dateien
-Erkennt GPSLoggerKit das Format einer Datei nicht, SHALL die App diese Datei mit Namen nennen und anbieten, ohne sie fortzufahren oder abzubrechen. Ist keine der Dateien erkannt, SHALL die App nur melden, dass das Format nicht unterstützt wird, und nichts konvertieren.
+### Requirement: Unrecognized files
+If the format of a file is not recognized, the app SHALL name this file and offer to continue without it or to cancel. If none of the files is recognized, the app SHALL only report that the format is not supported and convert nothing.
 
-#### Scenario: Eine von drei Dateien unbekannt
-- **WHEN** der Anwender zwei NMEA-Dateien und ein JPEG-Bild wählt
-- **THEN** nennt die App das Bild als nicht unterstützt und bietet „Ohne diese Datei fortfahren“ und „Abbrechen“ an
+#### Scenario: One of three files unknown
+- **WHEN** the user chooses two NMEA files and a JPEG image
+- **THEN** the app names the image as not supported and offers "Continue Without This File" and "Cancel"
 
-#### Scenario: Nur unbekannte Dateien
-- **WHEN** der Anwender ausschließlich eine PDF-Datei wählt
-- **THEN** meldet die App, dass das Format nicht unterstützt wird, und zeigt keinen Sicherungsdialog
+#### Scenario: Only unknown files
+- **WHEN** the user chooses only a PDF file
+- **THEN** the app reports that the format is not supported and shows no save dialog
 
-### Requirement: Mehrere Dateien zusammenführen
-Mehrere Dateien SHALL eine einzige GPX-Datei ergeben. Dateien desselben Formats SHALL in der gewählten Reihenfolge gemeinsam gelesen werden, sodass die Regeln des Formats für mehrere Dateien gelten. Die Ergebnisse verschiedener Formate SHALL in der Reihenfolge ihres ersten Auftretens zusammengefügt werden: erst alle Tracks, dann alle Wegpunkte.
+### Requirement: Merge several files
+Several files SHALL result in a single GPX file. Files of the same format SHALL be read together in the chosen order, so that the rules of the format for several files apply. The results of different formats SHALL be joined in the order of their first appearance: first all tracks, then all waypoints.
 
-#### Scenario: Zwei NMEA-Dateien
-- **WHEN** der Anwender zwei NMEA-Dateien mit je 100 Punkten konvertiert
-- **THEN** enthält die GPX-Datei einen Track mit zwei Segmenten und 200 Punkten
+#### Scenario: Two NMEA files
+- **WHEN** the user converts two NMEA files with 100 points each
+- **THEN** the GPX file contains one track with two segments and 200 points
 
-#### Scenario: Gemischte Formate
-- **WHEN** der Anwender eine GPX-Datei mit einem Track und eine IGC-Datei konvertiert
-- **THEN** enthält die GPX-Datei zwei Tracks, zuerst den aus der GPX-Datei, dann den aus der IGC-Datei
+#### Scenario: Mixed formats
+- **WHEN** the user converts a GPX file with one track and an IGC file
+- **THEN** the GPX file contains two tracks, first the one from the GPX file, then the one from the IGC file
 
-### Requirement: Nachbearbeitung
-Die App SHALL beim Konvertieren den GPS-Wochenüberlauf korrigieren. Enthält das zusammengeführte Ergebnis keine Tracks, aber Wegpunkte, SHALL die App die Wegpunkte zu einem Track machen.
+### Requirement: Post-processing
+When converting, the app SHALL correct the GPS week rollover. If the merged result contains no tracks but waypoints, the app SHALL turn the waypoints into a track.
 
-#### Scenario: Nur Wegpunkte
-- **WHEN** eine GPX-Datei nur 12 Wegpunkte enthält
-- **THEN** enthält die erzeugte GPX-Datei einen Track mit diesen 12 Punkten
+#### Scenario: Only waypoints
+- **WHEN** a GPX file contains only 12 waypoints
+- **THEN** the generated GPX file contains one track with these 12 points
 
-#### Scenario: Alter Logger mit Wochenüberlauf
-- **WHEN** eine NMEA-Datei Zeiten enthält, die mehr als 512 Wochen vor dem heutigen Datum liegen
-- **THEN** sind diese Zeiten in der GPX-Datei um 1024 Wochen verschoben
+#### Scenario: Old logger with week rollover
+- **WHEN** an NMEA file contains times more than 512 weeks before today
+- **THEN** these times are shifted by 1024 weeks in the GPX file
 
-### Requirement: Fortschritt und Abbruch
-Während der Konvertierung SHALL die App ein Fortschrittsfenster mit „Abbrechen“ zeigen und das Hauptfenster bedienbar lassen. Ein Abbruch SHALL die Konvertierung innerhalb einer Sekunde beenden, ohne Datei und ohne Fehlermeldung. Solange eine Konvertierung läuft, SHALL die App keine zweite starten.
+### Requirement: Progress and cancellation
+During the conversion the app SHALL show a progress window with "Cancel" and keep the main window usable. A cancellation SHALL end the conversion within one second, without a file and without an error message. While a conversion runs, the app SHALL not start a second one.
 
-#### Scenario: Große Datei abbrechen
-- **WHEN** der Anwender während der Konvertierung einer 50-MB-NMEA-Datei „Abbrechen“ wählt
-- **THEN** schließt sich das Fortschrittsfenster innerhalb einer Sekunde, und es erscheint weder ein Sicherungsdialog noch eine Fehlermeldung
+#### Scenario: Cancel a large file
+- **WHEN** the user chooses "Cancel" while a 50 MB NMEA file is converted
+- **THEN** the progress window closes within one second, and neither a save dialog nor an error message appears
 
-#### Scenario: Zweite Konvertierung
-- **WHEN** eine Konvertierung läuft und der Anwender weitere Dateien auf das Fenster zieht
-- **THEN** nimmt die App sie nicht an, und der Menübefehl ist deaktiviert
+#### Scenario: Second conversion
+- **WHEN** a conversion runs and the user drags more files onto the window
+- **THEN** the app does not accept them, and the menu command is disabled
 
-### Requirement: Speichern
-Nach erfolgreichem Lesen SHALL die App einen Sicherungsdialog zeigen und das Ergebnis als GPX 1.1 an den gewählten Ort schreiben (siehe `gpx-export`). Vorgeschlagen wird der Name der ersten konvertierten Datei mit der Endung `.gpx` und, sofern möglich, ihr Ordner.
+### Requirement: Save
+After successful reading the app SHALL show a save dialog and write the result as GPX 1.1 to the chosen place (see `gpx-export`). It suggests the name of the first converted file with the extension `.gpx` and, if possible, its folder.
 
-#### Scenario: Name vorschlagen
-- **WHEN** der Anwender `flug1.igc` und `flug2.igc` konvertiert
-- **THEN** schlägt der Sicherungsdialog den Namen `flug1.gpx` vor
+#### Scenario: Suggest a name
+- **WHEN** the user converts `flight1.igc` and `flight2.igc`
+- **THEN** the save dialog suggests the name `flight1.gpx`
 
-#### Scenario: Speichern abgebrochen
-- **WHEN** der Anwender den Sicherungsdialog abbricht
-- **THEN** wird keine Datei geschrieben und keine Meldung gezeigt
+#### Scenario: Saving cancelled
+- **WHEN** the user cancels the save dialog
+- **THEN** no file is written and no message is shown
 
-### Requirement: Fehler und Warnungen
-Kann eine Datei nicht gelesen werden oder enthält sie keine verwertbaren Daten, SHALL die App die lokalisierte Meldung von GPSLoggerKit mit Dateinamen und, falls vorhanden, das technische Detail zeigen und nichts speichern. Hat der Import Warnungen erzeugt, SHALL die App sie nach dem Speichern zusammengefasst anzeigen, eine Zeile je Warnung.
+### Requirement: Errors and warnings
+If a file cannot be read or contains no usable data, the app SHALL show the localized message of the package with the file name and, if present, the technical detail, and save nothing. If the import produced warnings, the app SHALL show them summarized after saving, one line per warning.
 
-#### Scenario: Kaputte GPX-Datei
-- **WHEN** eine GPX-Datei in Zeile 12 nicht wohlgeformt ist
-- **THEN** meldet die App, dass die Datei nicht wohlgeformt ist, nennt Datei und Zeile und zeigt keinen Sicherungsdialog
+#### Scenario: Broken GPX file
+- **WHEN** a GPX file is not well-formed in line 12
+- **THEN** the app reports that the file is not well-formed, names file and line and shows no save dialog
 
-#### Scenario: Verworfene Sätze
-- **WHEN** eine NMEA-Datei drei Sätze mit falscher Prüfsumme enthält
-- **THEN** wird die GPX-Datei geschrieben, und danach meldet die App, dass in dieser Datei drei Datensätze mit falscher Prüfsumme übersprungen wurden
+#### Scenario: Discarded sentences
+- **WHEN** an NMEA file contains three sentences with a wrong checksum
+- **THEN** the GPX file is written, and afterwards the app reports that three records with a wrong checksum were skipped in this file
 
-#### Scenario: Keine Positionen
-- **WHEN** eine NMEA-Datei nur Sätze ohne gültigen Fix enthält
-- **THEN** meldet die App, dass die Datei keine verwertbaren Daten enthält
+#### Scenario: No positions
+- **WHEN** an NMEA file contains only sentences without a valid fix
+- **THEN** the app reports that the file contains no usable data

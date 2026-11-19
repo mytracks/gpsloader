@@ -9,7 +9,7 @@ import LoggerCore
 struct SerialPortTests {
     // MARK: Open and configure
 
-    /// Scenario "Öffnen mit 115200 Baud".
+    /// Scenario "Open with 115200 baud".
     @Test func opensWith115200RawMode() async throws {
         let pty = try PseudoTerminal()
         let port = SerialPort(path: pty.path, baudRate: 115_200)
@@ -36,7 +36,7 @@ struct SerialPortTests {
         await port.close()
     }
 
-    /// Scenario "Port existiert nicht".
+    /// Scenario "Port does not exist".
     @Test func missingPortIsDeviceNotFound() async {
         let port = SerialPort(path: "/dev/cu.gpsloader-does-not-exist", baudRate: 9600)
         await #expect {
@@ -46,7 +46,7 @@ struct SerialPortTests {
         }
     }
 
-    /// Scenario "Port bereits geöffnet".
+    /// Scenario "Port already open".
     @Test func secondOpenIsPortBusy() async throws {
         let pty = try PseudoTerminal()
         let first = SerialPort(path: pty.path, baudRate: 9600)
@@ -65,7 +65,7 @@ struct SerialPortTests {
 
     // MARK: Writing
 
-    /// Scenario "Befehl senden".
+    /// Scenario "Send a command".
     @Test func writesAllBytes() async throws {
         let pty = try PseudoTerminal()
         let port = SerialPort(path: pty.path, baudRate: 9600)
@@ -78,7 +78,7 @@ struct SerialPortTests {
 
     // MARK: Reading (task 3.2)
 
-    /// Scenario "Zeile lesen".
+    /// Scenario "Read a line".
     @Test func readsLineWithoutTerminator() async throws {
         let pty = try PseudoTerminal()
         let port = SerialPort(path: pty.path, baudRate: 115_200)
@@ -91,7 +91,7 @@ struct SerialPortTests {
         await port.close()
     }
 
-    /// Scenario "Daten in Teilstücken".
+    /// Scenario "Data in pieces".
     @Test func readsCountAcrossChunks() async throws {
         let pty = try PseudoTerminal()
         let port = SerialPort(path: pty.path, baudRate: 115_200)
@@ -109,7 +109,7 @@ struct SerialPortTests {
         await port.close()
     }
 
-    /// Scenario "Gerät schweigt".
+    /// Scenario "Device is silent".
     @Test func silenceIsTimeout() async throws {
         let pty = try PseudoTerminal()
         let port = SerialPort(path: pty.path, baudRate: 9600)
@@ -139,7 +139,7 @@ struct SerialPortTests {
         await port.close()
     }
 
-    /// Scenario "Abbruch während des Lesens".
+    /// Scenario "Cancel while reading".
     @Test func cancellationEndsReadAndClosesPort() async throws {
         let pty = try PseudoTerminal()
         let port = SerialPort(path: pty.path, baudRate: 9600)
@@ -159,7 +159,7 @@ struct SerialPortTests {
 
     // MARK: Disconnect (task 3.3)
 
-    /// Scenario "Gerät wird abgezogen".
+    /// Scenario "Device is unplugged".
     @Test func hangUpEndsReadAndReleasesPort() async throws {
         let pty = try PseudoTerminal()
         let port = SerialPort(path: pty.path, baudRate: 9600)

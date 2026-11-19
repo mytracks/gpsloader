@@ -34,7 +34,7 @@ public enum SessionEvent: Sendable, Equatable {
     case finished(SessionOutcome)
 }
 
-/// Proof that the user explicitly confirmed erasing (spec `logger-session`, "Bestätigung vor dem Löschen").
+/// Proof that the user explicitly confirmed erasing (spec `logger-session`, "Confirmation before erasing").
 /// Only create it as the result of a confirmation dialog.
 public struct EraseConfirmation: Sendable, Equatable {
     public let acknowledgesExperimentalErase: Bool

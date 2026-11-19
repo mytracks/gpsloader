@@ -1,6 +1,6 @@
 import Foundation
 
-/// Suggested file names for exported recordings (spec `logger-session`, "Ergebnis speichern").
+/// Suggested file names for exported recordings (spec `logger-session`, "Save the result").
 public enum GPXFileName {
     /// "<device> yyyy-MM-dd HH-mm.gpx" in the given time zone (default: the user's).
     /// Characters that are not allowed or awkward in file names are replaced.

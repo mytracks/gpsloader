@@ -4,7 +4,7 @@ import Testing
 
 @Suite("USBDeviceCatalog")
 struct USBDeviceCatalogTests {
-    /// Scenario "Adapter ohne Treiber": the device is listed although no port belongs to it.
+    /// Scenario "Adapter without driver": the device is listed although no port belongs to it.
     @Test func adapterWithoutPort() {
         let adapter = USBDeviceInfo(vendorID: 0x067B, productID: 0x2303, productName: "USB-Serial Controller", locationID: 0x0114_0000)
         let other = SerialPortInfo(path: "/dev/cu.SLAB_USBtoUART", usbVendorID: 0x10C4, usbProductID: 0xEA60, usbLocationID: 0x0120_0000)

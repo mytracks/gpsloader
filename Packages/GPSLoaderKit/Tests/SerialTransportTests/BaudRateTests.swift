@@ -4,10 +4,10 @@ import Testing
 import LoggerCore
 @testable import SerialTransport
 
-/// Spec `serial-transport`, "Baudrate wechseln" (change device-mode).
+/// Spec `serial-transport`, "Change the baud rate" (change device-mode).
 @Suite("SerialPort baud rate", .serialized)
 struct BaudRateTests {
-    /// Scenario "Wechsel nach der Verhandlung".
+    /// Scenario "Switch after the negotiation".
     @Test func switchesTheRateOfTheOpenPort() async throws {
         let pty = try PseudoTerminal()
         let port = SerialPort(path: pty.path, baudRate: 9600)

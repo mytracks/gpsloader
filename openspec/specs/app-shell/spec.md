@@ -1,90 +1,90 @@
 # app-shell Specification
 
 ## Purpose
-Der App-Rahmen von gpsloader: Start auf allen unterstützten Macs, Hauptfenster, Lizenzhinweise für enthaltene Fremdkomponenten und portierte Vorlagen und Lokalisierung.
+The app frame of myTracks Loader: start on all supported Macs, main window, license notices for included third-party components and ported templates, name, icon and localization.
 
 ## Requirements
 
-### Requirement: Unterstützte Systeme
-Die App MUST auf macOS 12 und neuer starten, und zwar sowohl auf Apple-Silicon- als auch auf Intel-Macs nativ, ohne Rosetta für die App selbst.
+### Requirement: Supported systems
+The app MUST start on macOS 12 and later, natively on both Apple silicon and Intel Macs, without Rosetta for the app itself.
 
-#### Scenario: Start auf Apple Silicon
-- **WHEN** die App auf einem Apple-Silicon-Mac mit macOS 12 oder neuer gestartet wird
-- **THEN** läuft der App-Prozess nativ (arm64) und das Hauptfenster erscheint
+#### Scenario: Start on Apple silicon
+- **WHEN** the app is started on an Apple silicon Mac with macOS 12 or later
+- **THEN** the app process runs natively (arm64) and the main window appears
 
-#### Scenario: Start auf Intel
-- **WHEN** die App auf einem Intel-Mac mit macOS 12 oder neuer gestartet wird
-- **THEN** läuft der App-Prozess nativ (x86_64) und das Hauptfenster erscheint
+#### Scenario: Start on Intel
+- **WHEN** the app is started on an Intel Mac with macOS 12 or later
+- **THEN** the app process runs natively (x86_64) and the main window appears
 
-### Requirement: Lizenzhinweise
-Die App SHALL im Über-Fenster angeben, dass sie unter der GNU GPL Version 3 oder später steht, und wo ihr Quellcode erhältlich ist. Sie SHALL außerdem GPSLoggerKit unter der MIT-Lizenz sowie die Urheber der Vorlagen portierter Formate und Treiber nennen, jeweils mit Quellcode-Bezugsquelle. Gpsbabel und Qt MUST sie nicht als mitgelieferte Programme nennen. Die Texte der GPL Version 3 und der MIT-Lizenz MUST im App-Bundle enthalten sein.
+### Requirement: License notices
+The app SHALL state in the About window that it is licensed under the GNU GPL version 3 or later and where its source code is available. It SHALL also name GPSLoggerKit under the MIT License and the authors of the templates of ported formats and drivers, each with the source of their code. It MUST NOT name gpsbabel and Qt as bundled programs. The texts of the GPL version 3 and of the MIT License MUST be included in the app bundle.
 
-#### Scenario: Über-Fenster öffnen
-- **WHEN** der Anwender „Über myTracks Loader“ wählt
-- **THEN** zeigt das Fenster die App-Version, die Copyright-Angabe, die Lizenz der App mit Verweis auf ihren Quellcode und den Lizenzhinweis für GPSLoggerKit
-- **AND** es erwähnt weder gpsbabel 1.7.0 noch Qt als mitgelieferte Programme
+#### Scenario: Open the About window
+- **WHEN** the user chooses "About myTracks Loader"
+- **THEN** the window shows the app version, the copyright, the app's license with a link to its source code and the license notice for GPSLoggerKit
+- **AND** it mentions neither gpsbabel 1.7.0 nor Qt as bundled programs
 
-#### Scenario: Portierte Formate
-- **WHEN** GPSLoggerKitGPL Formate oder Treiber mit Vorlagen enthält
-- **THEN** nennt das Über-Fenster die Urheber dieser Vorlagen oder verweist auf eine mitgelieferte Liste, die sie nennt
+#### Scenario: Ported formats
+- **WHEN** GPSLoggerKitGPL contains formats or drivers based on templates
+- **THEN** the About window names the authors of these templates or refers to a bundled list that names them
 
-#### Scenario: Lizenztexte im Bundle
-- **WHEN** das ausgelieferte App-Bundle untersucht wird
-- **THEN** enthält es die vollständigen Texte der GPL Version 3 und der MIT-Lizenz von GPSLoggerKit
-- **AND** es enthält kein `Contents/Helpers` und kein Qt-Framework
+#### Scenario: License texts in the bundle
+- **WHEN** the shipped app bundle is examined
+- **THEN** it contains the complete texts of the GPL version 3 and of the MIT License of GPSLoggerKit
+- **AND** it contains no `Contents/Helpers` and no Qt framework
 
-### Requirement: Lokalisierung
-Alle sichtbaren Texte der App MUST auf Deutsch und Englisch vorliegen. Die Sprache SHALL der Systemeinstellung folgen, mit Englisch als Rückfall.
+### Requirement: Localization
+All visible texts of the app MUST be available in German and English. The language SHALL follow the system setting, with English as the fallback.
 
-#### Scenario: Deutsches System
-- **WHEN** die bevorzugte Systemsprache Deutsch ist
-- **THEN** erscheinen alle Texte der App auf Deutsch
+#### Scenario: German system
+- **WHEN** the preferred system language is German
+- **THEN** all texts of the app appear in German
 
-#### Scenario: Nicht unterstützte Sprache
-- **WHEN** die bevorzugte Systemsprache weder Deutsch noch Englisch ist
-- **THEN** erscheinen alle Texte der App auf Englisch
+#### Scenario: Unsupported language
+- **WHEN** the preferred system language is neither German nor English
+- **THEN** all texts of the app appear in English
 
-### Requirement: Bereiche des Hauptfensters
-Das Hauptfenster SHALL in der Werkzeugleiste einen Umschalter mit den Bereichen „Dateien konvertieren“ und „Gerät auslesen“ zeigen und darunter nur den gewählten Bereich. Das Menü „Darstellung“ SHALL beide Bereiche mit ⌘1 und ⌘2 anbieten. Die App SHALL den zuletzt gewählten Bereich beim nächsten Start wieder zeigen; beim ersten Start SHALL „Gerät auslesen“ gewählt sein.
+### Requirement: Sections of the main window
+The main window SHALL show a toggle with the sections "Convert Files" and "Read Device" in the toolbar and below it only the chosen section. The "View" menu SHALL offer both sections with ⌘1 and ⌘2. The app SHALL show the last chosen section again at the next start; at the first start "Read Device" SHALL be chosen.
 
-#### Scenario: Erster Start
-- **WHEN** die App zum ersten Mal startet
-- **THEN** zeigt das Hauptfenster den Bereich „Gerät auslesen“, und im Umschalter ist dieser Bereich gewählt
+#### Scenario: First start
+- **WHEN** the app starts for the first time
+- **THEN** the main window shows the section "Read Device", and this section is chosen in the toggle
 
-#### Scenario: Bereich merken
-- **WHEN** der Anwender „Dateien konvertieren“ wählt und die App neu startet
-- **THEN** zeigt das Hauptfenster den Bereich „Dateien konvertieren“
+#### Scenario: Remember the section
+- **WHEN** the user chooses "Convert Files" and restarts the app
+- **THEN** the main window shows the section "Convert Files"
 
-#### Scenario: Tastenkürzel
-- **WHEN** der Anwender im Bereich „Dateien konvertieren“ ⌘2 drückt
-- **THEN** zeigt das Hauptfenster den Bereich „Gerät auslesen“
+#### Scenario: Keyboard shortcut
+- **WHEN** the user presses ⌘2 in the section "Convert Files"
+- **THEN** the main window shows the section "Read Device"
 
-### Requirement: Name der App
-Die App MUST für Anwender „myTracks Loader“ heißen: im Finder, im Dock, im App-Menü und seinen Befehlen, in Fenstertiteln, im Über-Fenster, in allen Texten der Lokalisierung und in der Begründung von Systemdialogen. Das App-Bundle MUST `myTracks Loader.app` heißen. Die Bundle-ID MUST `info.stichling.gpsloader` bleiben, damit gespeicherte Einstellungen erhalten bleiben.
+### Requirement: Name of the app
+For users the app MUST be called "myTracks Loader": in the Finder, in the Dock, in the app menu and its commands, in window titles, in the About window, in all localized texts and in the explanation of system dialogs. The app bundle MUST be called `myTracks Loader.app`. The bundle ID MUST stay `info.stichling.gpsloader`, so that stored settings are kept.
 
-#### Scenario: App-Menü
-- **WHEN** der Anwender das App-Menü öffnet
-- **THEN** heißt es „myTracks Loader“, und es enthält „Über myTracks Loader“ und „myTracks Loader beenden“ (englisch „About myTracks Loader“ und „Quit myTracks Loader“)
+#### Scenario: App menu
+- **WHEN** the user opens the app menu
+- **THEN** it is called "myTracks Loader" and contains "About myTracks Loader" and "Quit myTracks Loader" (German "Über myTracks Loader" and "myTracks Loader beenden")
 
-#### Scenario: Kein alter Name sichtbar
-- **WHEN** alle lokalisierten Texte der App und ihr Info.plist auf Deutsch und Englisch durchsucht werden
-- **THEN** kommt „gpsloader“ in keinem sichtbaren Text vor, nur in Kennungen wie der Bundle-ID und der Adresse des Quellcodes
+#### Scenario: Old name not visible
+- **WHEN** all localized texts of the app and its Info.plist are searched in German and English
+- **THEN** "gpsloader" appears in no visible text, only in identifiers such as the bundle ID and the source code address
 
-#### Scenario: Einstellungen bleiben
-- **WHEN** eine Version mit dem neuen Namen auf einem Mac startet, auf dem eine frühere Version Gerät, Anschluss und Bereich gespeichert hat
-- **THEN** zeigt die App dieselbe Auswahl wie zuvor
+#### Scenario: Settings are kept
+- **WHEN** a version with the new name starts on a Mac where an earlier version stored device, port and section
+- **THEN** the app shows the same choice as before
 
-### Requirement: App-Icon
-Die App SHALL ein Icon im Stil von myTracks Neo haben: einen senkrechten Verlauf von `#1A46DE` oben nach `#9F199C` unten und darauf einen weißen Satelliten in Linienzeichnung. Das Icon MUST in allen Größen vorliegen, die macOS 12 und neuer im Finder, im Dock und im Über-Fenster nutzen. Es MUST aus einer versionierten Quelle reproduzierbar erzeugt werden.
+### Requirement: App icon
+The app SHALL have an icon in the style of myTracks Neo: a vertical gradient from `#1A46DE` at the top to `#9F199C` at the bottom with a white satellite in line art on it. The icon MUST be available in all sizes that macOS 12 and later use in the Finder, in the Dock and in the About window. It MUST be generated reproducibly from a versioned source.
 
-#### Scenario: Icon im Dock
-- **WHEN** die App läuft
-- **THEN** zeigt das Dock das Satelliten-Icon und nicht das allgemeine App-Symbol
+#### Scenario: Icon in the Dock
+- **WHEN** the app is running
+- **THEN** the Dock shows the satellite icon and not the generic app icon
 
-#### Scenario: Über-Fenster
-- **WHEN** der Anwender das Über-Fenster öffnet
-- **THEN** zeigt es das App-Icon
+#### Scenario: About window
+- **WHEN** the user opens the About window
+- **THEN** it shows the app icon
 
-#### Scenario: Reproduzierbar
-- **WHEN** das Icon aus seiner Quelle neu erzeugt wird
-- **THEN** stimmen die erzeugten Bilder mit denen im Repository überein
+#### Scenario: Reproducible
+- **WHEN** the icon is generated again from its source
+- **THEN** the generated images match those in the repository

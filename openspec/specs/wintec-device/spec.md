@@ -1,13 +1,13 @@
 # wintec-device Specification
 
 ## Purpose
-Die Einträge der Wintec-Logger im Gerätekatalog der App. Das Geräteprotokoll liegt in GPSLoggerKitGPL (https://github.com/mytracks/GPSLoggerKitGPL, Spec `wintec-device` dort).
+The entries of the Wintec loggers in the app's device catalog. The device protocol lives in GPSLoggerKitGPL (https://github.com/mytracks/GPSLoggerKitGPL, spec `wintec-device` there).
 
 ## Requirements
 
-### Requirement: Wintec-Geräte im Katalog
-Der Gerätekatalog SHALL die fünf Wintec-Geräte der Alt-App mit einem gemeinsamen Treiber enthalten und Löschen anbieten.
+### Requirement: Wintec devices in the catalog
+The device catalog SHALL contain the five Wintec devices of the old app with one shared driver and SHALL offer erasing.
 
-#### Scenario: Wintec-Geräte im Katalog
-- **WHEN** der Anwender die Geräteliste öffnet
-- **THEN** enthält sie G-Rays 2, WBT-100, WBT-200, WBT-201 und WSG-1000
+#### Scenario: Wintec devices in the catalog
+- **WHEN** the user opens the device list
+- **THEN** it contains G-Rays 2, WBT-100, WBT-200, WBT-201 and WSG-1000

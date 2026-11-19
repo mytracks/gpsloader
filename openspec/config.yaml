@@ -1,149 +1,152 @@
 schema: spec-driven
 
-# Projektkontext: Leitplanken für alle OpenSpec-Artefakte.
-# Fachliche Hintergründe zur Alt-App stehen in docs/legacy-analysis.md und
-# docs/legacy-device-catalog.md und werden hier nur referenziert.
+# Project context: guardrails for all OpenSpec artifacts.
+# Background on the old app is in docs/legacy-analysis.md and docs/legacy-device-catalog.md and is only
+# referenced here.
 context: |
-  ## Produkt
-  myTracks Loader (Name entschieden am 2026-11-19, Change rename-and-icon; Repository, Target, Module und
-  Bundle-ID heißen weiter gpsloader) ist eine kleine, eigenständige macOS-App. Sie liest GPS-Logger
-  aus und speichert die Aufzeichnungen als GPX-Dateien. Sie löst die Logger-Funktionen der
-  seit fast 20 Jahren entwickelten App myTracks ab; dort werden diese Funktionen entfernt.
-  Zielgruppe sind myTracks-Bestandskunden und andere Besitzer solcher Logger.
-  Zum Funktionsumfang gehören:
-  - Direktmodus: Gerät wählen (serieller Port /dev/cu.* bzw. gekoppeltes Bluetooth-Gerät),
-    Daten auslesen, GPX schreiben, optional den Logger-Speicher löschen.
-  - Dateimodus: Dateien von Speicherkarte bzw. USB-Speicher (NMEA, FIT, TCX, IGC, NAL,
-    wintec_tes, sbp/sbn usw.) nach GPX konvertieren.
-  Nicht dazu gehören Track-Verwaltung, Karten, Geotagging und Bearbeitung.
+  ## Product
+  myTracks Loader (name decided on 2026-11-19, change rename-and-icon; repository, target, modules and
+  bundle ID keep the name gpsloader) is a small standalone macOS app. It reads GPS loggers and saves the
+  recordings as GPX files. It replaces the logger functions of the app myTracks, developed for almost
+  20 years; these functions are removed there.
+  The audience is existing myTracks customers and other owners of such loggers.
+  The scope covers:
+  - Direct mode: choose a device (serial port /dev/cu.* or paired Bluetooth device), read the data,
+    write GPX, optionally erase the logger memory.
+  - File mode: convert files from a memory card or USB storage (NMEA, FIT, TCX, IGC, NAL, wintec_tes,
+    sbp/sbn and others) to GPX.
+  Track management, maps, geotagging and editing are not part of it.
 
-  ## Vertrieb
-  - Download über GitHub-Releases von https://github.com/mytracks/gpsloader (entschieden am
-    2026-11-19, Change split-repositories), NICHT über den Mac App Store. Das Release enthält das
-    notarisierte ZIP myTracks-Loader-<Version>.zip und seine Prüfsumme (Scripts/release.sh --publish).
-  - Developer-ID-signiert, notarisiert, Hardened Runtime. Die App-Sandbox ist nicht erforderlich
-    (direkter Zugriff auf /dev/cu.*, IOKit/HID und IOBluetooth).
-  - Die App ist ein Universal Binary (arm64 + x86_64) ohne Hilfsprogramme und ohne Rosetta-Bezug.
-  - Lizenz der App (entschieden am 2026-11-10, Change gpl-driver-package): GPL-3.0-or-later für App,
-    GPSLoaderKit und GPSLoggerKitGPL; GPSLoggerKit bleibt MIT. Jede ausgelieferte
-    Version MUST ihren vollständigen Quellcode anbieten (Adresse: Build-Einstellung
-    GPSLOADER_SOURCE_CODE_URL, von Scripts/verify-bundle.sh für Release-Builds erzwungen).
-    Bezugsquelle (entschieden am 2026-11-13): das öffentliche Repository
-    https://github.com/mytracks/gpsloader; jede Version wird dort vor dem Release gepusht und als Tag
-    geführt, die Pakete mit ihren Tags in ihren Repositories.
+  ## Language (decided by the developer on 2026-11-19)
+  - All files in the repositories are in English: OpenSpec artifacts, README, docs, code, identifiers
+    and comments. The conversation with the developer is in German. Archived changes from before
+    2026-11-19 stay in German as history.
+  - The app UI is localized in German and English (German texts address the user formally with "Sie").
 
-  ## Technische Leitplanken (entschieden)
-  - Minimales Deployment Target: macOS 12 (entschieden am 2026-11-02; das SDK von Xcode 27
-    unterstützt nichts Älteres).
-  - Eigener Code ausschließlich in Swift. Kein Objective-C-, C- oder C++-Quellcode im Projekt.
-    System-APIs wie IOKit, IOHID, termios/POSIX und IOBluetooth werden direkt aus Swift genutzt.
-  - Möglichst modernes Swift: Swift 6 Language Mode, Strict Concurrency, async/await, Actors,
-    Sendable, value types, Swift Package Manager für die Modularisierung.
-    APIs, die neuer als macOS 12 sind, nur mit `#available`-Fallback.
-  - UI auf AppKit-Basis. SwiftUI nur, wo es unter macOS 12 zuverlässig funktioniert.
-  - Treiber-Architektur: ein gemeinsames Treiber-Protokoll (async, abbrechbar, mit Fortschritt);
-    alle Treiber sind native Swift-Treiber in GPSLoggerKit bzw. GPSLoggerKitGPL (siehe unten). Die
-    Geräteschnittstelle (DeviceConnection/DeviceProtocol, eigener Code) liegt seit Change gns2000-driver
-    in GPSLoggerKit; die Transporte (seriell, USB-HID, Bluetooth-RFCOMM) liegen in GPSLoaderKit.
-    Noch offen: BG728 (Maptaq Trip IQ) und WSG-2000-NAL-Dateien.
-  - Kein gpsbabel (entschieden am 2026-11-13, Change remove-gpsbabel): Die App liefert weder gpsbabel
-    noch Qt noch einen Rosetta-Installer aus und braucht kein Rosetta. Das gpsbabel-1.7.0-Binary der
-    Alt-App (x86_64, docs/legacy-analysis.md, Abschnitt 3.1; myTracks-Historie, Commit e0d1f18) dient
-    nur noch der Black-Box-Gegenprüfung von Portierungen; es wird in den Scratchpad kopiert, nie ins
-    Repository und nie in die App. Aufruf auch dort nur als Prozess mit Argument-Array, nie über eine Shell.
-  - Bluetooth-Logger (außer GNS2000, der über IOBluetooth/RFCOMM läuft) werden nur über den seriellen Port /dev/cu.* angesprochen,
-    den macOS nach dem Koppeln anlegt. Es gibt keine eigene RFCOMM-Brücke.
-  - Keine Laufzeitabhängigkeit von Python, Perl oder anderen Interpretern.
-    Kein system()/popen(), keine Shell-Kommandozeilen mit Platzhaltern wie in der Alt-App.
-  - Gerätelogik (Protokolle, Parser, GPX-Erzeugung) liegt in UI-unabhängigen Swift-Packages.
-    Diese müssen ohne Hardware testbar sein: Transport als Protokoll, Mock-Transport,
-    aufgezeichnete Gerätedialoge als Test-Fixtures.
-  - Ausgabe: GPX 1.1, Zeiten in UTC (ISO 8601 mit Z), ohne myTracks-Extensions.
-    Tracks werden so aufgeteilt, wie es das Gerät bzw. der Treiber vorgibt.
-  - Lokalisierung: Deutsch und Englisch. Code, Bezeichner und Code-Kommentare auf Englisch.
+  ## Distribution
+  - Download through GitHub releases of https://github.com/mytracks/gpsloader (decided on 2026-11-19,
+    change split-repositories), NOT through the Mac App Store. The release contains the notarized ZIP
+    myTracks-Loader-<version>.zip and its checksum (Scripts/release.sh --publish).
+  - Developer ID signed, notarized, hardened runtime. The app sandbox is not required (direct access to
+    /dev/cu.*, IOKit/HID and IOBluetooth).
+  - The app is a universal binary (arm64 + x86_64) without helper programs and without any Rosetta
+    dependency.
+  - License of the app (decided on 2026-11-10, change gpl-driver-package): GPL-3.0-or-later for the app,
+    GPSLoaderKit and GPSLoggerKitGPL; GPSLoggerKit stays MIT. Every shipped version MUST offer its
+    complete source code (address: build setting GPSLOADER_SOURCE_CODE_URL, enforced by
+    Scripts/verify-bundle.sh for release builds). Source (decided on 2026-11-13): the public repository
+    https://github.com/mytracks/gpsloader; every version is pushed there before the release and tagged,
+    the packages with their tags in their repositories.
 
-  ## Pakete in eigenen Repositories (entschieden am 2026-11-19, Change split-repositories)
-  - Formate und Geräteprotokolle liegen in zwei eigenen, öffentlichen Repositories mit eigenem
-    OpenSpec, eigenen Regeln und eigenen Releases (Tags `x.y.z`, unter 1.0.0 als Pre-release):
-    - GPSLoggerKit (MIT, macOS 12+ und iOS/iPadOS 27+, Clean-Room):
-      https://github.com/mytracks/GPSLoggerKit. Auch myTracks Neo (App Store) nutzt es.
-      Familien: NMEA, GPX, IGC, FIT, TCX, Suunto SML, KML/KMZ, CSV-Logger (V-900, iBlue),
-      GNS 2000; WSG-2000 NAL ist dort als Black-Box vorgesehen.
-    - GPSLoggerKitGPL (GPL-3.0-or-later, nur macOS, Portierungen aus gpsbabel 1.7.0 und igotu2gpx):
-      https://github.com/mytracks/GPSLoggerKitGPL. Familien: SkyTraq, MTK/Holux, Wintec,
+  ## Technical guardrails (decided)
+  - Minimum deployment target: macOS 12 (decided on 2026-11-02; the SDK of Xcode 27 supports nothing
+    older).
+  - Own code only in Swift. No Objective-C, C or C++ source code in the project. System APIs such as
+    IOKit, IOHID, termios/POSIX and IOBluetooth are used directly from Swift.
+  - Modern Swift where possible: Swift 6 language mode, strict concurrency, async/await, actors,
+    Sendable, value types, Swift Package Manager for modularization. APIs newer than macOS 12 only with
+    an `#available` fallback.
+  - UI based on AppKit. SwiftUI only where it works reliably on macOS 12.
+  - Driver architecture: one shared driver protocol (async, cancellable, with progress); all drivers are
+    native Swift drivers in GPSLoggerKit or GPSLoggerKitGPL (see below). The device interface
+    (DeviceConnection/DeviceProtocol, own code) lives in GPSLoggerKit since change gns2000-driver; the
+    transports (serial, USB HID, Bluetooth RFCOMM) live in GPSLoaderKit. Still open: BG728 (Maptaq Trip IQ)
+    and WSG-2000 NAL files.
+  - No gpsbabel (decided on 2026-11-13, change remove-gpsbabel): the app ships neither gpsbabel nor Qt nor
+    a Rosetta installer and does not need Rosetta. The gpsbabel 1.7.0 binary of the old app (x86_64,
+    docs/legacy-analysis.md, section 3.1; myTracks history, commit e0d1f18) only serves black-box
+    cross-checks of ports; it is copied to the scratchpad, never into the repository and never into the
+    app. There too it is run only as a process with an argument array, never through a shell.
+  - Bluetooth loggers (except the GNS2000, which runs over IOBluetooth/RFCOMM) are only used through the
+    serial port /dev/cu.* that macOS creates after pairing. There is no RFCOMM bridge of our own.
+  - No runtime dependency on Python, Perl or other interpreters. No system()/popen(), no shell command
+    lines with placeholders as in the old app.
+  - Device logic (protocols, parsers, GPX generation) lives in UI-independent Swift packages. They must be
+    testable without hardware: transport as a protocol, mock transport, recorded device dialogs as test
+    fixtures.
+  - Output: GPX 1.1, times in UTC (ISO 8601 with Z), without myTracks extensions. Tracks are split as the
+    device or the driver dictates.
+
+  ## Packages in their own repositories (decided on 2026-11-19, change split-repositories)
+  - Formats and device protocols live in two public repositories of their own with their own OpenSpec,
+    rules and releases (tags `x.y.z`, pre-release below 1.0.0):
+    - GPSLoggerKit (MIT, macOS 12+ and iOS/iPadOS 27+, clean-room):
+      https://github.com/mytracks/GPSLoggerKit. myTracks Neo (App Store) uses it too.
+      Families: NMEA, GPX, IGC, FIT, TCX, Suunto SML, KML/KMZ, CSV loggers (V-900, iBlue), GNS 2000;
+      WSG-2000 NAL is planned there as black-box.
+    - GPSLoggerKitGPL (GPL-3.0-or-later, macOS only, ports from gpsbabel 1.7.0 and igotu2gpx):
+      https://github.com/mytracks/GPSLoggerKitGPL. Families: SkyTraq, MTK/Holux, Wintec,
       Locosys/Navilink, Medion GoPal, Magellan, XAiOX iTrackU, Alan Map500, i-GotU.
-  - Die Clean-Room-Regel von GPSLoggerKit und die Regeln für Portierungen (zulässige Lizenzen,
-    Dateiköpfe, gpsbabel-Tag, „kein Rückweg“) stehen in der openspec/config.yaml des jeweiligen
-    Repositorys und gelten dort. In diesem Repository wird kein GPL-Quelltext gelesen.
-  - Die App bindet beide Pakete in GPSLoaderKit per URL und `.upToNextMinor` ein; die Stände stehen
-    in Packages/GPSLoaderKit/Package.resolved. Release-Builds nutzen nur diese Stände.
-  - Ein Change arbeitet in genau einem Repository. Ein Feature, das Paket und App betrifft, ist ein
-    Change im Paket-Repository mit Paket-Release und danach ein Change hier, der die Version anhebt
-    und Katalog, Transporte oder UI ergänzt. Für die Entwicklung lässt sich ein lokal ausgecheckter
-    Paketstand statt der URL nutzen (README, Abschnitt „Pakete“).
-  - Gerätekatalog (Modul DeviceDrivers), Transporte (seriell, USB-HID, Bluetooth-RFCOMM) und UI
-    bleiben in diesem Repository; dafür gelten die Specs hier.
-  - Noch offen: BG728 (Maptaq Trip IQ); in welchem Paket die Familie entsteht, ist noch nicht
-    entschieden.
+  - The clean-room rule of GPSLoggerKit and the porting rules (permitted licenses, file headers,
+    gpsbabel tag, "no way back") are in the openspec/config.yaml of the respective repository and apply
+    there. No GPL source code is read in this repository.
+  - The app uses both packages in GPSLoaderKit by URL and `.upToNextMinor`; the versions are in
+    Packages/GPSLoaderKit/Package.resolved. Release builds use only these versions.
+  - A change works in exactly one repository. A feature that concerns a package and the app is a change
+    in the package repository with a package release, followed by a change here that raises the version
+    and adds catalog, transports or UI. For development a local package checkout can be used instead of
+    the URL (README, section "Packages").
+  - Device catalog (module DeviceDrivers), transports (serial, USB HID, Bluetooth RFCOMM) and UI stay in
+    this repository; the specs here apply to them.
+  - Still open: BG728 (Maptaq Trip IQ); in which package the family is built is not decided yet.
 
-  ## Umfang (entschieden)
-  - Unterstützt wird der Gerätekatalog der Alt-App (docs/legacy-device-catalog.md) mit diesen Abweichungen:
-    - Entfallen: alle LoadMyTracks-Geräte; alle Treiber auf Basis von Skriptsprachen
-      (Royaltek RGM-3800/RBT-2300/GOSGET S1, Gisteq DPL700/CD111, XAiOX iTrackU Nemerix/SiRF,
-      MainNav, Suunto Ambit via ambit2gpx, fit2tcx); die Palm-OS-Formate cetus und coto
-      (fehlen in gpsbabel 1.7.0).
-    - Wieder aufgenommen: i-GotU GT-100, GT-120, GT-200e, GT-600 und GT-800/Pro (nativ).
-  - Keine Übernahme von Logger-Konfigurationen aus myTracks.
-  - Kein Echtzeit-Tracking.
-  - Diagnose-Mitschnitt (bestätigt am 2026-11-02, umgesetzt in setup-foundation): alle gesendeten
-    und empfangenen Bytes mit Zeitstempel in eine Datei, die Anwender dem
-    Entwickler schicken können. Mitschnitte dienen zugleich als Test-Fixtures.
-    Seit 2026-11-14 (Change support-package) läuft er immer mit; Anwender schicken ihn im
-    Support-Paket (ZIP, nur lokal gesichert, kein Versand durch die App).
+  ## Scope (decided)
+  - The device catalog of the old app (docs/legacy-device-catalog.md) is supported with these deviations:
+    - Dropped: all LoadMyTracks devices; all drivers based on script languages (Royaltek
+      RGM-3800/RBT-2300/GOSGET S1, Gisteq DPL700/CD111, XAiOX iTrackU Nemerix/SiRF, MainNav, Suunto Ambit
+      via ambit2gpx, fit2tcx); the Palm OS formats cetus and coto (missing in gpsbabel 1.7.0).
+    - Added again: i-GotU GT-100, GT-120, GT-200e, GT-600 and GT-800/Pro (native).
+  - No takeover of logger configurations from myTracks.
+  - No real-time tracking.
+  - Diagnostic capture (confirmed on 2026-11-02, implemented in setup-foundation): all sent and received
+    bytes with timestamps in a file that users can send to the developer. Captures also serve as test
+    fixtures. Since 2026-11-14 (change support-package) it is always on; users send it in the support
+    package (ZIP, saved only locally, never sent by the app).
 
-  ## Vorschläge aus der Exploration (noch nicht bestätigt)
-  - Wintec WPL 1000 / Navilock NL-456DL zurückstellen (nur ein x86-Binary ohne Quellcode vorhanden).
-  - Rückweg zu myTracks: erzeugte GPX-Datei per "In myTracks öffnen" übergeben.
-  - Updates über Sparkle, als eigener Change.
+  ## Suggestions from the exploration (not yet confirmed)
+  - Defer Wintec WPL 1000 / Navilock NL-456DL (only an x86 binary without source code exists).
+  - Way back to myTracks: hand the generated GPX file over with "Open in myTracks".
+  - Updates through Sparkle, as a change of its own.
 
-  ## Rahmenbedingungen der Entwicklung
-  - Der Entwickler ist sehr erfahren mit macOS und myTracks. Fachliche Rückfragen zu Geräten
-    sind sinnvoll, Grundlagenerklärungen nicht.
-  - Der Entwickler hat KEINE Testgeräte für i-GotU und Bluetooth-Logger. Tests mit echter
-    Hardware übernehmen hier die Anwender. Für die übrigen Geräte ist Hardware-Verifikation
-    immer ein manueller Schritt des Entwicklers; der Agent hat keine Hardware.
-  - Der Originalcode von myTracks liegt in input/mytracks4mac/. Er ist ein Git-Repository,
-    nur lesbar, per .gitignore nicht versioniert und darf weder verändert noch in den Build
-    übernommen werden. Gelöschter Code (i-GotU, gpsbabel 1.7.0) ist über die Git-Historie
-    abrufbar. Proposals und Designs verweisen auf docs/legacy-analysis.md bzw. die Quelldateien,
-    statt Wissen neu herzuleiten.
-  - Ziel ist eine moderne Neuimplementierung des Verhaltens, keine 1:1-Portierung.
-    Schwächen der Alt-App (siehe legacy-analysis.md, Abschnitt 8) werden nicht übernommen.
+  ## Development conditions
+  - The developer is very experienced with macOS and myTracks. Functional questions about devices are
+    useful, explanations of basics are not.
+  - The developer has NO test devices for i-GotU and Bluetooth loggers. Users take over tests with real
+    hardware for those. For the other devices hardware verification is always a manual step of the
+    developer; the agent has no hardware.
+  - The original myTracks code is in input/mytracks4mac/. It is a Git repository, read only, not
+    versioned (.gitignore), and must neither be changed nor taken into the build. Deleted code (i-GotU,
+    gpsbabel 1.7.0) is available through the Git history. Proposals and designs refer to
+    docs/legacy-analysis.md or the source files instead of deriving knowledge again.
+  - The goal is a modern reimplementation of the behavior, not a 1:1 port. Weaknesses of the old app
+    (see legacy-analysis.md, section 8) are not taken over.
 
 rules:
   proposal:
-    - Auf Deutsch schreiben.
-    - Betroffene Geräte und Treiberfamilien (gemäß docs/legacy-device-catalog.md) explizit nennen.
-    - Immer einen Abschnitt "Nicht im Umfang" aufnehmen.
-    - Berührt der Change einen der noch nicht bestätigten Vorschläge, die Entscheidung
-      ausdrücklich beim Entwickler einholen und festhalten.
-    - Bei einer neuen Logger-Familie festlegen, ob sie in GPSLoggerKit (Clean-Room) oder in
-      GPSLoggerKitGPL (Portierung) entsteht, und die Entscheidung beim Entwickler einholen. Die
-      Familie selbst entsteht mit einem Change im Paket-Repository; der Change hier nennt die
-      Paketversion und ergänzt nur Katalog, Transport oder UI.
+    - Write in English.
+    - Name the affected devices and driver families (according to docs/legacy-device-catalog.md) explicitly.
+    - Always include a section "Out of scope".
+    - If the change touches one of the not yet confirmed suggestions, get the developer's decision
+      explicitly and record it.
+    - For a new logger family decide whether it is built in GPSLoggerKit (clean-room) or in
+      GPSLoggerKitGPL (port), and get the developer's decision. The family itself is built with a change
+      in the package repository; the change here names the package version and only adds catalog,
+      transport or UI.
   specs:
-    - Fließtext auf Deutsch. Jede Requirement-Aussage enthält das Schlüsselwort SHALL oder MUST,
-      weil der OpenSpec-Validator das verlangt (z. B. "Die App SHALL …").
-    - Szenarien im Format WHEN/THEN, möglichst ohne echte Hardware prüfbar
-      (Mock-Transport, aufgezeichnete Antworten).
-    - Protokolldetails (Befehle, Antwortformate, Byte-Layouts) gehören in die Specs der
-      jeweiligen Treiber-Capability, nicht in die UI-Specs.
+    - Write in English. Every requirement statement contains the keyword SHALL or MUST, because the
+      OpenSpec validator requires it (for example "The app SHALL …").
+    - Requirement texts at most 500 characters; examples and edge cases go into scenarios.
+    - Scenarios in WHEN/THEN form, testable without real hardware where possible (mock transport,
+      recorded answers).
+    - Protocol details (commands, answer formats, byte layouts) belong in the specs of the respective
+      driver capability, not in the UI specs.
   design:
-    - Auf Deutsch schreiben.
-    - Relevante Alt-Quelldateien unter input/mytracks4mac/ mit Pfad (bei gelöschtem Code mit Commit) referenzieren.
-    - "Swift-6-Concurrency explizit behandeln: Isolation, Sendable, Timeouts, Abbruch."
+    - Write in English.
+    - Reference relevant old source files below input/mytracks4mac/ with their path (deleted code with
+      the commit).
+    - "Handle Swift 6 concurrency explicitly: isolation, Sendable, timeouts, cancellation."
   tasks:
-    - Auf Deutsch schreiben.
-    - Zu jedem Protokoll-/Parser-Task gehört ein Test-Task mit Fixtures.
-    - Manuelle Hardware-Tests als eigene, klar markierte Tasks ("[manuell, Hardware]") aufführen;
-      Tests, die Anwender übernehmen müssen, als "[manuell, Anwender]".
+    - Write in English.
+    - Every protocol/parser task has a test task with fixtures.
+    - List manual hardware tests as separate, clearly marked tasks ("[manual, hardware]"); tests that
+      users have to take over as "[manual, user]".

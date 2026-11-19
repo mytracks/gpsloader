@@ -10,7 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var sessionPresenter: SessionPresenter? { mainWindowController?.sessionPresenter }
 
     /// Folders of earlier builds named "gpsloader", moved before the log and the capture store write anything
-    /// (spec `support-package`, "App-Protokoll"; design D2 of change rename-and-icon).
+    /// (spec `support-package`, "App log"; design D2 of change rename-and-icon).
     private var folderMigrations: [(String, LegacyFolderMigration.Outcome)] = []
 
     func applicationWillFinishLaunching(_ notification: Notification) {

@@ -9,7 +9,7 @@ struct GPXFileNameTests {
     /// 2026-11-02 14:30:05 UTC
     private let date = Date(timeIntervalSince1970: 1_793_629_805)
 
-    /// Scenario "Erfolgreiches Auslesen": name with device, date and time.
+    /// Scenario "Successful read": name with device, date and time.
     @Test func containsDeviceDateAndTime() {
         let name = GPXFileName.suggested(device: "Gerätename", date: date, timeZone: TimeZone(identifier: "UTC")!)
         #expect(name == "Gerätename 2026-11-02 14-30.gpx")
@@ -45,7 +45,7 @@ struct GPXExportTests {
         #expect(String(decoding: data, as: UTF8.self).contains(#"creator="myTracks Loader 0.1.0""#))
     }
 
-    /// Write errors arrive as `LoggerError(.writeFailed)`; scenario "Ziel nicht beschreibbar".
+    /// Write errors arrive as `LoggerError(.writeFailed)`; scenario "Destination not writable".
     @Test func writeErrorsBecomeLoggerErrors() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

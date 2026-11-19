@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import LoggerCore
 
-/// Moving folders of builds named "gpsloader" (spec `support-package`, "App-Protokoll").
+/// Moving folders of builds named "gpsloader" (spec `support-package`, "App log").
 @Suite("Legacy folders")
 struct LegacyFolderMigrationTests {
     private let root = FileManager.default.temporaryDirectory.appendingPathComponent("legacy-\(UUID().uuidString)")
@@ -14,7 +14,7 @@ struct LegacyFolderMigrationTests {
         return url
     }
 
-    /// Scenario "Ordner mit altem Namen".
+    /// Scenario "Folder with the old name".
     @Test func movesOldFolder() throws {
         defer { try? FileManager.default.removeItem(at: root) }
         let old = try folder("gpsloader", file: "gpsloader.log")
@@ -24,7 +24,7 @@ struct LegacyFolderMigrationTests {
         #expect(!FileManager.default.fileExists(atPath: old.path))
     }
 
-    /// Scenario "Beide Ordner vorhanden".
+    /// Scenario "Both folders exist".
     @Test func keepsBoth() throws {
         defer { try? FileManager.default.removeItem(at: root) }
         let old = try folder("gpsloader", file: "gpsloader.log")

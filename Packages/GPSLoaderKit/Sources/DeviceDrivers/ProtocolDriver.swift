@@ -5,7 +5,7 @@ import GPSLoggerKitGPL
 import LoggerCore
 import SerialTransport
 
-/// Runs a protocol of GPSLoggerKit or GPSLoggerKitGPL as a session driver (spec `device-mode`, "Anbindung der Treiber").
+/// Runs a protocol of GPSLoggerKit or GPSLoggerKitGPL as a session driver (spec `device-mode`, "Connecting the drivers").
 public struct ProtocolDriver: LoggerDriver {
     public let entry: DeviceEntry
     /// Serial port path; `nil` for HID and Bluetooth devices.
@@ -48,7 +48,7 @@ public struct ProtocolDriver: LoggerDriver {
     }
 
     /// Reads the device and corrects GPS week rollovers (spec `device-mode`,
-    /// "Korrektur des GPS-Wochenüberlaufs beim Auslesen").
+    /// "GPS week rollover correction when reading").
     public func read(_ context: DriverContext) async throws -> Recording {
         let recording = try await run(context) { proto, connection, reporter in
             try await proto.read(connection, reporter)

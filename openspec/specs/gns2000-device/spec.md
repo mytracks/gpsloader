@@ -1,13 +1,13 @@
 # gns2000-device Specification
 
 ## Purpose
-Der Eintrag des Bluetooth-Loggers GNS 2000 (auch GNS 2000 plus) im Gerätekatalog der App. Das Geräteprotokoll liegt in GPSLoggerKit (https://github.com/mytracks/GPSLoggerKit, Spec `gns2000-device` dort).
+The entry of the Bluetooth logger GNS 2000 (also GNS 2000 plus) in the app's device catalog. The device protocol lives in GPSLoggerKit (https://github.com/mytracks/GPSLoggerKit, spec `gns2000-device` there).
 
 ## Requirements
 
-### Requirement: GNS 2000 im Katalog
-Der Gerätekatalog SHALL einen Eintrag „GNS 2000“ mit der Verbindungsart Bluetooth enthalten. Er gilt für die Gerätenamen „GNS 2000“ und „GNS 2000 plus“ und den SDP-Dienst „GNS GPS“. Er SHALL ohne Anschlusswahl auskommen und Löschen anbieten.
+### Requirement: GNS 2000 in the catalog
+The device catalog SHALL contain an entry "GNS 2000" with the connection type Bluetooth. It applies to the device names "GNS 2000" and "GNS 2000 plus" and the SDP service "GNS GPS". It SHALL need no port choice and SHALL offer erasing.
 
-#### Scenario: GNS 2000 wählen
-- **WHEN** der Anwender „GNS 2000“ wählt
-- **THEN** zeigt das Fenster keine Anschlusswahl, und „Auslesen“ und „Speicher löschen …“ sind verfügbar
+#### Scenario: Choose GNS 2000
+- **WHEN** the user chooses "GNS 2000"
+- **THEN** the window shows no port choice, and "Read" and "Erase Memory…" are available

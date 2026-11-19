@@ -14,7 +14,7 @@ public struct ReplayMismatch: Error, Sendable, CustomStringConvertible {
     }
 }
 
-/// Plays back a recorded serial dialog as `ByteTransport` (spec `diagnostic-capture`, "Wiedergabe in Tests").
+/// Plays back a recorded serial dialog as `ByteTransport` (spec `diagnostic-capture`, "Replay in tests").
 ///
 /// Recorded `tx` entries become expectations, `rx` entries become device replies. Replies before the
 /// first `tx` are delivered on `open()`, the others after the matching write.

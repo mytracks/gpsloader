@@ -2,7 +2,7 @@ import Foundation
 import LoggerCore
 
 /// Bytes received on a Bluetooth RFCOMM channel, filled on the main run loop and read by the transport
-/// (spec `bluetooth-transport`, "Daten übertragen").
+/// (spec `bluetooth-transport`, "Transfer data").
 final class RFCOMMInputBuffer: @unchecked Sendable {
     private let lock = NSLock()
     private var bytes: [UInt8] = []

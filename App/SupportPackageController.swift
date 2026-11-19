@@ -92,7 +92,7 @@ final class SupportPackageController: NSObject {
     #endif
 }
 
-/// The check boxes of the support package sheet (spec "Inhalt des Support-Pakets", "Datenschutz im Support-Paket").
+/// The check boxes of the support package sheet (spec "Content of the support package", "Privacy in the support package").
 @MainActor
 private final class ItemChoice {
     let view: NSView

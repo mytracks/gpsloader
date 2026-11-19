@@ -24,7 +24,7 @@ struct AppFormatsTests {
         #expect(Array(AppFormats.catalog.all.map(\.id).prefix(FileFormats.all.count)) == FileFormats.all.map(\.id))
     }
 
-    /// Spec `file-conversion`, "Format aus dem GPL-Paket".
+    /// Spec `file-conversion`, "Format from the GPL package".
     @Test func formatOfAnAddedPackageIsConverted() async throws {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("AppFormatsTests-\(UUID().uuidString)", isDirectory: true)

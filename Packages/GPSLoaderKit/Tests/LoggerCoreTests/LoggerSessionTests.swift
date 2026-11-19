@@ -44,19 +44,19 @@ struct LoggerSessionTests {
         #expect(collected.last == .finished(.recording(onePointRecording)))
     }
 
-    /// Scenario "Bestimmter Fortschritt".
+    /// Scenario "Determinate progress".
     @Test func determinateProgressFraction() {
         #expect(ProgressUpdate.determinate(completed: 250, total: 1000, step: nil).fraction == 0.25)
     }
 
-    /// Scenario "Unbestimmter Fortschritt".
+    /// Scenario "Indeterminate progress".
     @Test func indeterminateProgressHasStepButNoFraction() {
         let update = ProgressUpdate.indeterminate(step: "Waiting for device")
         #expect(update.fraction == nil)
         #expect(update.step == "Waiting for device")
     }
 
-    /// Scenario "Keine Daten auf dem Gerät".
+    /// Scenario "No data on the device".
     @Test func emptyRecordingIsReportedAsEmptyDevice() async {
         let session = LoggerSession(driver: ClosureDriver(read: { _ in Recording() }), reservations: PortReservations())
         #expect(await session.read() == .emptyDevice)
@@ -64,7 +64,7 @@ struct LoggerSessionTests {
 
     // MARK: Cancellation
 
-    /// Scenario "Abbruch beim Auslesen": the port is released and no data is returned.
+    /// Scenario "Cancel while reading": the port is released and no data is returned.
     @Test func cancelReleasesTransportAndDiscardsData() async throws {
         let transport = MockTransport(script: [])
         let driver = ClosureDriver(resourceKey: transport.identifier, read: { context in
@@ -107,7 +107,7 @@ struct LoggerSessionTests {
 
     // MARK: Timeout
 
-    /// Scenario "Gerät antwortet nicht".
+    /// Scenario "Device does not answer".
     @Test func noActivityEndsWithTimeout() async {
         let driver = ClosureDriver(descriptor: descriptor(timeout: 0.2), read: { _ in
             try await cancellableSleep(10)
@@ -136,7 +136,7 @@ struct LoggerSessionTests {
 
     // MARK: Errors
 
-    /// Scenario "Port belegt".
+    /// Scenario "Port busy".
     @Test func loggerErrorsArePassedThrough() async {
         let error = LoggerError(.portBusy, detail: "/dev/cu.SLAB_USBtoUART")
         let session = LoggerSession(driver: ClosureDriver(read: { _ in throw error }), reservations: PortReservations())
@@ -155,7 +155,7 @@ struct LoggerSessionTests {
 
     // MARK: Exclusivity
 
-    /// Scenario "Zweiter Start während laufendem Vorgang".
+    /// Scenario "Second start during a running operation".
     @Test func secondOperationOnSamePortIsRejected() async throws {
         let reservations = PortReservations()
         let slow = ClosureDriver(read: { _ in
@@ -174,7 +174,7 @@ struct LoggerSessionTests {
 
     // MARK: Erasing
 
-    /// Scenario "Treiber ohne Löschfunktion".
+    /// Scenario "Driver without erasing".
     @Test func eraseIsRejectedWhenUnsupported() async {
         let erased = Locked(false)
         let driver = ClosureDriver(descriptor: descriptor(erase: .unsupported), erase: { _ in erased.withLock { $0 = true } })
@@ -183,7 +183,7 @@ struct LoggerSessionTests {
         #expect(!erased.current)
     }
 
-    /// Scenario "Experimentelles Löschen": without acknowledging the warning nothing is sent.
+    /// Scenario "Experimental erasing": without acknowledging the warning nothing is sent.
     @Test func experimentalEraseNeedsAcknowledgement() async {
         let erased = Locked(false)
         let driver = ClosureDriver(descriptor: descriptor(erase: .experimental), erase: { _ in erased.withLock { $0 = true } })
@@ -196,7 +196,7 @@ struct LoggerSessionTests {
         #expect(erased.current)
     }
 
-    /// Scenario "Löschen bestätigt".
+    /// Scenario "Erasing confirmed".
     @Test func confirmedEraseSucceeds() async {
         let session = LoggerSession(driver: ClosureDriver(), reservations: PortReservations())
         #expect(await session.erase(.confirmedByUser()) == .erased)

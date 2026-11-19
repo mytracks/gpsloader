@@ -20,7 +20,7 @@ struct SerialPortCatalogTests {
         #expect(!SerialPortInfo(path: "/dev/cu.GNS2000").isUSB)
     }
 
-    /// Scenarios "Gekoppeltes Bluetooth-Gerät" and "Systemanschluss" (properties as observed on macOS 27).
+    /// Scenarios "Paired Bluetooth device" and "System port" (properties as observed on macOS 27).
     @Test func kindOfPort() {
         #expect(SerialPortInfo(path: "/dev/cu.HOLUX_M-241-SPPSlave", isBluetooth: true).kind == .bluetooth)
         #expect(SerialPortInfo(path: "/dev/cu.GNS2000", isBluetooth: true).kind == .bluetooth)

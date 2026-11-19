@@ -3,7 +3,7 @@ import Foundation
 import LoggerCore
 import SerialTransport
 
-/// The parts a user can choose for a support package (spec `support-package`, "Inhalt des Support-Pakets").
+/// The parts a user can choose for a support package (spec `support-package`, "Content of the support package").
 public enum SupportPackageItem: String, Sendable, CaseIterable, Hashable {
     case system, log, settings, ports, bluetooth, captures, crashReports
 }

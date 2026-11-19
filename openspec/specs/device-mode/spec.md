@@ -1,102 +1,102 @@
 # device-mode Specification
 
 ## Purpose
-Der Direktmodus von gpsloader: Gerät und Anschluss im Hauptfenster wählen, Auslesen und Löschen starten, der Gerätekatalog aller nativen Treiber und ihre Anbindung an die Sitzung, über serielle Schnittstelle oder USB-HID.
+The direct mode of myTracks Loader: choosing device and port in the main window, starting reading and erasing, the device catalog of all native drivers and their connection to the session, over a serial port, USB HID or Bluetooth.
 
 ## Requirements
 
-### Requirement: Gerät wählen
-Das Hauptfenster SHALL im Bereich „Gerät“ eine Auswahl aller Geräte des Gerätekatalogs anbieten, alphabetisch sortiert. Die zuletzt gewählte Kombination aus Gerät und Anschluss SHALL beim nächsten Start vorausgewählt sein, sofern beide noch vorhanden sind.
+### Requirement: Choose the device
+The main window SHALL offer a choice of all devices of the device catalog in the section "Read Device", sorted alphabetically. The last chosen combination of device and port SHALL be preselected at the next start, if both still exist.
 
-#### Scenario: Auswahl merken
-- **WHEN** der Anwender „Qstarz BT-Q1000“ und `/dev/cu.usbserial-1410` wählt und die App neu startet
-- **THEN** sind Gerät und Anschluss wieder ausgewählt, sofern der Anschluss vorhanden ist
+#### Scenario: Remember the choice
+- **WHEN** the user chooses "Qstarz BT-Q1000" and `/dev/cu.usbserial-1410` and restarts the app
+- **THEN** device and port are chosen again, if the port exists
 
-### Requirement: Anschluss wählen
-Für serielle Geräte SHALL das Fenster die Anschlüsse `/dev/cu.*` ohne Systemanschlüsse und mit sprechenden Namen zeigen (USB: Produkt oder Chip-Hersteller; Bluetooth: „Bluetooth:“ und Gerätename; Pfad als Tooltip). Ein zum Gerät passender Anschluss SHALL oben stehen und vorausgewählt sein, danach USB-, dann Bluetooth-Anschlüsse. Die Liste SHALL beim An- und Abstecken aktuell bleiben. Fehlt ein Anschluss, SHALL das Fenster das melden und kein Auslesen anbieten. Andere Geräte haben keine Portwahl.
+### Requirement: Choose the port
+For serial devices the window SHALL show the ports `/dev/cu.*` without system ports and with readable names (USB: product or chip vendor; Bluetooth: "Bluetooth:" and the device name; the path as tooltip). A port that fits the device SHALL be at the top and preselected, then USB ports, then Bluetooth ports. The list SHALL stay current when devices are plugged in and out. Without a port the window SHALL say so and not offer reading. Other devices have no port choice.
 
-#### Scenario: Logger angesteckt
-- **WHEN** der Anwender bei geöffnetem Fenster einen USB-Logger ansteckt
-- **THEN** erscheint sein Anschluss in der Liste
+#### Scenario: Logger plugged in
+- **WHEN** the user plugs in a USB logger while the window is open
+- **THEN** its port appears in the list
 
-#### Scenario: Kein Anschluss
-- **WHEN** ein serielles Gerät gewählt ist und kein Anschluss vorhanden ist
-- **THEN** ist „Auslesen“ deaktiviert, und ein Hinweis nennt den Grund
+#### Scenario: No port
+- **WHEN** a serial device is chosen and there is no port
+- **THEN** "Read" is disabled, and a hint names the reason
 
-#### Scenario: Passender Bluetooth-Anschluss
-- **WHEN** „Holux M-241“ gewählt ist und die Anschlüsse `/dev/cu.usbserial-1410` und `/dev/cu.HOLUX_M-241-SPPSlave` vorhanden sind
-- **THEN** steht „Bluetooth: HOLUX_M-241-SPPSlave“ oben und ist vorausgewählt
+#### Scenario: Fitting Bluetooth port
+- **WHEN** "Holux M-241" is chosen and the ports `/dev/cu.usbserial-1410` and `/dev/cu.HOLUX_M-241-SPPSlave` exist
+- **THEN** "Bluetooth: HOLUX_M-241-SPPSlave" is at the top and preselected
 
-#### Scenario: Systemanschlüsse
-- **WHEN** nur `/dev/cu.Bluetooth-Incoming-Port` und `/dev/cu.debug-console` vorhanden sind
-- **THEN** ist die Liste leer, und der Hinweis „kein Anschluss“ erscheint
+#### Scenario: System ports
+- **WHEN** only `/dev/cu.Bluetooth-Incoming-Port` and `/dev/cu.debug-console` exist
+- **THEN** the list is empty, and the hint "no port" appears
 
-### Requirement: Auslesen und Löschen starten
-„Auslesen“ SHALL den Treiber des gewählten Geräts mit dem gewählten Anschluss über die Sitzung (`logger-session`) starten. „Speicher löschen …“ SHALL nur für Geräte angeboten werden, deren Treiber löschen kann, und SHALL vorher die Bestätigung der Sitzung einholen. Während eines Vorgangs SHALL keiner der beiden Knöpfe einen zweiten Vorgang starten.
+### Requirement: Start reading and erasing
+"Read" SHALL start the driver of the chosen device with the chosen port through the session (`logger-session`). "Erase Memory…" SHALL only be offered for devices whose driver can erase, and SHALL first get the confirmation of the session. While an operation runs, neither button SHALL start a second operation.
 
-#### Scenario: Gerät ohne Löschfunktion
-- **WHEN** ein Gerät gewählt ist, dessen Treiber nicht löschen kann
-- **THEN** ist „Speicher löschen …“ nicht verfügbar
+#### Scenario: Device without erasing
+- **WHEN** a device is chosen whose driver cannot erase
+- **THEN** "Erase Memory…" is not available
 
-### Requirement: Gerätekatalog
-Der Gerätekatalog SHALL je Gerät den Namen, den Treiber, die Verbindungsart (seriell, USB-HID oder Bluetooth-RFCOMM), die Baudrate bzw. Gerätenamen und Dienst und die Löschunterstützung festlegen. Er SHALL nur Geräte enthalten, deren Treiber vorhanden ist.
+### Requirement: Device catalog
+For each device the device catalog SHALL define the name, the driver, the connection type (serial, USB HID or Bluetooth RFCOMM), the baud rate or the device names and service, and the erase support. It SHALL contain only devices whose driver exists.
 
-#### Scenario: Treiber fehlt
-- **WHEN** für eine Familie noch kein Treiber vorhanden ist
-- **THEN** erscheinen ihre Geräte nicht in der Auswahl
+#### Scenario: Driver missing
+- **WHEN** a family has no driver yet
+- **THEN** its devices do not appear in the choice
 
-#### Scenario: Bluetooth-Gerät
-- **WHEN** der Anwender ein Gerät mit der Verbindungsart Bluetooth-RFCOMM wählt
-- **THEN** entfällt die Anschlusswahl, und „Auslesen“ ist ohne Anschluss verfügbar
+#### Scenario: Bluetooth device
+- **WHEN** the user chooses a device with the connection type Bluetooth RFCOMM
+- **THEN** there is no port choice, and "Read" is available without a port
 
-### Requirement: Anbindung der Treiber
-Ein Treiber aus GPSLoggerKit oder GPSLoggerKitGPL SHALL über einen Adapter als Treiber der Sitzung laufen. Der Adapter SHALL den Anschluss bzw. das Gerät exklusiv öffnen und danach in jedem Fall schließen. Alle gesendeten und empfangenen Bytes SHALL er in den Diagnose-Mitschnitt schreiben und Fortschritt und Aktivität an die Sitzung melden. Protokollfehler des Treibers SHALL er als Protokollfehler mit Detailtext melden.
+### Requirement: Connecting the drivers
+A driver from GPSLoggerKit or GPSLoggerKitGPL SHALL run as a driver of the session through an adapter. The adapter SHALL open the port or device exclusively and close it afterwards in every case. It SHALL write all sent and received bytes to the diagnostic capture and report progress and activity to the session. It SHALL report protocol errors of the driver as protocol errors with a detail text.
 
-#### Scenario: Protokollfehler
-- **WHEN** ein Treiber meldet, dass das Gerät eine unerwartete Antwort gesendet hat
-- **THEN** zeigt die App die Meldung für Protokollfehler, und der Detailtext nennt die Antwort
+#### Scenario: Protocol error
+- **WHEN** a driver reports that the device sent an unexpected answer
+- **THEN** the app shows the message for protocol errors, and the detail text names the answer
 
-#### Scenario: Mitschnitt
-- **WHEN** ein Auslesevorgang mit einem simulierten Gerät endet
-- **THEN** enthält der Diagnose-Mitschnitt alle gesendeten und empfangenen Bytes
+#### Scenario: Capture
+- **WHEN** a read operation with a simulated device ends
+- **THEN** the diagnostic capture contains all sent and received bytes
 
-#### Scenario: Mitschnitt über Bluetooth
-- **WHEN** ein GNS 2000 bei eingeschaltetem Mitschnitt ausgelesen wird
-- **THEN** enthält der Mitschnitt die über den RFCOMM-Kanal gesendeten und empfangenen Bytes
+#### Scenario: Capture over Bluetooth
+- **WHEN** a GNS 2000 is read
+- **THEN** the capture contains the bytes sent and received over the RFCOMM channel
 
-### Requirement: Korrektur des GPS-Wochenüberlaufs beim Auslesen
-Der Adapter der Treiber SHALL auf jedes ausgelesene Ergebnis die Korrektur des GPS-Wochenüberlaufs der Spec `logger-kit` anwenden, mit dem Zeitpunkt des Auslesens als Bezug, für Trackpunkte und Wegpunkte. Die Korrektur SHALL immer aktiv sein. Ein Treiber, der Tracks nach Zeiten teilt oder benennt, SHALL dafür die korrigierten Zeiten verwenden.
+### Requirement: GPS week rollover correction when reading
+The adapter of the drivers SHALL apply the GPS week rollover correction of the GPSLoggerKit spec `logger-kit` to every read result, with the time of reading as reference, for track points and waypoints. The correction SHALL always be active. A driver that splits or names tracks by time SHALL use the corrected times for that.
 
-#### Scenario: Logger mit Wochenüberlauf
-- **WHEN** ein simuliertes Gerät am 13. November 2026 einen Punkt mit der Zeit 2. November 2026 minus 1024 Wochen liefert
-- **THEN** hat der Punkt im Ergebnis die Zeit 2. November 2026
+#### Scenario: Logger with week rollover
+- **WHEN** on 13 November 2026 a simulated device returns a point with the time 2 November 2026 minus 1024 weeks
+- **THEN** the point has the time 2 November 2026 in the result
 
-#### Scenario: Aktuelle Zeiten bleiben
-- **WHEN** ein simuliertes Gerät einen Punkt liefert, der weniger als 512 Wochen vor dem Auslesen liegt
-- **THEN** ist seine Zeit im Ergebnis unverändert
+#### Scenario: Current times stay
+- **WHEN** a simulated device returns a point less than 512 weeks before the time of reading
+- **THEN** its time is unchanged in the result
 
-#### Scenario: Tracknamen nach der Korrektur
-- **WHEN** ein GNS 2000 Punkte liefert, deren Zeiten um 1024 Wochen zu früh liegen
-- **THEN** tragen die Tracks die Namen der korrigierten Zeiten, und es entsteht keine zusätzliche Trackgrenze
+#### Scenario: Track names after the correction
+- **WHEN** a GNS 2000 returns points whose times are 1024 weeks too early
+- **THEN** the tracks carry the names of the corrected times, and no additional track boundary appears
 
-### Requirement: Hinweise zum Gerät
-Der Gerätekatalog SHALL je Gerät Hinweise mit Bedingung festlegen können: immer oder bei gewähltem Bluetooth-Anschluss. Das Fenster SHALL die zutreffenden Hinweise unter der Anschlusswahl zeigen. Ein Hinweis mit Bedingung SHALL auch in der Fehlermeldung eines fehlgeschlagenen Lesevorgangs erscheinen, etwa bei Zeitüberschreitung oder unerwarteter Antwort.
+### Requirement: Device hints
+The device catalog SHALL be able to define hints per device with a condition: always or when a Bluetooth port is chosen. The window SHALL show the applicable hints below the port choice. A hint with a condition SHALL also appear in the error message of a failed read operation, for example after a timeout or an unexpected answer.
 
-#### Scenario: M-241 über Bluetooth
-- **WHEN** „Holux M-241“ und ein Bluetooth-Anschluss gewählt sind
-- **THEN** rät ein Hinweis, den Logger über USB zu verbinden
+#### Scenario: M-241 over Bluetooth
+- **WHEN** "Holux M-241" and a Bluetooth port are chosen
+- **THEN** a hint advises to connect the logger via USB
 
-#### Scenario: Fehlschlag über Bluetooth
-- **WHEN** das Auslesen des M-241 über einen Bluetooth-Anschluss scheitert, weil das Gerät nicht oder unerwartet antwortet
-- **THEN** nennt die Fehlermeldung denselben Hinweis
+#### Scenario: Failure over Bluetooth
+- **WHEN** reading the M-241 over a Bluetooth port fails because the device does not answer or answers unexpectedly
+- **THEN** the error message names the same hint
 
-### Requirement: Fehlender Treiber
-Ist ein serielles Gerät gewählt und steckt ein USB-Gerät mit der Hersteller-ID eines bekannten USB-Seriell-Chips (Silicon Labs, Prolific, FTDI, WCH), zu dem kein Anschluss existiert, SHALL das Fenster auf den vermutlich fehlenden Treiber hinweisen und die Treiberseite des Herstellers verlinken.
+### Requirement: Missing driver
+If a serial device is chosen and a USB device with the vendor ID of a known USB serial chip (Silicon Labs, Prolific, FTDI, WCH) is plugged in without a port, the window SHALL point to the probably missing driver and link the vendor's driver page.
 
-#### Scenario: Treiber fehlt
-- **WHEN** ein serielles Gerät gewählt ist und ein USB-Gerät mit der Hersteller-ID von Prolific (0x067B) steckt, aber kein Anschluss dazu existiert
-- **THEN** nennt ein Hinweis den fehlenden Prolific-Treiber und verlinkt die Treiberseite
+#### Scenario: Driver missing
+- **WHEN** a serial device is chosen and a USB device with the vendor ID of Prolific (0x067B) is plugged in, but has no port
+- **THEN** a hint names the missing Prolific driver and links the driver page
 
-#### Scenario: Treiber vorhanden
-- **WHEN** zu dem USB-Gerät ein Anschluss existiert
-- **THEN** erscheint kein Hinweis auf einen fehlenden Treiber
+#### Scenario: Driver present
+- **WHEN** the USB device has a port
+- **THEN** no hint on a missing driver appears

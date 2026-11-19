@@ -1,83 +1,83 @@
 # gpx-export Specification
 
 ## Purpose
-Erzeugt aus den ausgelesenen Daten (Tracks, Segmente, Wegpunkte) standardkonforme GPX-1.1-Dateien, die myTracks und andere Programme ohne Anpassungen importieren können.
+Creates standard-compliant GPX 1.1 files from the data read (tracks, segments, waypoints) that myTracks and other programs can import without adjustments.
 
 ## Requirements
 
-### Requirement: GPX-1.1-Konformität
-Erzeugte Dateien MUST gültiges GPX 1.1 nach dem Schema `http://www.topografix.com/GPX/1/1` in UTF-8 sein. Das `creator`-Attribut SHALL „myTracks Loader“ und die App-Version enthalten, etwa „myTracks Loader 0.1.0“. Erweiterungen, insbesondere die von myTracks, SHALL die Datei nicht enthalten.
+### Requirement: GPX 1.1 conformance
+Generated files MUST be valid GPX 1.1 according to the schema `http://www.topografix.com/GPX/1/1` in UTF-8. The `creator` attribute SHALL contain "myTracks Loader" and the app version, for example "myTracks Loader 0.1.0". The file SHALL not contain extensions, in particular not those of myTracks.
 
-#### Scenario: Validierung gegen das Schema
-- **WHEN** eine erzeugte Datei gegen das GPX-1.1-XSD geprüft wird
-- **THEN** ist sie gültig
+#### Scenario: Validation against the schema
+- **WHEN** a generated file is checked against the GPX 1.1 XSD
+- **THEN** it is valid
 
-#### Scenario: Keine Erweiterungen
-- **WHEN** eine Datei erzeugt wird
-- **THEN** enthält sie kein `extensions`-Element
+#### Scenario: No extensions
+- **WHEN** a file is generated
+- **THEN** it contains no `extensions` element
 
 #### Scenario: Creator
-- **WHEN** die App in Version 0.1.0 eine Datei erzeugt
-- **THEN** lautet ihr `creator`-Attribut „myTracks Loader 0.1.0“
+- **WHEN** the app in version 0.1.0 generates a file
+- **THEN** its `creator` attribute is "myTracks Loader 0.1.0"
 
-### Requirement: Inhalt
-Jeder Track SHALL als `trk` mit Namen und einem oder mehreren `trkseg` ausgegeben werden. Jeder Punkt erscheint als `trkpt` mit Breite und Länge, sofern vorhanden mit Höhe (`ele`) und Zeit (`time`). Wegpunkte SHALL als `wpt` ausgegeben werden. Vorhandene Qualitätsangaben SHALL in der Reihenfolge des GPX-1.1-Schemas als `fix`, `sat`, `hdop`, `vdop` und `pdop` erscheinen. Geschwindigkeit und Kurs SHALL nicht ausgegeben werden.
+### Requirement: Content
+Each track SHALL be written as `trk` with a name and one or more `trkseg`. Each point appears as `trkpt` with latitude and longitude and, if present, elevation (`ele`) and time (`time`). Waypoints SHALL be written as `wpt`. Existing quality data SHALL appear in the order of the GPX 1.1 schema as `fix`, `sat`, `hdop`, `vdop` and `pdop`. Speed and course SHALL not be written.
 
-#### Scenario: Track mit Segmenten
-- **WHEN** ein Track mit zwei Segmenten zu je 3 Punkten exportiert wird
-- **THEN** enthält die Datei ein `trk` mit zwei `trkseg` zu je drei `trkpt`
+#### Scenario: Track with segments
+- **WHEN** a track with two segments of 3 points each is exported
+- **THEN** the file contains one `trk` with two `trkseg` of three `trkpt` each
 
-#### Scenario: Punkt ohne Höhe
-- **WHEN** ein Punkt keine Höhe hat
-- **THEN** enthält sein `trkpt` kein `ele`-Element
+#### Scenario: Point without elevation
+- **WHEN** a point has no elevation
+- **THEN** its `trkpt` contains no `ele` element
 
-#### Scenario: Wegpunkt
-- **WHEN** ein Wegpunkt mit Namen „WPT“ exportiert wird
-- **THEN** enthält die Datei ein `wpt` mit `name` „WPT“
+#### Scenario: Waypoint
+- **WHEN** a waypoint named "WPT" is exported
+- **THEN** the file contains a `wpt` with `name` "WPT"
 
-#### Scenario: Punkt mit Qualitätsangaben
-- **WHEN** ein Punkt einen 3D-Fix, 8 Satelliten und HDOP 0,9 hat
-- **THEN** enthält sein `trkpt` `<fix>3d</fix>`, `<sat>8</sat>` und `<hdop>0.9</hdop>` in dieser Reihenfolge, und die Datei bleibt gültig nach dem GPX-1.1-XSD
+#### Scenario: Point with quality data
+- **WHEN** a point has a 3D fix, 8 satellites and HDOP 0.9
+- **THEN** its `trkpt` contains `<fix>3d</fix>`, `<sat>8</sat>` and `<hdop>0.9</hdop>` in this order, and the file stays valid according to the GPX 1.1 XSD
 
-#### Scenario: Geschwindigkeit wird nicht ausgegeben
-- **WHEN** ein Punkt eine Geschwindigkeit hat
-- **THEN** enthält die Datei weder ein `speed`-Element noch eine Erweiterung dafür
+#### Scenario: Speed is not written
+- **WHEN** a point has a speed
+- **THEN** the file contains neither a `speed` element nor an extension for it
 
-### Requirement: Zeiten in UTC
-Zeitangaben MUST als ISO 8601 in UTC mit dem Suffix `Z` ausgegeben werden. Bruchteile von Sekunden SHALL nur erscheinen, wenn sie ungleich null sind.
+### Requirement: Times in UTC
+Times MUST be written as ISO 8601 in UTC with the suffix `Z`. Fractions of seconds SHALL only appear when they are not zero.
 
-#### Scenario: Ganze Sekunden
-- **WHEN** ein Punkt die Zeit 2. November 2026, 14:30:05 UTC hat
-- **THEN** lautet `time` `2026-11-02T14:30:05Z`
+#### Scenario: Whole seconds
+- **WHEN** a point has the time 2 November 2026, 14:30:05 UTC
+- **THEN** `time` is `2026-11-02T14:30:05Z`
 
-#### Scenario: Millisekunden
-- **WHEN** ein Punkt die Zeit 14:30:05,250 UTC hat
-- **THEN** lautet `time` `2026-11-02T14:30:05.250Z`
+#### Scenario: Milliseconds
+- **WHEN** a point has the time 14:30:05.250 UTC
+- **THEN** `time` is `2026-11-02T14:30:05.250Z`
 
-### Requirement: Gebietsschema-unabhängige Zahlen
-Koordinaten und Höhen MUST mit Punkt als Dezimaltrennzeichen und ohne Tausendertrennzeichen ausgegeben werden, unabhängig von der Systemsprache. Koordinaten SHALL bis zu 7 Nachkommastellen haben, ohne nachgestellte Nullen.
+### Requirement: Locale-independent numbers
+Coordinates and elevations MUST be written with a point as decimal separator and without thousands separators, independent of the system language. Coordinates SHALL have up to 7 decimal places, without trailing zeros.
 
-#### Scenario: Deutsches Gebietsschema
-- **WHEN** das System auf Deutsch eingestellt ist und ein Punkt die Breite 51,7411580 hat
-- **THEN** lautet das Attribut `lat="51.741158"`
+#### Scenario: German locale
+- **WHEN** the system is set to German and a point has the latitude 51.7411580
+- **THEN** the attribute is `lat="51.741158"`
 
-### Requirement: Sonderzeichen in Texten
-Namen und Beschreibungen MUST korrekt für XML maskiert werden.
+### Requirement: Special characters in texts
+Names and descriptions MUST be escaped correctly for XML.
 
-#### Scenario: Name mit Sonderzeichen
-- **WHEN** ein Track „Berg & Tal <1>“ heißt
-- **THEN** ist die Datei wohlgeformt und der Name wird beim Einlesen unverändert als „Berg & Tal <1>“ gelesen
+#### Scenario: Name with special characters
+- **WHEN** a track is called "Hill & Dale <1>"
+- **THEN** the file is well-formed and the name is read back unchanged as "Hill & Dale <1>"
 
-### Requirement: Deterministische Ausgabe
-Gleiche Eingabedaten MUST byte-identische Dateien ergeben, mit Ausnahme des Erzeugungszeitpunkts in `metadata/time`.
+### Requirement: Deterministic output
+The same input data MUST result in byte-identical files, except for the creation time in `metadata/time`.
 
-#### Scenario: Zweimal exportieren
-- **WHEN** dieselben Daten zweimal mit festem Erzeugungszeitpunkt exportiert werden
-- **THEN** sind beide Dateien byte-identisch
+#### Scenario: Export twice
+- **WHEN** the same data is exported twice with a fixed creation time
+- **THEN** both files are byte-identical
 
-### Requirement: Sicheres Schreiben
-Die Datei MUST atomar geschrieben werden. Schlägt das Schreiben fehl, SHALL keine unvollständige Datei am Zielort zurückbleiben, und eine bestehende Datei mit gleichem Namen MUST unverändert bleiben.
+### Requirement: Safe writing
+The file MUST be written atomically. If writing fails, no incomplete file SHALL remain at the destination, and an existing file with the same name MUST stay unchanged.
 
-#### Scenario: Ziel nicht beschreibbar
-- **WHEN** der Zielordner schreibgeschützt ist
-- **THEN** wird ein Schreibfehler gemeldet, und am Zielort entsteht keine Datei
+#### Scenario: Destination not writable
+- **WHEN** the destination folder is read-only
+- **THEN** a write error is reported, and no file appears at the destination

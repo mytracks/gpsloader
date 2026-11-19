@@ -49,7 +49,7 @@ private func fixtureData() throws -> Data {
 struct DiagnosticCaptureTests {
     // MARK: Recorder and format (task 5.1)
 
-    /// Scenario "Serieller Dialog".
+    /// Scenario "Serial dialog".
     @Test func recordsBytesInOrderWithTimestamps() throws {
         let recorder = CaptureRecorder(environment: environment)
         recorder.record(.header(DiagnosticHeader(driver: "test", port: "/dev/cu.x", parameters: ["baud": "9600"])))
@@ -83,7 +83,7 @@ struct DiagnosticCaptureTests {
         }
     }
 
-    /// Scenario "Datei im Texteditor": NMEA-like lines are readable as text.
+    /// Scenario "File in a text editor": NMEA-like lines are readable as text.
     @Test func asciiColumnIsReadable() throws {
         let recorder = CaptureRecorder(environment: environment)
         recorder.record(.received(source: "s", bytes: Array("$PMTKLOX,0,12*6E\r\n".utf8)))
@@ -91,7 +91,7 @@ struct DiagnosticCaptureTests {
         #expect(text.contains("$PMTKLOX,0,12*6E\\\\r\\\\n"))
     }
 
-    /// Scenario "App unter Rosetta": the header notes that the app itself runs translated.
+    /// Scenario "App under Rosetta": the header notes that the app itself runs translated.
     @Test func headerNotesRosetta() throws {
         var translated = environment
         translated.isTranslated = true
@@ -133,7 +133,7 @@ struct DiagnosticCaptureTests {
 
     // MARK: Replay (task 5.3)
 
-    /// Scenario "Wiedergabe eines erfolgreichen Auslesens".
+    /// Scenario "Replay of a successful read".
     @Test func fixtureReplayProducesSameResult() async throws {
         let replay = try ReplayTransport(captureData: fixtureData())
         let recording = try await LineTestDriver(transport: replay).read()
@@ -141,7 +141,7 @@ struct DiagnosticCaptureTests {
         #expect(await replay.isFinished)
     }
 
-    /// Scenario "Abweichung".
+    /// Scenario "Deviation".
     @Test func deviationIsReportedWithPosition() async throws {
         let replay = try ReplayTransport(captureData: fixtureData())
         do {
@@ -176,7 +176,7 @@ struct DiagnosticCaptureTests {
         return (CaptureStore(directory: directory), directory)
     }
 
-    /// Scenario "Erster Start": a fresh store records without any setting.
+    /// Scenario "First start": a fresh store records without any setting.
     @Test func everyOperationIsRecorded() async throws {
         let (store, directory) = makeStore()
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -188,7 +188,7 @@ struct DiagnosticCaptureTests {
         #expect(store.captures().map(\.lastPathComponent) == [url.lastPathComponent])
     }
 
-    /// Scenario "Fehlgeschlagener Vorgang": the capture of a failed operation is stored with the error.
+    /// Scenario "Failed operation": the capture of a failed operation is stored with the error.
     @Test func failedOperationIsRecorded() async throws {
         let (store, directory) = makeStore()
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -201,7 +201,7 @@ struct DiagnosticCaptureTests {
         #expect(text.contains("Unexpected answer"))
     }
 
-    /// Scenario "Elfter Vorgang".
+    /// Scenario "Eleventh operation".
     @Test func keepsOnlyTheLastTenCaptures() throws {
         let (store, directory) = makeStore()
         defer { try? FileManager.default.removeItem(at: directory) }

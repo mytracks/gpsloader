@@ -11,7 +11,7 @@ public enum ProductName {
     public static let legacyName = "gpsloader"
 }
 
-/// Moves a folder of an earlier build to its new name (spec `support-package`, "App-Protokoll").
+/// Moves a folder of an earlier build to its new name (spec `support-package`, "App log").
 public enum LegacyFolderMigration {
     public enum Outcome: Equatable, Sendable {
         /// There was no old folder.

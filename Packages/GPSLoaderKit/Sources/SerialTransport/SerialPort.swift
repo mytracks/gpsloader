@@ -87,7 +87,7 @@ public actor SerialPort: ByteTransport {
         closeDescriptor()
     }
 
-    /// Switches the baud rate of the open port (spec `serial-transport`, "Baudrate wechseln").
+    /// Switches the baud rate of the open port (spec `serial-transport`, "Change the baud rate").
     /// Output still queued is sent at the old rate first (`TCSADRAIN`).
     public func setBaudRate(_ rate: Int) async throws {
         guard Self.supportedBaudRates.contains(rate) else {

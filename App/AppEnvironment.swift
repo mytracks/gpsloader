@@ -2,7 +2,7 @@ import AppKit
 import DiagnosticCapture
 import LoggerCore
 
-/// The name users see (spec `app-shell`, "Name der App"); from the bundle, "myTracks Loader" as fallback.
+/// The name users see (spec `app-shell`, "Name of the app"); from the bundle, "myTracks Loader" as fallback.
 enum AppName {
     static var current: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "myTracks Loader"

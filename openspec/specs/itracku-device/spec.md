@@ -1,13 +1,13 @@
 # itracku-device Specification
 
 ## Purpose
-Der Eintrag des XAiOX iTrackU im Gerätekatalog der App. Das Geräteprotokoll liegt in GPSLoggerKitGPL (https://github.com/mytracks/GPSLoggerKitGPL, Spec `itracku-device` dort).
+The entry of the XAiOX iTrackU in the app's device catalog. The device protocol lives in GPSLoggerKitGPL (https://github.com/mytracks/GPSLoggerKitGPL, spec `itracku-device` there).
 
 ## Requirements
 
-### Requirement: iTrackU im Katalog
-Der Gerätekatalog SHALL den Eintrag „XAiOX iTrackU“ mit 4800 Baud und ohne Löschen enthalten.
+### Requirement: iTrackU in the catalog
+The device catalog SHALL contain the entry "XAiOX iTrackU" with 4800 baud and without erasing.
 
-#### Scenario: iTrackU wählen
-- **WHEN** der Anwender „XAiOX iTrackU“ wählt
-- **THEN** ist „Speicher löschen …“ nicht verfügbar
+#### Scenario: Choose iTrackU
+- **WHEN** the user chooses "XAiOX iTrackU"
+- **THEN** "Erase Memory…" is not available

@@ -23,7 +23,7 @@ struct MockTransportTests {
         #expect(try await mock.read(count: 3, timeout: 1) == [0x01, 0x02, 0x03])
     }
 
-    /// Scenario "Unerwarteter Befehl im Mock" (spec serial-transport).
+    /// Scenario "Unexpected command in the mock" (spec serial-transport).
     @Test func unexpectedCommandNamesExpectedAndActual() async throws {
         let mock = MockTransport(script: [.expect([0x93, 0x01]), .reply([0x93])])
         try await mock.open()

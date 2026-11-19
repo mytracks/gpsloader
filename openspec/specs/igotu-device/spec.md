@@ -1,20 +1,20 @@
 # igotu-device Specification
 
 ## Purpose
-Die i-GotU-Logger in der App: ihre Einträge im Gerätekatalog und die USB-HID-Verbindung der USB-Modelle. Das Geräteprotokoll liegt in GPSLoggerKitGPL (https://github.com/mytracks/GPSLoggerKitGPL, Spec `igotu-device` dort).
+The i-GotU loggers in the app: their entries in the device catalog and the USB HID connection of the USB models. The device protocol lives in GPSLoggerKitGPL (https://github.com/mytracks/GPSLoggerKitGPL, spec `igotu-device` there).
 
 ## Requirements
 
-### Requirement: USB-HID-Verbindung
-Für USB-Modelle SHALL die App das Gerät über Hersteller- und Produktkennung (`0x0DF7`/`0x0900`) finden, exklusiv öffnen, Befehle als Output-Reports zu 8 Byte senden und Antworten aus den Input-Reports lesen, mit Zeitlimit und Diagnose-Mitschnitt. Ist kein Gerät angeschlossen, MUST der Vorgang mit „Gerät nicht gefunden“ enden.
+### Requirement: USB HID connection
+For USB models the app SHALL find the device by vendor and product ID (`0x0DF7`/`0x0900`), open it exclusively, send commands as 8-byte output reports and read answers from the input reports, with a timeout and diagnostic capture. If no device is connected, the operation MUST end with "device not found".
 
-#### Scenario: Kein i-GotU angeschlossen
-- **WHEN** der Anwender ein USB-Modell ausliest und kein Gerät angeschlossen ist
-- **THEN** meldet die App, dass das Gerät nicht gefunden wurde
+#### Scenario: No i-GotU connected
+- **WHEN** the user reads a USB model and no device is connected
+- **THEN** the app reports that the device was not found
 
-### Requirement: i-GotU-Geräte im Katalog
-Der Gerätekatalog SHALL die fünf USB-Modelle ohne Portwahl und den GT-800 und GT-800 Pro mit seriellem Anschluss enthalten.
+### Requirement: i-GotU devices in the catalog
+The device catalog SHALL contain the five USB models without port choice and the GT-800 and GT-800 Pro with a serial port.
 
-#### Scenario: i-GotU-Geräte im Katalog
-- **WHEN** der Anwender ein USB-Modell wählt
-- **THEN** zeigt das Fenster keine Portwahl
+#### Scenario: i-GotU devices in the catalog
+- **WHEN** the user chooses a USB model
+- **THEN** the window shows no port choice

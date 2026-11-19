@@ -44,7 +44,7 @@ private struct Fixture {
 struct SupportPackageBuilderTests {
     let date = Date(timeIntervalSince1970: 1_793_700_000)
 
-    /// Scenario "Vollständiges Paket".
+    /// Scenario "Complete package".
     @Test func fullPackage() async throws {
         let fixture = Fixture()
         defer { try? FileManager.default.removeItem(at: fixture.directory) }
@@ -61,13 +61,13 @@ struct SupportPackageBuilderTests {
         #expect(base.hasPrefix("myTracks-Loader-Support-20261103-"))
     }
 
-    /// Scenario "Vorgeschlagener Name" (local time).
+    /// Scenario "Suggested name" (local time).
     @Test func suggestedName() throws {
         let date = try #require(Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: 19, hour: 14, minute: 5)))
         #expect(SupportPackageBuilder.suggestedFileName(for: date) == "myTracks-Loader-Support-20261119-1405.zip")
     }
 
-    /// Scenario "Inhalt abgewählt"; Bluetooth is left out when it is not available.
+    /// Scenario "Content deselected"; Bluetooth is left out when it is not available.
     @Test func deselectedParts() async throws {
         let fixture = Fixture()
         defer { try? FileManager.default.removeItem(at: fixture.directory) }

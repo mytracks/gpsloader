@@ -80,7 +80,7 @@ public struct CaptureStore: Sendable {
 }
 
 /// The capture of one operation: the recorder gets the header at once, `finish()` stores it whatever the
-/// outcome of the operation was (spec `diagnostic-capture`, "Aufzeichnung immer aktiv").
+/// outcome of the operation was (spec `diagnostic-capture`, "Capture always on").
 public struct OperationCapture: Sendable {
     public let recorder: CaptureRecorder
     public let store: CaptureStore

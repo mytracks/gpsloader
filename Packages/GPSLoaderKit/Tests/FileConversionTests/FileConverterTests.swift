@@ -58,7 +58,7 @@ private func points(_ recording: Recording) -> [TrackPoint] {
 
 @Suite("FileConverter – plan")
 struct FileConverterPlanTests {
-    /// Scenario "NMEA mit Endung .LOG".
+    /// Scenario "NMEA with extension .LOG".
     @Test func nmeaWithLogExtension() throws {
         let files = try TempFiles()
         let plan = try FileConverter.plan(for: [try files.file("GPS_20261102.LOG", nmeaTrack(count: 5))])
@@ -66,7 +66,7 @@ struct FileConverterPlanTests {
         #expect(plan.unrecognized.isEmpty)
     }
 
-    /// Scenario "Eine von drei Dateien unbekannt".
+    /// Scenario "One of three files unknown".
     @Test func oneOfThreeUnknown() throws {
         let files = try TempFiles()
         let jpeg = Data([0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46])
@@ -82,7 +82,7 @@ struct FileConverterPlanTests {
         #expect(plan.excludingUnrecognized().groups.count == 1)
     }
 
-    /// Scenario "Nur unbekannte Dateien".
+    /// Scenario "Only unknown files".
     @Test func onlyUnknownFiles() throws {
         let files = try TempFiles()
         let plan = try FileConverter.plan(for: [try files.file("doc.pdf", "%PDF-1.7\n%âãÏÓ\n")])
@@ -123,7 +123,7 @@ struct FileConverterConvertTests {
         try await FileConverter.convert(try FileConverter.plan(for: urls), referenceDate: reference)
     }
 
-    /// Scenario "Zwei NMEA-Dateien".
+    /// Scenario "Two NMEA files".
     @Test func twoNMEAFiles() async throws {
         let files = try TempFiles()
         let result = try await convert([try files.file("a.nmea", nmeaTrack(count: 100)),
@@ -133,7 +133,7 @@ struct FileConverterConvertTests {
         #expect(points(result.recording).count == 200)
     }
 
-    /// Scenario "Gemischte Formate".
+    /// Scenario "Mixed formats".
     @Test func mixedFormats() async throws {
         let files = try TempFiles()
         let track = "<trk><name>From GPX</name><trkseg><trkpt lat=\"1\" lon=\"2\"/><trkpt lat=\"1.1\" lon=\"2.1\"/></trkseg></trk>"
@@ -141,7 +141,7 @@ struct FileConverterConvertTests {
         #expect(result.recording.tracks.map(\.name) == ["From GPX", "b"])
     }
 
-    /// Scenario "Nur Wegpunkte".
+    /// Scenario "Only waypoints".
     @Test func onlyWaypoints() async throws {
         let files = try TempFiles()
         let result = try await convert([try files.file("w.gpx", gpx(waypoints(12)))])
@@ -157,7 +157,7 @@ struct FileConverterConvertTests {
         #expect(result.recording.waypoints.count == 3)
     }
 
-    /// Scenario "Alter Logger mit Wochenüberlauf".
+    /// Scenario "Old logger with week rollover".
     @Test func weekRolloverIsCorrected() async throws {
         let files = try TempFiles()
         let result = try await convert([try files.file("old.nmea", nmeaTrack(count: 3, date: "150307"))])
@@ -165,7 +165,7 @@ struct FileConverterConvertTests {
         #expect(points(result.recording).first?.time == expected)
     }
 
-    /// Scenario "Name vorschlagen".
+    /// Scenario "Suggest a name".
     @Test func suggestedName() {
         let urls = [URL(fileURLWithPath: "/tmp/flug1.igc"), URL(fileURLWithPath: "/tmp/flug2.igc")]
         #expect(FileConverter.suggestedFileName(for: urls) == "flug1.gpx")
@@ -173,7 +173,7 @@ struct FileConverterConvertTests {
         #expect(FileConverter.suggestedFileName(for: []) == "GPS.gpx")
     }
 
-    /// Scenario "Keine Positionen".
+    /// Scenario "No positions".
     @Test func noPositions() async throws {
         let files = try TempFiles()
         let text = (0..<5).map { _ in nmea("GPRMC,120000,V,,,,,,,021126,,,N") }.joined(separator: "\n")
@@ -182,7 +182,7 @@ struct FileConverterConvertTests {
         }
     }
 
-    /// Scenario "Kaputte GPX-Datei".
+    /// Scenario "Broken GPX file".
     @Test func malformedGPX() async throws {
         let files = try TempFiles()
         let text = "<?xml version=\"1.0\"?>\n<gpx version=\"1.1\">\n<wpt lat=\"1\" lon=\"2\">\n</gpx>\n"
@@ -207,7 +207,7 @@ struct FileConverterConvertTests {
         }
     }
 
-    /// Scenario "Große Datei abbrechen".
+    /// Scenario "Cancel a large file".
     @Test func cancellationStopsSoon() async throws {
         let files = try TempFiles()
         let line = nmea("GPGGA,120000,5144.4694,N,00840.8580,E,1,08,0.9,94.5,M,47.0,M,,") + "\n"

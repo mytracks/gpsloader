@@ -50,7 +50,7 @@ enum MainMenuBuilder {
         return item
     }
 
-    /// "Ablage" menu (spec `file-conversion`, "Dateien auswählen"). The action goes through the responder chain
+    /// "File" menu (spec `file-conversion`, "Choose files"). The action goes through the responder chain
     /// to the main window controller.
     private static func makeFileMenuItem() -> NSMenuItem {
         let item = NSMenuItem()
@@ -70,7 +70,6 @@ enum MainMenuBuilder {
         return item
     }
 
-    /// "Diagnose" menu (spec `diagnostic-capture`).
     /// "Help" with "Create Support Package…" (spec `support-package`).
     private static func makeHelpMenuItem() -> NSMenuItem {
         let item = NSMenuItem()
@@ -83,7 +82,7 @@ enum MainMenuBuilder {
         return item
     }
 
-    /// "View" with the two sections of the main window (spec `app-shell`, "Bereiche des Hauptfensters").
+    /// "View" with the two sections of the main window (spec `app-shell`, "Sections of the main window").
     private static func makeViewMenuItem() -> NSMenuItem {
         let item = NSMenuItem()
         let menu = NSMenu(title: String(localized: "View"))

@@ -1,49 +1,49 @@
 # bluetooth-transport Specification
 
 ## Purpose
-Verbindet gpsloader über IOBluetooth mit einem gekoppelten Bluetooth-Gerät, indem es den RFCOMM-Kanal eines benannten SDP-Dienstes öffnet. Das gilt für Logger, die nicht über `/dev/cu.*` laufen, etwa den GNS 2000.
+Connects myTracks Loader through IOBluetooth to a paired Bluetooth device by opening the RFCOMM channel of a named SDP service. This applies to loggers that do not work through `/dev/cu.*`, such as the GNS 2000.
 
 ## Requirements
 
-### Requirement: Gerät und Dienst finden
-Der Transport SHALL unter den gekoppelten Bluetooth-Geräten das erste mit einem der vorgegebenen Namen suchen. Eine bestehende Verbindung SHALL er schließen und neu aufbauen. Dann SHALL er per SDP-Abfrage den Dienst mit dem vorgegebenen Namen suchen und dessen RFCOMM-Kanal öffnen. Fehlt das Gerät, der Dienst oder der Kanal, MUST das Öffnen mit dem Fehler „Gerät nicht gefunden“ und einem Hinweis enden.
+### Requirement: Find device and service
+The transport SHALL look for the first paired Bluetooth device with one of the given names. It SHALL close an existing connection and open it again. Then it SHALL look for the service with the given name through an SDP query and open its RFCOMM channel. If the device, the service or the channel is missing, opening MUST end with the error "device not found" and a hint.
 
-#### Scenario: Gerät nicht gekoppelt
-- **WHEN** kein gekoppeltes Gerät „GNS 2000“ oder „GNS 2000 plus“ heißt
-- **THEN** endet der Vorgang mit „Gerät nicht gefunden“ und dem Hinweis, das Gerät in den Systemeinstellungen zu koppeln
+#### Scenario: Device not paired
+- **WHEN** no paired device is called "GNS 2000" or "GNS 2000 plus"
+- **THEN** the operation ends with "device not found" and the hint to pair the device in System Settings
 
-#### Scenario: Dienst fehlt
-- **WHEN** das Gerät keinen Dienst „GNS GPS“ meldet
-- **THEN** endet der Vorgang mit „Gerät nicht gefunden“, und der Detailtext nennt den gesuchten Dienst
+#### Scenario: Service missing
+- **WHEN** the device reports no service "GNS GPS"
+- **THEN** the operation ends with "device not found", and the detail text names the service looked for
 
-### Requirement: Zeitlimits beim Verbinden
-Verbindungsaufbau und SDP-Abfrage SHALL zusammen höchstens 20 Sekunden dauern, sonst MUST der Vorgang mit einer Zeitüberschreitung enden. Ein Abbruch durch den Anwender SHALL das Warten sofort beenden und die Verbindung schließen.
+### Requirement: Time limits when connecting
+Connecting and the SDP query together SHALL take at most 20 seconds, otherwise the operation MUST end with a timeout. A cancellation by the user SHALL end the wait at once and close the connection.
 
-#### Scenario: Gerät ausgeschaltet
-- **WHEN** das gekoppelte Gerät ausgeschaltet ist
-- **THEN** endet der Vorgang spätestens nach 20 Sekunden mit einer Zeitüberschreitung
+#### Scenario: Device switched off
+- **WHEN** the paired device is switched off
+- **THEN** the operation ends with a timeout after 20 seconds at the latest
 
-### Requirement: Daten übertragen
-Der Transport SHALL die Schnittstelle `ByteTransport` erfüllen: Schreiben in Stücken bis zur MTU des Kanals sowie Lesen einer Anzahl Bytes oder bis zu einem Endezeichen, je mit Stille-Zeitlimit. Empfangene Daten SHALL er puffern, bis sie gelesen werden. Wird der Kanal vom Gerät geschlossen, MUST eine wartende Leseanforderung mit einem Fehler enden.
+### Requirement: Transfer data
+The transport SHALL fulfil the interface `ByteTransport`: writing in chunks up to the MTU of the channel and reading a number of bytes or up to a terminator, each with a silence timeout. It SHALL buffer received data until it is read. If the device closes the channel, a waiting read MUST end with an error.
 
-#### Scenario: Zeilen in mehreren Paketen
-- **WHEN** eine Zeile in zwei RFCOMM-Paketen ankommt
-- **THEN** liefert das Lesen bis CR LF die ganze Zeile
+#### Scenario: Lines in several packets
+- **WHEN** a line arrives in two RFCOMM packets
+- **THEN** reading up to CR LF returns the whole line
 
-#### Scenario: Gerät trennt die Verbindung
-- **WHEN** das Gerät den Kanal während des Lesens schließt
-- **THEN** endet das Lesen mit einem Fehler statt mit einer Zeitüberschreitung
+#### Scenario: Device disconnects
+- **WHEN** the device closes the channel while reading
+- **THEN** reading ends with an error instead of a timeout
 
-### Requirement: Schließen
-Nach dem Vorgang SHALL der Transport den RFCOMM-Kanal und die Verbindung zum Gerät schließen, auch nach Fehlern und Abbruch. Mehrfaches Schließen MUST unschädlich sein.
+### Requirement: Close
+After the operation the transport SHALL close the RFCOMM channel and the connection to the device, also after errors and cancellation. Closing several times MUST be harmless.
 
-#### Scenario: Abbruch beim Lesen
-- **WHEN** der Anwender während des Auslesens abbricht
-- **THEN** sind Kanal und Verbindung danach geschlossen
+#### Scenario: Cancel while reading
+- **WHEN** the user cancels while reading
+- **THEN** channel and connection are closed afterwards
 
-### Requirement: Bluetooth-Berechtigung
-Die App SHALL eine Begründung für den Bluetooth-Zugriff (de/en) mitbringen, die macOS bei der ersten Nutzung anzeigt. Verweigert der Anwender den Zugriff, MUST der Vorgang mit „Gerät nicht gefunden“ und dem Hinweis auf die Datenschutz-Einstellungen enden.
+### Requirement: Bluetooth permission
+The app SHALL bring an explanation for Bluetooth access (de/en) that macOS shows at the first use. If the user denies access, the operation MUST end with "device not found" and the hint to the privacy settings.
 
-#### Scenario: Zugriff verweigert
-- **WHEN** der Anwender den Bluetooth-Zugriff für gpsloader verweigert hat
-- **THEN** nennt die Fehlermeldung die Einstellung „Datenschutz & Sicherheit > Bluetooth“
+#### Scenario: Access denied
+- **WHEN** the user has denied Bluetooth access for myTracks Loader
+- **THEN** the error message names the setting "Privacy & Security > Bluetooth"
